@@ -1,0 +1,122 @@
+---
+import RhineMark from './RhineMark.astro'
+
+interface Props {
+  isHome?: boolean
+}
+
+const { isHome = false } = Astro.props
+---
+
+<!--
+  莱茵生命启动动画：仅在首页首次进入 / 从「风格入口」选择莱茵档案 / ?intro=1 时播放。
+  无 JS 时默认 hidden，不阻塞阅读；prefers-reduced-motion 直接跳过。
+-->
+<div id="rhine-boot" class="rhine-boot" data-home={isHome ? '1' : '0'} hidden>
+  <div class="rhine-boot__frame" aria-hidden="true"></div>
+  <div class="rhine-boot__panel">
+    <div class="rhine-boot__mark">
+      <RhineMark size={52} />
+    </div>
+    <p class="rhine-boot__kicker">RHINE LAB // FIELD ARCHIVE</p>
+    <p class="rhine-boot__title">莱茵档案</p>
+    <div class="rhine-boot__lines" aria-hidden="true">
+      <span><i></i>CALIBRATING FIELD SENSORS<b>OK</b></span>
+      <span><i></i>MOUNTING DOSSIERS<b>08</b></span>
+      <span><i></i>SYNCING PERSONAL ARCHIVE<b>OK</b></span>
+      <span><i></i>ACCESS GRANTED<b>07</b></span>
+    </div>
+    <div class="rhine-boot__bar" aria-hidden="true"><i></i></div>
+    <button class="rhine-boot__skip" type="button" aria-label="跳过启动动画">跳过 / SKIP</button>
+  </div>
+</div>
+
+<script is:inline>
+  ;(() => {
+    const boot = document.getElementById('rhine-boot')
+    if (!boot || boot.dataset.home !== '1') {
+      boot?.remove()
+      return
+    }
+
+    const read = (storage, key) => {
+      try {
+        return storage.getItem(key)
+      } catch {
+        return null
+      }
+    }
+    const write = (storage, key, value) => {
+      try {
+        storage.setItem(key, value)
+      } catch {
+        /* 隐私模式下忽略 */
+      }
+    }
+    const remove = (storage, key) => {
+      try {
+        storage.removeItem(key)
+      } catch {
+        /* 忽略 */
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search)
+    const forced = params.get('intro') === '1'
+    const debugHold = params.get('bootdebug') === '1'
+    const enabled = read(localStorage, 'rhine-boot-enabled') !== '0'
+    const sessionPlay = read(sessionStorage, 'rhine-boot-play') === '1'
+    const seen = read(sessionStorage, 'rhine-boot-seen') === '1'
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const shouldPlay = enabled && (forced || sessionPlay || !seen)
+    if (!shouldPlay || reduced) {
+      boot.remove()
+      if (forced) {
+        history.replaceState(null, '', window.location.pathname + window.location.hash)
+      }
+      return
+    }
+
+    write(sessionStorage, 'rhine-boot-seen', '1')
+    remove(sessionStorage, 'rhine-boot-play')
+    if (forced) {
+      history.replaceState(null, '', window.location.pathname + window.location.hash)
+    }
+
+    boot.hidden = false
+    document.documentElement.classList.add('rhine-booting')
+    // 触发一次 reflow，让入场动画从初始状态开始
+    void boot.offsetHeight
+    boot.classList.add('is-active')
+
+    let finished = false
+    const finish = () => {
+      if (finished) return
+      finished = true
+      boot.classList.remove('is-active')
+      boot.classList.add('is-leaving')
+      const done = () => {
+        boot.remove()
+        document.documentElement.classList.remove('rhine-booting')
+      }
+      window.setTimeout(done, 560)
+    }
+
+    const timer = window.setTimeout(finish, debugHold ? 30000 : 2600)
+    boot.querySelector('.rhine-boot__skip')?.addEventListener('click', () => {
+      window.clearTimeout(timer)
+      finish()
+    })
+    window.addEventListener(
+      'keydown',
+      event => {
+        if (['Escape', 'Enter', ' '].includes(event.key)) {
+          window.clearTimeout(timer)
+          finish()
+        }
+      },
+      { once: true },
+    )
+  })()
+</script>

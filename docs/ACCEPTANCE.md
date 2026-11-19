@@ -1,4 +1,4 @@
-# 验收记录 · 黯的博客 · Rhine Archive v0.5.0
+# 验收记录 · 黯的博客 · Rhine Archive v0.6.0
 
 > 本文件记录最终交付版本的验收命令、实测结果与已知限制，便于接手者复现与核对。
 > 版本号以 `package.json` 与 `release/` 下最新 MANIFEST 为准。
@@ -22,20 +22,21 @@ node scripts/package.mjs       # 生成 zip + MANIFEST
 node scripts/verify-release.mjs --full --build   # 清单一致性 + 解压包自测 + 文档门禁 + 解压后 astro build + check-links
 ```
 
-## 3. 实测结果（v0.5.0 · 作者博客 + CI + Pages）
+## 3. 实测结果（v0.6.0 · 作者博客 + 引导页/动画 + CI + Pages）
 
 - `pnpm verify`：**18/18 通过**；`astro check` 89 files 0/0/0。
-- 页面与索引：**48 个 HTML 页**（46 个参与 SEO；第三方静态小游戏页除外）/ 46 唯一标题 / 15 段 JSON-LD / 44 canonical / 46 张 OG / 44 条 sitemap URL / **7 篇文章** / 4 分类 / 16 标签。
-- 链接与无障碍：**2886 站内链接 / 309 锚点 / 304 资源** 0 断链；无障碍 **48 页**通过 17 条规则，fixture 自测命中 9 类提示。
+- 页面与索引：**49 个 HTML 页**（47 个参与 SEO；第三方静态小游戏页除外）/ 47 唯一标题 / 15 段 JSON-LD / 45 canonical / 47 张 OG / 45 条 sitemap URL / **7 篇文章** / 4 分类 / 16 标签。
+- 链接与无障碍：**3034 站内链接 / 309 锚点 / 312 资源** 0 断链；无障碍 **49 页**通过 17 条规则，fixture 自测命中 9 类提示。
 - Feed：RSS 2.0 6 items + JSON Feed 1.1 6 items；GUID/id 唯一、绝对地址、自引用与 URL 契约校验通过。
-- 体积预算：总产物 **11498 KB / 12800 KB（90%）**、JS 87%、CSS 91%、字体 73%、单页最大 **145.0 KB / 160 KB（91%）**、OG 60%、**75 张 `<img>` 全部带 width/height**。
+- 体积预算：总产物 **11724 KB / 12800 KB（92%）**、JS 87%、CSS 94%、字体 73%、单页最大 **149.4 KB / 160 KB（93%）**、OG 60%、**79 张 `<img>` 全部带 width/height**。
 - 子路径部署：`BASE_PATH=/rhine-test/` 构建 + 断链/SEO/Feed 检查全过，并恢复默认构建。
 - 解压包自身可构建：`--build` 下解压 zip → 复用 `node_modules` → `astro build` 通过 → 构建后 `check-links --strict` 通过。
 - GitHub Actions：`verify.yml`（18 步 + 子路径 + 打包 + 解压构建）与 `pages.yml`（构建 + Actions 部署）均全绿。
 - **博客内容**：7 篇文章（2 篇安全研究长文）、关于页、头像、友链与静态小游戏页面已完整迁移（v0.5.0）。
+- **引导与动效**：`/start/` 三风格入口、莱茵启动序列、英雄区入场动画（v0.6.0；尊重 reduced-motion，可跳过）。
 - **在线演示（GitHub Pages）**：<https://mayuxiao2021.github.io/rhinelab-blog/>（`BASE_PATH=/rhinelab-blog/`；备用域 <https://github.glmyx.eu.org/rhinelab-blog/>）。
 - 运行时采样（本机 Chromium，静态服务）：FCP **164ms**、load **320ms**、44 资源 / 255KB、DOM 632 节点。
-- 版本沿革：**136 条迭代记录**（Iteration 0–135），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
+- 版本沿革：**137 条迭代记录**（Iteration 0–136），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
 
 ## 4. 已知限制
 

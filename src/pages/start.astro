@@ -1,0 +1,166 @@
+---
+import Layout from '@layouts/Layout.astro'
+import RhineMark from '@components/rhine/RhineMark.astro'
+import { siteConfig } from '@/config'
+import { url } from '@utils/url-utils'
+
+const legacyUrl = 'https://github.glmyx.eu.org/'
+
+const styles = [
+  {
+    id: 'rhine',
+    kicker: '01 / RHINE ARCHIVE',
+    title: '莱茵档案',
+    desc: '当前的莱茵生命主题：暖纸质档案、双角色英雄区、组织与设施图录，进入时播放一段启动序列。',
+    meta: ['暖纸 / 黄铜', '亮暗双模式', '启动动画'],
+    href: url('/?intro=1'),
+    cta: '带启动动画进入',
+    featured: true,
+  },
+  {
+    id: 'dossier',
+    kicker: '02 / DOSSIER',
+    title: '研究员名录',
+    desc: '8 位莱茵生命干员的档案卡与大型立绘，适合先看主题的视觉密度与信息排版。',
+    meta: ['8 位干员', '立绘 / 档案', '非商业演示'],
+    href: url('/operators/'),
+    cta: '进入名录',
+    featured: false,
+  },
+  {
+    id: 'legacy',
+    kicker: '03 / LEGACY',
+    title: '旧版博客',
+    desc: '迁移前的 Fuwari 原版界面，保留在同一域名的根路径，方便对照两套阅读体验。',
+    meta: ['Fuwari 原版', '根域名', '外部页面'],
+    href: legacyUrl,
+    cta: '前往旧版',
+    featured: false,
+    external: true,
+  },
+] as const
+---
+
+<Layout
+  title="选择界面风格"
+  description="进入黯的博客前先选择界面：莱茵档案主题（含启动动画）、研究员名录演示，或旧版 Fuwari 博客。"
+>
+  <div class="rl-start">
+    <header class="rl-start__bar">
+      <a class="rl-start__brand" href={url('/')}>
+        <RhineMark size={26} />
+        <span>
+          <b>{siteConfig.title}</b>
+          <i>RHINE ARCHIVE / SELECT INTERFACE</i>
+        </span>
+      </a>
+      <a class="rl-start__back" href={url('/')} data-no-swup>直接进入博客 →</a>
+    </header>
+
+    <main id="swup-container" tabindex="-1" class="rl-start__main">
+      <p class="rl-kicker rl-start__kicker">START / 引导</p>
+      <h1 class="rl-start__title">选择你的界面<span>.</span></h1>
+      <p class="rl-start__lede">
+        同一份内容，三种入口。莱茵档案提供完整的启动序列与档案氛围；名录适合直接看视觉；
+        旧版保留原来的 Fuwari 阅读体验。
+      </p>
+
+      <div class="rl-start__grid">
+        {
+          styles.map(style => (
+            <a
+              class:list={['rl-style-card', { 'rl-style-card--featured': style.featured }]}
+              href={style.href}
+              {...('external' in style && style.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              {...(!('external' in style && style.external) ? { 'data-no-swup': '' } : {})}
+              data-style={style.id}
+            >
+              <span class="rl-style-card__kicker">{style.kicker}</span>
+
+              {style.id === 'rhine' && (
+                <span class="rl-style-card__preview rl-style-card__preview--rhine" aria-hidden="true">
+                  <span class="rl-style-card__chrome"><i /><i /><i /></span>
+                  <img
+                    src={url('/rhine/art/card-muelsyse.webp')}
+                    alt=""
+                    width="700"
+                    height="700"
+                    loading="lazy"
+                  />
+                  <span class="rl-style-card__mock-copy">
+                    <i class="w-70" />
+                    <i class="w-92" />
+                    <i class="w-56" />
+                    <i class="w-40 rl-style-card__mock-btn" />
+                  </span>
+                </span>
+              )}
+
+              {style.id === 'dossier' && (
+                <span class="rl-style-card__preview rl-style-card__preview--dossier" aria-hidden="true">
+                  <img src={url('/rhine/art/card-saria.webp')} alt="" width="700" height="700" loading="lazy" />
+                  <img src={url('/rhine/art/card-muelsyse.webp')} alt="" width="700" height="700" loading="lazy" />
+                  <img src={url('/rhine/art/card-ifrit.webp')} alt="" width="700" height="700" loading="lazy" />
+                </span>
+              )}
+
+              {style.id === 'legacy' && (
+                <span class="rl-style-card__preview rl-style-card__preview--legacy" aria-hidden="true">
+                  <span class="rl-style-card__chrome"><i /><i /><i /></span>
+                  <span class="rl-style-card__legacy-card" />
+                  <span class="rl-style-card__legacy-card" />
+                  <span class="rl-style-card__legacy-card" />
+                </span>
+              )}
+
+              <span class="rl-style-card__body">
+                <b class="rl-style-card__title">{style.title}</b>
+                <span class="rl-style-card__desc">{style.desc}</span>
+                <span class="rl-style-card__meta">
+                  {style.meta.map(item => (
+                    <i>{item}</i>
+                  ))}
+                </span>
+                <span class="rl-style-card__cta">{style.cta} →</span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+
+      <div class="rl-start__toolbar">
+        <label class="rl-start__toggle">
+          <input id="rl-boot-toggle" type="checkbox" checked />
+          <span class="rl-start__toggle-track" aria-hidden="true"><i /></span>
+          <span>进入莱茵档案时播放启动动画</span>
+        </label>
+        <a class="rl-start__replay" href={url('/?intro=1')} data-no-swup>重播启动动画</a>
+      </div>
+
+      <p class="rl-start__note">
+        偏好会保存在本机浏览器；关闭动画后仍可通过上面的链接手动重播。系统开启「减少动态效果」时动画自动跳过。
+      </p>
+    </main>
+
+    <footer class="rl-start__foot">
+      <span>{siteConfig.title} / {siteConfig.subtitle}</span>
+      <span>MIT CODE · CC BY-NC-SA CONTENT</span>
+    </footer>
+  </div>
+</Layout>
+
+<script is:inline>
+  ;(() => {
+    const toggle = document.getElementById('rl-boot-toggle')
+    if (!toggle) return
+    try {
+      const saved = localStorage.getItem('rhine-boot-enabled')
+      toggle.checked = saved !== '0'
+      toggle.addEventListener('change', () => {
+        localStorage.setItem('rhine-boot-enabled', toggle.checked ? '1' : '0')
+      })
+    } catch {
+      /* 隐私模式忽略 */
+    }
+  })()
+</script>

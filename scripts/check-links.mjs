@@ -131,7 +131,8 @@ for (const htmlFile of htmlFiles) {
     if (eventAttr(href)) continue
     stats.links++
 
-    const pathname = stripHash(href)
+    // 查询串只影响运行时行为，不参与静态文件存在性判断
+    const pathname = stripHash(href.split('?')[0])
     const hash = href.includes('#') ? href.split('#')[1] : ''
     let targetFile = htmlFile
     if (pathname) {

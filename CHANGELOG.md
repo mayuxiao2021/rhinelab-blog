@@ -2,6 +2,22 @@
 
 本项目的变更记录，遵循「每轮迭代至少修一个严重 bug 或加一个创新点」的节奏。
 
+## [0.6.0] — 2026-11-19
+
+### 界面引导页 + 莱茵启动动画
+
+- 新增 `/start/` 设计：三种界面入口卡片（莱茵档案 / 研究员名录 / 旧版 Fuwari 博客），带 CSS mock 预览、启动动画开关与重播入口；导航新增「入口」，页脚、关于页与站点索引同步收录
+- 新增莱茵启动序列 `RhineBoot.astro`：全屏终端式 boot（旋转徽记、逐行加载、进度条、跳过），支持 `?intro=1`、首次进入播放、`rhine-boot-enabled` 开关、`prefers-reduced-motion` 直接跳过；`?bootdebug=1` 保留 30s 便于验收截图
+- 首页英雄区加入分层入场动画（back/mid/front 立绘 + 内容 + 斜向扫光），移动端与 reduced-motion 自动降级
+- 修复：`/start/` 是独立 Layout，进出该页与 Swup 容器结构不兼容 → 导航/页脚/卡片链接加 `data-no-swup` 强制整页加载
+- 修复：`check-links` 未剥离查询串，`/?intro=1` 被误判为断链（B72）
+- 修复：`/start/` 缺少 `#swup-container` 导致 skip link 锚点失效
+
+### 文档 / 门禁
+
+- 新增 4 张截图（引导亮/暗、启动序列、移动端引导），更新 README 预览与体积表
+- `pnpm verify` 18 步、`pnpm test:subpath` 全绿：49 HTML 页 / 47 SEO 页 / 3034 链接 0 断链 / 79 张图带尺寸 / 预算 92%
+
 ## [0.5.0] — 2026-11-19
 
 ### 作者博客完整迁移（黯）

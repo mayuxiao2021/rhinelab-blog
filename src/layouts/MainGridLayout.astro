@@ -6,6 +6,8 @@ import SideBar from '@components/widget/SideBar.astro'
 import { Icon } from 'astro-icon/components'
 import { siteConfig } from '../config'
 import Layout from './Layout.astro'
+import RhineBoot from '@components/rhine/RhineBoot.astro'
+import { url, pathsEqual } from '@utils/url-utils'
 
 interface Props {
   title?: string
@@ -16,6 +18,7 @@ interface Props {
 }
 
 const { title, banner, description, image, noindex } = Astro.props
+const isHomePage = pathsEqual(Astro.url.pathname, url('/'))
 const hasBannerCredit =
   siteConfig.banner.enable && siteConfig.banner.credit.enable
 const hasBannerLink = !!siteConfig.banner.credit.url
@@ -59,4 +62,5 @@ const hasBannerLink = !!siteConfig.banner.credit.url
     </div>
     <BackToTop></BackToTop>
 </div>
+    <RhineBoot isHome={isHomePage} />
 </Layout>

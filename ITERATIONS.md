@@ -3462,3 +3462,32 @@
 - `pnpm test:subpath` 通过（base-aware 友链、OG、RSS）。
 - 浏览器实测：首页（7 篇）、关于、文章正文、项目索引亮暗均正常；截图更新至 `docs/screenshots/`。
 - 待本次推送后由 GitHub Actions `verify` + `pages` 复核并发布。
+
+## Iteration 136 — 界面引导页 + 莱茵启动动画（15:43–17:00）
+
+### 需求
+
+「做个引导页面，可以选择哪种风格，为莱茵生命添加进入动画」。
+
+### 实现
+
+- **`/start/` 引导页**：全屏暖纸/暗色设计，三张风格卡（莱茵档案 / 研究员名录 / 旧版博客）带 CSS mock 预览；
+  启动动画开关写入 `localStorage`，可手动重播；导航「入口」、页脚 STYLE、关于枢纽与站点索引均可达。
+- **莱茵启动序列**：`RhineBoot.astro` 全屏终端 boot（旋转徽记 / 逐行状态 / 进度条 / SKIP），
+  触发条件：首次进入首页、`?intro=1`、引导页选择莱茵；`rhine-boot-enabled=0` 关闭；
+  `prefers-reduced-motion` 直接跳过；`?bootdebug=1` 保留 30 秒供截图验收。
+- **英雄区入场**：back/mid/front 三层立绘 + 内容块依次淡入，斜向扫光一次；移动端与 reduced-motion 降级。
+- **入口动效**：引导页卡片 hover 抬升、开关滑块、启动序列网格/角标样式。
+
+### 迭代内修复
+
+1. `/start/` 独立 Layout 与 Swup `#swup-container` 结构不兼容，导航进/出会残留旧页外壳 → 相关链接加 `data-no-swup` 强制整页加载（Navbar、移动菜单、引导页卡片/返回/重播）。
+2. `check-links` 未剥离 `?query`，`/?intro=1` 被误报断链 → 解析文件前先 `split('?')`（B72）。
+3. 引导页缺 `#swup-container` 导致 skip link 锚点失效 → 给 `<main>` 补 id。
+4. 全屏启动序列无 JS 时不能阻塞页面 → 默认 `hidden`，脚本满足条件才显示；减少动态偏好直接跳过。
+
+### 验证
+
+- `pnpm verify` 18 步全绿：49 HTML 页 / 47 SEO 页 / 3034 链接 0 断链 / 49 页无障碍 / RSS 7 items / 预算 92%（11724/12800 KB）、79 张图带尺寸。
+- `pnpm test:subpath` 通过（`/rhinelab-blog/?intro=1` 链接、引导页资源均带 base）。
+- 浏览器实测：引导页亮/暗、启动序列（36s 保持）、移动端 390px；导航进/出引导页均整页加载；英雄区入场动画计算样式生效。

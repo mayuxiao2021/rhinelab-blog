@@ -60,6 +60,11 @@ export const navBarConfig: NavBarConfig = {
       external: false,
     },
     {
+      name: '入口',
+      url: '/start/',
+      external: false,
+    },
+    {
       name: 'GitHub',
       url: 'https://github.com/mayuxiao2021/rhinelab-blog',
       external: true,

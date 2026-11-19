@@ -34,8 +34,10 @@ const links: NavBarLink[] = navBarConfig.links.map(
         </a>
         <div class="hidden md:flex">
             {links.map((l) => {
+                const isStartLink = !l.external && /^\/?start\/?$/.test(l.url)
                 return <a aria-label={l.name} href={l.external ? l.url : url(l.url)} target={l.external ? "_blank" : null}
                           rel={l.external ? "noopener noreferrer" : null}
+                          data-no-swup={isStartLink ? '' : undefined}
                           class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
                 >
                     <div class="flex items-center">

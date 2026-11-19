@@ -5,12 +5,12 @@
 
 ## 当前状态
 
-- 版本：**v0.5.0**（`package.json`）
-- 阶段：**v0.5.0 / 黯的博客正式上线**——作者博客（7 篇）已完整迁移到莱茵档案主题并部署 GitHub Pages
-- 本轮：Iteration 135（作者博客完整迁移 + 8 类迁移 bug 修复）
+- 版本：**v0.6.0**（`package.json`）
+- 阶段：**v0.6.0 / 界面引导页 + 启动动画**——/start/ 三风格入口、莱茵 boot 序列与英雄区入场动画已上线
+- 本轮：Iteration 136（作者博客完整迁移 + 8 类迁移 bug 修复）
 - 下一轮候选：见 `ITERATIONS.md` 末尾「下一轮候选」
-- 交付物：`release/rhinelab-blog-v0.5.0.zip`（326 文件）、`docs/MILESTONE-100.md`、README 与 `docs/` 全套
-- 当前指标：**18 步 verify 全绿** · 48 HTML 页 / 44 sitemap URL / 326 包文件 · 预算 90%（11498/12800 KB）
+- 交付物：`release/rhinelab-blog-v0.6.0.zip`（326 文件）、`docs/MILESTONE-100.md`、README 与 `docs/` 全套
+- 当前指标：**18 步 verify 全绿** · 49 HTML 页 / 45 sitemap URL · 预算 92%（11724/12800 KB）
 
 ## 关键命令
 

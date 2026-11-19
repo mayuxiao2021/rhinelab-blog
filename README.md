@@ -54,6 +54,14 @@
 | --- | --- |
 | ![文章正文](docs/screenshots/blog-post-light.webp) | ![项目索引](docs/screenshots/blog-gallery-light.webp) |
 
+| 界面引导 `/start/` · 亮色 | 界面引导 · 暗色 |
+| --- | --- |
+| ![界面引导亮色](docs/screenshots/start-light.webp) | ![界面引导暗色](docs/screenshots/start-dark.webp) |
+
+| 莱茵启动序列（`?intro=1` / 首次进入） | 移动端引导 390px |
+| --- | --- |
+| ![启动序列](docs/screenshots/boot-sequence.webp) | ![移动端引导](docs/screenshots/start-mobile.webp) |
+
 ### 归档与文章
 
 | 首页 · 亮色 | 首页 · 暗色 |
@@ -144,7 +152,7 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.5.0 真实构建产物，无后期合成。
+> 截图来自 v0.6.0 真实构建产物，无后期合成。
 
 ## 它是什么
 
@@ -211,7 +219,7 @@ pnpm preview
 | --- | --- | --- |
 | dist 总产物 | ≈ 11.5 MB | 含 7 篇文章、搜索索引、2.4 MB 非商业演示立绘与作者静态小游戏；预算 12.5 MB |
 | JS 合计 | ≈ 3.75 MB | 大头是 Mermaid 各图表类型分块（按需加载） |
-| CSS 合计 | ≈ 382 KB | Tailwind + 主题 + KaTeX + Fuwari |
+| CSS 合计 | ≈ 393 KB | Tailwind + 主题 + KaTeX + Fuwari |
 | 字体（woff2） | ≈ 377 KB | Roboto 仅 latin 子集；中文走系统字体 |
 
 - **Mermaid 按需加载**：`mermaid.core` 约 600 KB，flowchart 依赖约 0.8–2 MB（视图表类型），只有页面包含图表时才会下载；不需要图表可删除 `src/components/misc/Markdown.astro` 里的 Mermaid 初始化与 `mermaid` 依赖。
@@ -269,6 +277,8 @@ theme/                # 可移植主题包 + 安装器（见 theme/README.md）
 - [x] PWA：构建期 manifest 与应用图标（180/192/512，自制 SVG 栅格化）
 - [x] 文章分享 / 引用复制 / MD 引用 / 打印 PDF（触屏系统分享、跨 Swup 事件委托）
 - [x] 作者博客内容已迁移：7 篇文章（含 2 篇安全研究长文）、关于页、头像、友链与静态小游戏页面
+- [x] 界面引导 `/start/`：三种入口（莱茵档案 / 研究员名录 / 旧版博客）+ 启动动画开关
+- [x] 莱茵生命启动序列（首屏 overlay，可跳过、尊重 reduced-motion）+ 英雄区人物/扫光入场动画
 - [x] 演示站：首页英雄区（双角色立绘 + 组织/设施/研究员区块）与 `/operators/` 研究员名录
 - [x] 随机档案 `/random/`（随机跳转、`?no=1` 预览兜底）
 - [x] 版本沿革页 `/changelog/`（构建期读取 CHANGELOG.md，版本锚点）
@@ -328,7 +338,7 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.5.0**（`package.json`）
+- 当前版本 **v0.6.0**（`package.json`）
 - 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
 - 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。
