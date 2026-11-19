@@ -2,6 +2,7 @@
 import WidgetLayout from "./WidgetLayout.astro";
 import ButtonLink from "../control/ButtonLink.astro";
 import { FRIENDLY_LINKS } from "../../config";
+import { url } from "@utils/url-utils";
 
 const COLLAPSED_HEIGHT = "7.5rem";
 const COLLAPSE_THRESHOLD = 5;
@@ -21,7 +22,7 @@ const style = Astro.props.style;
 >
     {FRIENDLY_LINKS.map((link) =>
         <ButtonLink
-            url={link.url}
+            url={link.url.startsWith("/") ? url(link.url) : link.url}
             label={`Visit ${link.name}`}
             external={true}
         >

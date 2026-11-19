@@ -248,6 +248,8 @@ async function main() {
       .relative(POSTS_DIR, file)
       .replace(/\\/g, '/')
       .replace(/\.md$/, '')
+      // 与文章页 OG 路径保持一致：foo/index.md → foo（而不是 foo-index）
+      .replace(/\/index$/, '')
       .replaceAll('/', '-')
     const svg = postSvg({
       title: meta.title,

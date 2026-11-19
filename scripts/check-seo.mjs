@@ -43,7 +43,14 @@ function walk(dir, out = []) {
   return out
 }
 
-const pages = walk(DIST)
+// 第三方静态页（作者自己的小游戏，放在 public/ 下）不参与本站 SEO 门禁：
+// 它们不是博客页面，也不应该伪造 canonical / OG 元数据。
+const THIRD_PARTY_DIRS = ['EatKun-main', 'EatKano-main', 'jump play']
+const isThirdPartyPage = (abs) => {
+  const rel = path.relative(DIST, abs).split(path.sep).join('/')
+  return THIRD_PARTY_DIRS.some((dir) => rel === `${dir}/index.html` || rel.startsWith(`${dir}/`))
+}
+const pages = walk(DIST).filter((abs) => !isThirdPartyPage(abs))
 
 let basePrefix = '/'
 

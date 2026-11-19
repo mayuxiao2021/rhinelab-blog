@@ -34,9 +34,10 @@ const hubLinks = [
 ]
 
 ---
-<MainGridLayout title={i18n(I18nKey.about)} description="关于莱茵档案：模板定位、设计语言、素材边界、隐私声明与站点导航入口">
+<MainGridLayout title={i18n(I18nKey.about)} description="关于黯：个人介绍、博客定位、素材来源与许可、隐私声明，以及全站导航入口（分类、标签、时间线、订阅与检索）。">
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
         <div class="card-base z-10 px-9 py-6 relative w-full" data-pagefind-body>
+            <h1 class="sr-only">关于黯</h1>
             <Markdown class="mt-2 rl-prose">
                 <Content />
             </Markdown>

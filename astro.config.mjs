@@ -22,6 +22,7 @@ import { remarkReadingTime } from './src/plugins/remark-reading-time.mjs'
 import { AdmonitionComponent } from './src/plugins/rehype-component-admonition.mjs'
 import { GithubCardComponent } from './src/plugins/rehype-component-github-card.mjs'
 import { rehypeExternalLinks } from './src/plugins/rehype-external-links.mjs'
+import { rehypeFrameTitle } from './src/plugins/rehype-frame-title.mjs'
 import { rehypeLazyImages } from './src/plugins/rehype-lazy-images.mjs'
 
 // 代码块行号（CSS 计数器实现，不进入复制文本，可在此开关）
@@ -35,7 +36,7 @@ const codeLineNumberTransformer = {
 // ⚠️ 部署前把 site 改成你自己的域名（GitHub Pages / 自托管均可）
 // 外链插件与 canonical/OG 共用同一个站点 origin；改域名时只改这一处。
 // 部署环境变量：SITE_URL 换域名、BASE_PATH 换子路径（如 /blog/），默认根路径
-const SITE_URL = process.env.SITE_URL || 'https://example.com'
+const SITE_URL = process.env.SITE_URL || 'https://github.glmyx.eu.org'
 const SITE_ORIGIN = new URL(SITE_URL).origin
 const rawBasePath = process.env.BASE_PATH || '/'
 const BASE_PATH = rawBasePath.endsWith('/') ? rawBasePath : `${rawBasePath}/`
@@ -132,6 +133,10 @@ export default defineConfig({
       CSS: true,
       // 图片已在生成阶段手工压到目标尺寸/质量；astro-compress 的 Image 通道会重编码 WebP 反而膨胀
       Image: false,
+      // 第三方静态页（友链小游戏）保持原样：它们不是本站生成页面，压缩会解析失败
+      Exclude: [
+        (File) => /EatKun-main|EatKano-main|jump play/.test(File),
+      ],
       Action: {
         Passed: async () => true,
       },
@@ -148,6 +153,7 @@ export default defineConfig({
     rehypePlugins: [
       rehypeKatex,
       [rehypeExternalLinks, { origin: SITE_ORIGIN }],
+      rehypeFrameTitle,
       rehypeLazyImages,
       rehypeSlug,
       [

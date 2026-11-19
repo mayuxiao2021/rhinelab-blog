@@ -43,7 +43,7 @@ jobs:
       - name: Build for GitHub Pages
         env:
           BASE_PATH: /rhinelab-blog/
-          SITE_URL: https://mayuxiao2021.github.io
+          SITE_URL: https://github.glmyx.eu.org
         run: pnpm build
 
       - name: Setup Pages

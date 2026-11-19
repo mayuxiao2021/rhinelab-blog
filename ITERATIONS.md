@@ -3430,3 +3430,35 @@
 - `verify` run 44447842999：18 步 + 子路径 + 打包 + 解压构建全绿；
 - 线上：<https://mayuxiao2021.github.io/rhinelab-blog/> 200，首页与 `/operators/` 标题正确；`/rhine/art/art-saria.webp`、`/pagefind/pagefind.js`、`/og/default.png` 均 200；
 - 浏览器访问被 302 到 <https://github.glmyx.eu.org/rhinelab-blog/>（Pages 代理域），页面完整渲染。
+
+## Iteration 135 — 作者博客完整迁移（14:10–15:30）
+
+### 目标
+
+用户要求「继续持续迭代，修复 bug，并且把我的博客完整设置上去」。把 `D:\admin\main\blog_astro`（Fuwari 原站，标题「黯」）的身份、文章、关于、头像、友链与静态页面完整迁移到莱茵档案主题，并部署上线。
+
+### 迁移内容
+
+- **身份**：`siteConfig.title = 黯`、subtitle、profile 名称/简介/头像/社交链接、导航（首页/归档/关于/研究员/项目/统计/GitHub）。
+- **文章**：7 篇（2 篇安全研究长文 + 测试/指南/Markdown 示例），保留 frontmatter 的分类、标签、日期与草稿状态；删除模板示例文章。
+- **关于**：`src/content/spec/about.md` 换为作者内容（含 GitHub 仓库卡与图片来源声明）。
+- **资源**：头像、banners、favicon、`gallery/` 预览图、友链静态小游戏（EatKun / EatKano / jump play），合计约 1.2 MB。
+- **站点 URL**：默认与 Pages workflow 均切到 `https://github.glmyx.eu.org` + `BASE_PATH=/rhinelab-blog/`。
+
+### 迁移中修复（8 类）
+
+1. 友链内部链接在子路径部署下 404（`Links.astro` 未加 base）。
+2. 嵌套文章 OG 路径不一致（`guide-index.png` vs `guide.png`）。
+3. 摘要 feed 中转义 iframe 残留 `<iframe>`（实体解码顺序错误）。
+4. `astro-compress` 压缩第三方小游戏 HTML 报错（增加 `Exclude`）。
+5. 公共封面图/小游戏精灵图缺 `width`/`height`（补默认尺寸）。
+6. 无障碍：内容 H1 与页面标题重复、iframe 缺 title、外链缺 rel、静态页缺 lang/重复 id/alt。
+7. SEO 门禁误扫第三方静态页（check-seo 排除），关于页 description 过短。
+8. 预算过紧（真实博客长文 145 KB/页）→ 调整为 12.5 MB / 160 KB；页脚与隐私页的「无官方素材」表述改准确。
+
+### 验证
+
+- `pnpm verify` 18 步全绿：48 HTML 页 / 46 SEO 页 / 2886 链接 0 断链 / 48 页无障碍 / RSS 7 items / 预算 90%（11493/12800 KB）。
+- `pnpm test:subpath` 通过（base-aware 友链、OG、RSS）。
+- 浏览器实测：首页（7 篇）、关于、文章正文、项目索引亮暗均正常；截图更新至 `docs/screenshots/`。
+- 待本次推送后由 GitHub Actions `verify` + `pages` 复核并发布。

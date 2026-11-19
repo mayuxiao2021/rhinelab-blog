@@ -93,7 +93,26 @@ v0.4.0 的演示站（首页 + `/operators/`）额外包含以下 16 个 WebP �
   替换为拥有授权的素材，并保留同人声明。
 - 素材经本机脚本压缩为 WebP（长边 1400 / 700，质量 0.72–0.8），未做二次描摹或修改人物形象。
 
+## 3.2 作者博客内容与第三方静态页
+
+**文章与关于内容**
+
+- `src/content/posts/**`（7 篇）与 `src/content/spec/about.md` 由博主「黯」创作，版权归作者所有，以 **CC BY-NC-SA 4.0** 发布（与站点许可一致），不属于 MIT 代码许可。
+- 文中代码片段、命令与截图均为作者原创或已脱敏；安全研究文章仅用于授权测试与技术学习。
+
+**头像与图片**
+
+- `src/assets/images/demo-avatar.png`：作者博客头像（原站素材，来源见关于页「Sources of images」：Unsplash、星と少女 by Stella、Rabbit by Rabbit_YourMajesty）。
+- `public/gallery/*`：项目索引预览图，随站点一起托管。
+- `public/banners/`、`public/favicon/`：作者原博客静态资源。
+
+**友链静态小游戏**
+
+- `public/EatKun-main/`、`public/EatKano-main/`、`public/jump play/`：来自开源项目 [EatKano](https://github.com/arcxingye/EatKano) / [EatKun](https://github.com/fangkuai767/EatKun) 的静态页面，作为友链「吃掉明卓 / 明卓跑酷」托管；许可见上游仓库，本项目仅补充了无障碍属性（`lang`、`alt`、`h1`），未修改游戏逻辑。
+- 若你要复用本模板，请删除上述目录并同步修改 `src/config.ts` 的 `FRIENDLY_LINKS`。
+
 ## 4. 同人使用声明
+
 
 「莱茵生命」「明日方舟」等名称与相关设定的权利归鹰角网络（Hypergryph）所有。
 

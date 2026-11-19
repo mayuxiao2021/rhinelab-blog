@@ -2,6 +2,26 @@
 
 本项目的变更记录，遵循「每轮迭代至少修一个严重 bug 或加一个创新点」的节奏。
 
+## [0.5.0] — 2026-11-19
+
+### 作者博客完整迁移（黯）
+
+- 站点身份切换为「黯」：标题、头像、简介、社交链接、项目页与关于页均为作者真实内容
+- 迁移 7 篇文章（2 篇安全研究长文 + 5 篇示例/指南）到模板内容集合；关于页读取作者 `about.md`，友链替换为作者友链
+- 复制作者静态资源：头像、banners、favicon、项目预览图与友链小游戏页面（EatKun / EatKano / jump play）
+- 站点 URL 切到 <https://github.glmyx.eu.org/rhinelab-blog/>，Pages workflow 同步 `SITE_URL`
+
+### 迁移中修复的 bug
+
+- **B67** 友链内部链接未带 `BASE_PATH`，子路径部署下 404 → `Links.astro` 用 `url()` 补前缀
+- **B68** 嵌套文章 `guide/index.md` 的 OG 图路径不一致（生成 `guide-index.png`，页面找 `guide.png`）
+- **B69** 摘要 feed 的 `content_text` 在实体解码后才剥标签，导致转义 iframe 残留可执行标签
+- **B70** 第三方静态页被 astro-compress 压缩报错 → 增加 `Exclude` 过滤
+- **B71** 公共封面图缺少 width/height、第三方小游戏 `<img>` 缺尺寸 → ImageWrapper 补默认尺寸 / 页面补属性
+- 无障碍：文章内 H1 与页面标题重复、iframe 缺 title、外链缺 `rel=noopener`、静态页缺 `lang` / 重复 id / 图片缺 alt
+- SEO：第三方静态页不应伪造 canonical/OG → check-seo 排除；关于页 description 加长
+- 预算按真实博客调整为 12.5 MB / 单页 160 KB；移除重复文章标题锚点；页脚与隐私页素材声明改为准确表述
+
 ## [0.4.2] — 2026-11-19
 
 ### 公开 + GitHub Pages

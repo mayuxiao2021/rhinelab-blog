@@ -1,16 +1,15 @@
-# 莱茵档案 · Rhine Archive
+# 黯的博客 · 莱茵档案（Rhine Archive）
 
-> 一套《明日方舟》「莱茵生命」风格的 **Astro / Fuwari 博客模板包**：暖纸质档案美学、亮暗双模式、纯 CSS/SVG 图形、零游戏版权素材。
+> **黯**的个人博客，基于《明日方舟》「莱茵生命」风格的 **Astro / Fuwari 博客模板**：暖纸质档案美学、亮暗双模式、纯 CSS/SVG 图形；主题同时可作为独立模板复用。
 >
-> 同人风格主题，与鹰角网络（Hypergryph）无关；代码 MIT。
+> 同人风格主题，与鹰角网络（Hypergryph）无关；代码 MIT。演示页 `/operators/` 使用公开干员立绘（版权归鹰角，非商业同人演示，见 [docs/ASSETS.md](docs/ASSETS.md)）。
 
 [![Astro](https://img.shields.io/badge/Astro-6.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
 [![Fuwari](https://img.shields.io/badge/base-Fuwari%20(MIT)-blue)](https://github.com/saicaca/fuwari)
 [![License](https://img.shields.io/badge/code-MIT-green)](LICENSE)
 ![rhinelab 版本与迭代数](docs/badge-version.svg) [![verify](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/verify.yml/badge.svg)](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/verify.yml) [![pages](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/pages.yml/badge.svg)](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/pages.yml)
 
-> **在线演示（GitHub Pages）**：<https://mayuxiao2021.github.io/rhinelab-blog/> —— 使用 `BASE_PATH=/rhinelab-blog/` 构建；
-> 若该域名被代理，也可访问 <https://github.glmyx.eu.org/rhinelab-blog/>。
+> **在线博客（GitHub Pages）**：<https://github.glmyx.eu.org/rhinelab-blog/>（备用：<https://mayuxiao2021.github.io/rhinelab-blog/>）—— 使用 `BASE_PATH=/rhinelab-blog/` 构建；文章、关于、RSS 均为真实内容。
 
 **导航**：[预览](#预览) · [它是什么](#它是什么) · [快速开始](#快速开始) · [安装到现有博客](#把主题安装到现有-fuwari-博客) · [主题定制](docs/THEMING.md) · [设计说明](docs/DESIGN.md) · [部署](docs/DEPLOY.md) · [素材许可](docs/ASSETS.md) · [验收记录](docs/ACCEPTANCE.md) · [贡献指南](CONTRIBUTING.md) · [迭代记录](ITERATIONS.md)
 
@@ -24,16 +23,16 @@
 - 可访问性页 **动效偏好**（系统 reduced-motion 检测 + 一键预览）
 - 制作说明 **LAST BUILD**（构建时间 / 文件数 / 体积）
 
-细节见 [THEMING 5.3 运行时小组件与降级](docs/THEMING.md)；这些请求只访问本站静态文件，见[隐私与数据](https://example.com/privacy/)。
+细节见 [THEMING 5.3 运行时小组件与降级](docs/THEMING.md)；这些请求只访问本站静态文件，见[隐私与数据](https://github.glmyx.eu.org/rhinelab-blog/privacy/)。
 
 > 第 100 轮里程碑：完整交付概览、质量门禁与检查清单见 [docs/MILESTONE-100.md](docs/MILESTONE-100.md)；最终验收命令与实测结果见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。
 
 ## 预览
 
-### 演示站：莱茵生命 / RHINE LAB（v0.4.0）
+### 黯的博客 · 莱茵档案（v0.5.0）
 
-> 下列截图来自真实构建产物。演示站额外加入 8 位干员立绘（非商业同人演示，素材版权归鹰角网络），
-> 与模板核心分离：删除 `public/rhine/art/` 与 `src/pages/operators.astro` 即回到纯自制图形模板。
+> 截图来自真实构建产物：首页英雄区 + 组织/设施/研究员区块为莱茵主题展示，文章列表为黯的真实文章。
+> 演示页额外使用 8 位干员立绘（非商业同人演示，素材版权归鹰角网络），与模板核心分离，移除方式见 [docs/ASSETS.md](docs/ASSETS.md) 3.1。
 
 | 首页 · 亮色（含干员立绘） | 首页 · 暗色 |
 | --- | --- |
@@ -46,6 +45,14 @@
 | 移动端 · 首页 390px | 移动端 · 研究员名录 390px |
 | --- | --- |
 | ![移动端首页](docs/screenshots/demo-mobile-home.webp) | ![移动端名录](docs/screenshots/demo-mobile-operators.webp) |
+
+| 关于 · 亮色（作者介绍 + 导航枢纽） | 关于 · 暗色 |
+| --- | --- |
+| ![关于亮色](docs/screenshots/blog-about-light.webp) | ![关于暗色](docs/screenshots/blog-about-dark.webp) |
+
+| 文章正文（安全研究长文 + 目录） | 项目索引 |
+| --- | --- |
+| ![文章正文](docs/screenshots/blog-post-light.webp) | ![项目索引](docs/screenshots/blog-gallery-light.webp) |
 
 ### 归档与文章
 
@@ -137,13 +144,14 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.4.2 真实构建产物，无后期合成。
+> 截图来自 v0.5.0 真实构建产物，无后期合成。
 
 ## 它是什么
 
 - **一整站模板**：`pnpm install && pnpm dev` 就能跑的个人博客（本文档所在仓库）；
 - **一层可剥离的主题**：`src/styles/rhinelab.css` + `src/components/rhine/*`，可覆盖到任意同版本 Fuwari 站点，删掉 import 即还原；
-- **一个非商业演示站**：首页英雄区 + 设施图录 + `/operators/` 研究员名录，使用公开干员立绘素材（版权归鹰角网络，仅演示、不商用），见下方「许可与声明」。
+- **黯的个人博客**：首页英雄区 + 设施图录 + `/operators/` 研究员名录；文章、关于、RSS 与项目索引均为真实内容（7 篇）。
+- **非商业演示页**：`/operators/` 使用公开干员立绘素材（版权归鹰角网络，仅演示、不商用），见下方「许可与声明」。
 
 ## 一眼看懂设计
 
@@ -201,13 +209,13 @@ pnpm preview
 
 | 指标 | 体积 | 说明 |
 | --- | --- | --- |
-| dist 总产物 | ≈ 9.3 MB | 含示例文章、搜索索引与 2.4 MB 非商业演示立绘；删除 `public/rhine/art/` 后约 6.9 MB |
-| JS 合计 | ≈ 3.6 MB | 大头是 Mermaid 各图表类型分块（按需加载） |
-| CSS 合计 | ≈ 366 KB | Tailwind + 主题 + KaTeX + Fuwari |
+| dist 总产物 | ≈ 11.5 MB | 含 7 篇文章、搜索索引、2.4 MB 非商业演示立绘与作者静态小游戏；预算 12.5 MB |
+| JS 合计 | ≈ 3.75 MB | 大头是 Mermaid 各图表类型分块（按需加载） |
+| CSS 合计 | ≈ 382 KB | Tailwind + 主题 + KaTeX + Fuwari |
 | 字体（woff2） | ≈ 377 KB | Roboto 仅 latin 子集；中文走系统字体 |
 
 - **Mermaid 按需加载**：`mermaid.core` 约 600 KB，flowchart 依赖约 0.8–2 MB（视图表类型），只有页面包含图表时才会下载；不需要图表可删除 `src/components/misc/Markdown.astro` 里的 Mermaid 初始化与 `mermaid` 依赖。
-- **体积门禁**：`pnpm check:budget` 对总产物/JS/CSS/字体/单页 HTML 设预算，超出即失败；已接入 `pnpm verify`。
+- **体积门禁**：`pnpm check:budget` 对总产物（12.5 MB）/JS/CSS/字体/单页 HTML（160 KB）设预算，超出即失败；已接入 `pnpm verify`。
 - **产物优化**：`scripts/optimize-dist.mjs` 会移除 `.woff/.ttf` 旧格式字体与未使用的 Pagefind UI 资源（约 1.2 MB）。
 - **首屏字体**：Roboto latin-400 与 JetBrains Mono latin 通过 `<link rel="preload">` 提前加载。
 
@@ -221,11 +229,15 @@ src/
   styles/rhinelab.css # ★ 设计令牌 + 全部视觉规则（可移植）
   content/posts/      # 示例文章（5 篇，可整目录替换）
   data/operators.ts   # 演示站干员元数据（8 位，可替换/删除）
+  content/posts/     # 作者文章（7 篇）
+  content/spec/about.md # 关于页内容
   pages/operators.astro # 研究员名录（演示页）
   config.ts           # 站点名、导航、作者、友链
 astro.config.mjs      # 站点 URL、Markdown 管线、集成
 public/rhine/         # 自制 SVG：徽标 / favicon / 头像
 public/rhine/art/     # 演示立绘（非商业素材，可整目录删除）
+public/gallery/       # 项目索引预览图
+public/EatKun-main/ 等 # 友链静态小游戏（作者自用）
 docs/                 # 设计、定制、部署、素材许可
 ITERATIONS.md         # 24h 迭代日志（每轮：严重 bug 或创新点）
 theme/                # 可移植主题包 + 安装器（见 theme/README.md）
@@ -256,6 +268,7 @@ theme/                # 可移植主题包 + 安装器（见 theme/README.md）
 - [x] 子路径部署（`base`）兼容：canonical / OG / RSS / sitemap / 封面图全部正确带前缀
 - [x] PWA：构建期 manifest 与应用图标（180/192/512，自制 SVG 栅格化）
 - [x] 文章分享 / 引用复制 / MD 引用 / 打印 PDF（触屏系统分享、跨 Swup 事件委托）
+- [x] 作者博客内容已迁移：7 篇文章（含 2 篇安全研究长文）、关于页、头像、友链与静态小游戏页面
 - [x] 演示站：首页英雄区（双角色立绘 + 组织/设施/研究员区块）与 `/operators/` 研究员名录
 - [x] 随机档案 `/random/`（随机跳转、`?no=1` 预览兜底）
 - [x] 版本沿革页 `/changelog/`（构建期读取 CHANGELOG.md，版本锚点）
@@ -315,7 +328,7 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.4.2**（`package.json`）
+- 当前版本 **v0.5.0**（`package.json`）
 - 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
 - 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。

@@ -80,13 +80,15 @@ export function toPlainText(html: string, maxLength = 1200): string {
     .replace(/<(script|style)[\s\S]*?<\/\1>/gi, '')
     .replace(/<\/(p|div|li|h[1-6]|blockquote)>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/g, ' ')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, '&')
+    // 先解码实体再剥标签：原文里被转义的 iframe/video 等标签
+    // （&lt;iframe ...&gt;）解码后仍需清掉，否则摘要会带可执行标签
+    .replace(/<[^>]*>/g, '')
     .replace(/[ \t]+/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
