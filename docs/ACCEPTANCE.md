@@ -1,4 +1,4 @@
-# 验收记录 · 黯的博客 · Rhine Archive v0.6.0
+# 验收记录 · 黯的博客 · Rhine Archive v0.7.0
 
 > 本文件记录最终交付版本的验收命令、实测结果与已知限制，便于接手者复现与核对。
 > 版本号以 `package.json` 与 `release/` 下最新 MANIFEST 为准。
@@ -22,7 +22,7 @@ node scripts/package.mjs       # 生成 zip + MANIFEST
 node scripts/verify-release.mjs --full --build   # 清单一致性 + 解压包自测 + 文档门禁 + 解压后 astro build + check-links
 ```
 
-## 3. 实测结果（v0.6.0 · 作者博客 + 引导页/动画 + CI + Pages）
+## 3. 实测结果（v0.7.0 · 根域名 Portal + 博客 + 旧版归档）
 
 - `pnpm verify`：**18/18 通过**；`astro check` 89 files 0/0/0。
 - 页面与索引：**49 个 HTML 页**（47 个参与 SEO；第三方静态小游戏页除外）/ 47 唯一标题 / 15 段 JSON-LD / 45 canonical / 47 张 OG / 45 条 sitemap URL / **7 篇文章** / 4 分类 / 16 标签。
@@ -34,9 +34,10 @@ node scripts/verify-release.mjs --full --build   # 清单一致性 + 解压包�
 - GitHub Actions：`verify.yml`（18 步 + 子路径 + 打包 + 解压构建）与 `pages.yml`（构建 + Actions 部署）均全绿。
 - **博客内容**：7 篇文章（2 篇安全研究长文）、关于页、头像、友链与静态小游戏页面已完整迁移（v0.5.0）。
 - **引导与动效**：`/start/` 三风格入口、莱茵启动序列、英雄区入场动画（v0.6.0；尊重 reduced-motion，可跳过）。
+- **部署拓扑（v0.7.0）**：根域名 `/` = 选择界面 Portal（`mayuxiao2021.github.io` 的 `portal` 分支）；`/rhinelab-blog/` = 博客；`/legacy-blog/` = 旧版 Fuwari 归档（`mayuxiao2021/legacy-blog`）。三处均已线上核验 200。
 - **在线演示（GitHub Pages）**：<https://mayuxiao2021.github.io/rhinelab-blog/>（`BASE_PATH=/rhinelab-blog/`；备用域 <https://github.glmyx.eu.org/rhinelab-blog/>）。
 - 运行时采样（本机 Chromium，静态服务）：FCP **164ms**、load **320ms**、44 资源 / 255KB、DOM 632 节点。
-- 版本沿革：**137 条迭代记录**（Iteration 0–136），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
+- 版本沿革：**138 条迭代记录**（Iteration 0–137），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
 
 ## 4. 已知限制
 

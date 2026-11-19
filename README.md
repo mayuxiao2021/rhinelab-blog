@@ -9,7 +9,8 @@
 [![License](https://img.shields.io/badge/code-MIT-green)](LICENSE)
 ![rhinelab 版本与迭代数](docs/badge-version.svg) [![verify](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/verify.yml/badge.svg)](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/verify.yml) [![pages](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/pages.yml/badge.svg)](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/pages.yml)
 
-> **在线博客（GitHub Pages）**：<https://github.glmyx.eu.org/rhinelab-blog/>（备用：<https://mayuxiao2021.github.io/rhinelab-blog/>）—— 使用 `BASE_PATH=/rhinelab-blog/` 构建；文章、关于、RSS 均为真实内容。
+> **站点入口（GitHub Pages）**：<https://github.glmyx.eu.org/> —— 根域名是「选择界面」引导页（莱茵档案 / 研究员名录 / 旧版博客）。
+> 莱茵档案博客：<https://github.glmyx.eu.org/rhinelab-blog/>（`BASE_PATH=/rhinelab-blog/`）；旧版归档：<https://github.glmyx.eu.org/legacy-blog/>。
 
 **导航**：[预览](#预览) · [它是什么](#它是什么) · [快速开始](#快速开始) · [安装到现有博客](#把主题安装到现有-fuwari-博客) · [主题定制](docs/THEMING.md) · [设计说明](docs/DESIGN.md) · [部署](docs/DEPLOY.md) · [素材许可](docs/ASSETS.md) · [验收记录](docs/ACCEPTANCE.md) · [贡献指南](CONTRIBUTING.md) · [迭代记录](ITERATIONS.md)
 
@@ -57,6 +58,10 @@
 | 界面引导 `/start/` · 亮色 | 界面引导 · 暗色 |
 | --- | --- |
 | ![界面引导亮色](docs/screenshots/start-light.webp) | ![界面引导暗色](docs/screenshots/start-dark.webp) |
+
+| 根域名「选择界面」（Portal） | 旧版 Fuwari 归档 `/legacy-blog/` |
+| --- | --- |
+| ![根域名入口](docs/screenshots/portal-root.webp) | ![旧版归档](docs/screenshots/legacy-live.webp) |
 
 | 莱茵启动序列（`?intro=1` / 首次进入） | 移动端引导 390px |
 | --- | --- |
@@ -152,7 +157,7 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.6.0 真实构建产物，无后期合成。
+> 截图来自 v0.7.0 真实构建产物，无后期合成。
 
 ## 它是什么
 
@@ -286,6 +291,16 @@ theme/                # 可移植主题包 + 安装器（见 theme/README.md）
 - [x] `prefers-contrast: more` 与 `forced-colors: active` 适配
 - [x] `prefers-reduced-motion` 全量降级、键盘焦点可见、skip link、h1 语义、辅助色 AA
 
+## 部署拓扑（GitHub Pages）
+
+| 位置 | 内容 | 仓库 / 分支 |
+| --- | --- | --- |
+| `https://github.glmyx.eu.org/` | 选择界面 Portal（静态单页，含三风格入口与启动动画开关） | `mayuxiao2021.github.io` → `portal` 分支（Pages 源设为该分支） |
+| `/rhinelab-blog/` | 黯的博客（莱茵档案主题，49 页，含 `/start/` 内置引导） | `mayuxiao2021/rhinelab-blog` → `main`（Actions 构建） |
+| `/legacy-blog/` | 旧版 Fuwari 博客归档快照 | `mayuxiao2021/legacy-blog` → `main`（Actions 构建，`BASE_PATH=/legacy-blog/`） |
+
+根域名的 `portal` 分支只放一个自包含 `index.html`（无构建依赖），旧的 Fuwari 源码与历史仍保留在 `mayuxiao2021.github.io` 的 `master` 分支，随时可回滚。
+
 ## GitHub Actions（CI）
 
 仓库自带 [`.github/workflows/verify.yml`](.github/workflows/verify.yml)，在 `push` 到 `main` 或手动 `workflow_dispatch` 时运行：
@@ -338,7 +353,7 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.6.0**（`package.json`）
+- 当前版本 **v0.7.0**（`package.json`）
 - 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
 - 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。

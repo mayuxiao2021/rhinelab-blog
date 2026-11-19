@@ -1,7 +1,7 @@
 {
   "name": "rhine-archive-blog",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "莱茵档案 — 莱茵生命风格的 Astro/Fuwari 博客模板包",
   "scripts": {

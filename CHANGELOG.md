@@ -2,6 +2,20 @@
 
 本项目的变更记录，遵循「每轮迭代至少修一个严重 bug 或加一个创新点」的节奏。
 
+## [0.7.0] — 2026-11-19
+
+### 根域名改为「选择界面」Portal
+
+- 根域名 <https://github.glmyx.eu.org/> 现在展示选择界面：莱茵档案（带启动动画）/ 研究员名录 / 旧版博客；自包含单页（内联 CSS/JS），支持亮暗切换、启动动画开关（与博客共用 `rhine-boot-enabled`）、动态读取博客版本号
+- 新博客保持在 <https://github.glmyx.eu.org/rhinelab-blog/>，`/start/` 内置引导页同步把「旧版博客」指向 `/legacy-blog/`
+- 旧版 Fuwari 博客完整归档到新仓库 `mayuxiao2021/legacy-blog`，以 `BASE_PATH=/legacy-blog/` 构建并部署到 `/legacy-blog/`；源码与未提交改动一并保存，`mayuxiao2021.github.io` 的 `master` 源分支保持不动
+- 用户站仓库 `mayuxiao2021.github.io` 新增 `portal` 分支作为 Pages 源（`build_type: legacy`），只含 Portal 页面，可随时切回 `master` 或旧工作流
+
+### 部署过程中修复
+
+- 切换 Pages 源时 API 会清空 `cname`（自定义域名脱离，根域名 404）→ 重新提交 `cname: github.glmyx.eu.org` 并手动触发 `pages/builds` 恢复
+- 旧博客以子路径构建需要 base 支持 → 归档仓库 `astro.config.mjs` 改为 `base: process.env.BASE_PATH || "/"`，构建产物资源全部带 `/legacy-blog/` 前缀
+
 ## [0.6.0] — 2026-11-19
 
 ### 界面引导页 + 莱茵启动动画

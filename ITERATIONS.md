@@ -3491,3 +3491,35 @@
 - `pnpm verify` 18 步全绿：49 HTML 页 / 47 SEO 页 / 3034 链接 0 断链 / 49 页无障碍 / RSS 7 items / 预算 92%（11724/12800 KB）、79 张图带尺寸。
 - `pnpm test:subpath` 通过（`/rhinelab-blog/?intro=1` 链接、引导页资源均带 base）。
 - 浏览器实测：引导页亮/暗、启动序列（36s 保持）、移动端 390px；导航进/出引导页均整页加载；英雄区入场动画计算样式生效。
+
+## Iteration 137 — 根域名切换为「选择界面」（17:27–18:10）
+
+### 需求澄清
+
+用户明确：「我就是说根域名换成选择界面」——即 `https://github.glmyx.eu.org/` 直接展示风格选择页，而不是旧博客首页。
+
+### 部署拓扑
+
+| 路径 | 内容 | 仓库 / 分支 |
+| --- | --- | --- |
+| `/` | 选择界面 Portal（自包含单页） | `mayuxiao2021.github.io` → `portal` 分支，Pages 源设为 legacy 分支 |
+| `/rhinelab-blog/` | 黯的博客（v0.7.0，49 页） | `mayuxiao2021/rhinelab-blog` → `main`（Actions） |
+| `/legacy-blog/` | 旧版 Fuwari 归档快照 | 新建 `mayuxiao2021/legacy-blog` → `main`（Actions，`BASE_PATH=/legacy-blog/`） |
+
+### 实现
+
+- Portal 页面从 `/start/` 抽成零构建静态 `index.html`：三卡片、亮暗切换、启动序列开关（与博客共用 localStorage key）、动态读取 `/rhinelab-blog/build-info.json` 版本号；图片直接用 `/rhinelab-blog/rhine/art/*` 公开路径。
+- 旧博客归档：复制 `blog_astro` 工作树（含未提交改动）为独立仓库，补 `base` 环境变量与 Pages workflow；旧仓库 `master` 完全未动，仅新增 `portal` 分支作为站点入口。
+- 博客 `/start/` 页的「旧版博客」卡片改为指向 `/legacy-blog/`，避免与根域名 Portal 形成指向歧义。
+
+### 迭代内修复
+
+1. 切换 Pages 源时 GitHub API 会清空 `cname`，导致自定义域名 404 → PUT 重新设置 `cname` 并手动 POST `pages/builds`，`/`、`/rhinelab-blog/`、`/legacy-blog/` 全部恢复 200。
+2. 旧博客子路径构建的资源前缀 → `base` 环境变量化，产物 CSS/JS/头像均 200。
+3. Portal 与博客的启动动画开关统一使用 `rhine-boot-enabled`，避免两套偏好不一致。
+
+### 线上验证
+
+- `https://github.glmyx.eu.org/` → 选择界面 200；三卡片链接分别到博客、名录、旧版归档。
+- `/rhinelab-blog/` → 200（v0.7.0）；`/legacy-blog/` → 200，CSS/头像资源 200。
+- 点击 Portal 的莱茵卡片 → 博客首页并触发启动序列；旧版卡片 → 旧博客完整渲染。
