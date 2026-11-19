@@ -12,7 +12,7 @@
 > **站点入口（GitHub Pages）**：<https://github.glmyx.eu.org/> —— 根域名是「选择界面」引导页（莱茵档案 / 研究员名录 / 旧版博客）。
 > 莱茵档案博客：<https://github.glmyx.eu.org/rhinelab-blog/>（`BASE_PATH=/rhinelab-blog/`）；旧版归档：<https://github.glmyx.eu.org/legacy-blog/>。
 
-**导航**：[预览](#预览) · [它是什么](#它是什么) · [快速开始](#快速开始) · [安装到现有博客](#把主题安装到现有-fuwari-博客) · [主题定制](docs/THEMING.md) · [设计说明](docs/DESIGN.md) · [部署](docs/DEPLOY.md) · [素材许可](docs/ASSETS.md) · [验收记录](docs/ACCEPTANCE.md) · [贡献指南](CONTRIBUTING.md) · [迭代记录](ITERATIONS.md)
+**导航**：[预览](#预览) · [它是什么](#它是什么) · [快速开始](#快速开始) · [安装到现有博客](#把主题安装到现有-fuwari-博客) · [主题定制](docs/THEMING.md) · [设计说明](docs/DESIGN.md) · [部署](docs/DEPLOY.md) · [素材许可](docs/ASSETS.md) · [验收记录](docs/ACCEPTANCE.md) · [AI 交接文档](docs/AI-HANDOFF.md) · [贡献指南](CONTRIBUTING.md) · [迭代记录](ITERATIONS.md)
 
 ## 运行时小组件（渐进增强）
 
@@ -161,7 +161,7 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.8.0 真实构建产物，无后期合成。
+> 截图来自 v0.8.1 真实构建产物，无后期合成。
 
 ## 它是什么
 
@@ -359,7 +359,7 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.8.0**（`package.json`）
+- 当前版本 **v0.8.1**（`package.json`）
 - 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
 - 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。

@@ -3547,3 +3547,27 @@
 - `pnpm verify` 18 步全绿：49 页 / 47 SEO / 3034 链接 / 79 张图带尺寸 / 预算 92%（11786/12800 KB）、CSS 95%、单页 94%。
 - 浏览器实测：Portal 亮/暗、`/start/` 亮/暗、彩蛋浮层；移动端遥测改为单列。
 - 已知余量：CSS 预算已到 95%、单页 HTML 94%，后续新增样式需先做合并或提高预算。
+
+## Iteration 139 — 交接文档与 Portal 源码归档（23:16–23:45）
+
+### 需求
+
+「写思路文档，我要给别的 ai 继续」。
+
+### 交付
+
+- `docs/AI-HANDOFF.md`：面向下一个 AI 的完整交接文档，包含：
+  - 三站点 URL / 仓库 / 分支 / Pages 源与自定义域；
+  - 本地目录、命令与 18 步门禁、发布与截图流程；
+  - 代码地图、`rhinelab.css` 第 20–23 节目录、主题键与 session 键；
+  - Portal / 引导页 / 启动序列 / 全站彩蛋的实现细节；
+  - B64–B72 与 Swup、Pages cname 等已修问题清单；
+  - 部署 Runbook（博客 / Portal / 旧版 / 回滚）、当前预算余量（CSS 95%、单页 94%）；
+  - 已知坑与下一轮优先级（CSS 瘦身、主题键统一、Portal 自动同步、内容增厚、视觉回归等）。
+- `portal/` 源码镜像 + `portal/README.md`：Portal 与用户站 `portal` 分支的同步流程。
+- 修正 STATE 遗留的过期数字与描述。
+
+### 验证
+
+- `node scripts/check-docs.mjs` 文档一致；`pnpm verify` 18 步全绿（无代码变更）。
+- 发布包重新生成并校验；随后 push 触发 CI 与 Pages 复核。
