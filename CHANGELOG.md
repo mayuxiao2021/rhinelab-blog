@@ -2,6 +2,20 @@
 
 本项目的变更记录，遵循「每轮迭代至少修一个严重 bug 或加一个创新点」的节奏。
 
+## [0.8.0] — 2026-11-19
+
+### 莱茵生命主题细节补完（Portal + 引导页 + 全站彩蛋）
+
+- **根域名 Portal 重做**：标题改为「莱茵生命 · 档案入口」，加入 `TRIMONT · COLUMBIA / OBSERVER-07` 品牌行、SECTOR-03 本地时钟、三格遥测读数（来源 / 结构稳定度 / 档案总量，带动态仪表条）、STRUCTURE / DEFENSE & CLINICAL / ECOLOGY & FIELD 跑马灯、标本标签与 RL 档案编号、hover 扫描线、条形码页脚
+- **`/start/` 引导页同步**：遥测（文章 / 干员 / 分类与标签）、跑马灯、卡片编号与 SPECIMEN 标签、hover 扫光、本地时钟
+- **隐藏彩蛋**：在 Portal 或博客任意页面输入 `rhine`，唤起 `ACCESS GRANTED // DIAGNOSTIC` 浮层（OBSERVER-07、ARCHIVE SYNC、结构/防卫/生态 OK），12 秒自动关闭，支持点击/Esc，`prefers-reduced-motion` 跳过；页脚与 Portal 有 `HINT / 输入 rhine` 提示
+- 首页英雄区坐标加入 `TRIMONT · COLUMBIA`；页脚增加提示与 `rl-footer__hint`
+- 亮暗双主题下全部细节均有配色（Portal 独立静态页也支持亮暗切换）
+
+### 验收
+
+- `pnpm verify` 18 步全绿（49 页 / 47 SEO / 3034 链接 / 79 图带尺寸 / 预算 92%，CSS 95%、单页 94%）。
+
 ## [0.7.0] — 2026-11-19
 
 ### 根域名改为「选择界面」Portal

@@ -1,6 +1,6 @@
 # 第 100 轮里程碑 · 交付概览
 
-> 版本 **v0.7.0** · 第 **100** 轮迭代 · 更新于 2026-11-19
+> 版本 **v0.8.0** · 第 **100** 轮迭代 · 更新于 2026-11-19
 > 本项目按「每轮至少修复一个严重 bug 或增加一个创新点」的节奏推进，逐轮记录见 [ITERATIONS.md](../ITERATIONS.md)，版本记录见 [CHANGELOG.md](../CHANGELOG.md)。
 
 ## 1. 交付物
@@ -9,7 +9,7 @@
 | --- | --- | --- |
 | 模板站点（可独立构建） | 仓库根目录 | Astro 6 + Fuwari，`pnpm install && pnpm build` |
 | 主题覆盖层（非破坏安装） | `theme/` | `node theme/install.mjs`，自动备份 / `--restore` 回滚 / `--verify` 校验 |
-| 版本化发布包 | `release/rhinelab-blog-v0.7.0.zip` | 含 MANIFEST（sha256 / 体积），`verify-release --full` 校验 |
+| 版本化发布包 | `release/rhinelab-blog-v0.8.0.zip` | 含 MANIFEST（sha256 / 体积），`verify-release --full` 校验 |
 | 文档 | `README.md`、`docs/` | README / THEMING / DESIGN / ASSETS / DEPLOY / READERS / CONTRIBUTING / ITERATIONS / CHANGELOG / STATE |
 
 ## 2. 站点规模

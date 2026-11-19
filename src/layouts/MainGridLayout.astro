@@ -7,6 +7,7 @@ import { Icon } from 'astro-icon/components'
 import { siteConfig } from '../config'
 import Layout from './Layout.astro'
 import RhineBoot from '@components/rhine/RhineBoot.astro'
+import RhineEgg from '@components/rhine/RhineEgg.astro'
 import { url, pathsEqual } from '@utils/url-utils'
 
 interface Props {
@@ -63,4 +64,5 @@ const hasBannerLink = !!siteConfig.banner.credit.url
     <BackToTop></BackToTop>
 </div>
     <RhineBoot isHome={isHomePage} />
+    <RhineEgg />
 </Layout>

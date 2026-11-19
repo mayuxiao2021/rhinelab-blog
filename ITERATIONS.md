@@ -3523,3 +3523,27 @@
 - `https://github.glmyx.eu.org/` → 选择界面 200；三卡片链接分别到博客、名录、旧版归档。
 - `/rhinelab-blog/` → 200（v0.7.0）；`/legacy-blog/` → 200，CSS/头像资源 200。
 - 点击 Portal 的莱茵卡片 → 博客首页并触发启动序列；旧版卡片 → 旧博客完整渲染。
+
+## Iteration 138 — 莱茵生命主题细节补完 + 隐藏彩蛋（22:00–23:00）
+
+### 需求
+
+「你做的要完全符合莱茵生命的主题啊，加一点小巧思」——Portal 与引导页不能只是通用档案风，要有莱茵生命的机构感、术语与可探索的小细节。
+
+### 落地
+
+- **Portal（根域名）**：品牌行改为 `莱茵生命 · 档案入口 / RHINE LAB / TRIMONT · COLUMBIA / OBSERVER-07`；
+  SECTOR-03 本地实时时钟；三格遥测（归档来源 / 结构稳定度 98.7% / 档案总量，动态仪表条）；
+  STRUCTURE · DEFENSE & CLINICAL · ECOLOGY & FIELD 跑马灯；卡片 RL 档案编号 + SPECIMEN 标签 + hover 扫描线；
+  页脚条形码与 HINT；暗色主题单独适配。
+- **`/start/`**：同样的遥测、跑马灯、编号、标本标签与时钟；`rl-style-card__top`、`rl-start__meter` 等复用样式。
+- **全站彩蛋**：新增 `RhineEgg.astro` 挂在 `MainGridLayout`，任意页面输入 `rhine` 弹出 `ACCESS GRANTED // DIAGNOSTIC`
+  （OBSERVER-07 / ARCHIVE SYNC / 三学科 OK / 进度条），12s 自动关闭、点击或 Esc 关闭、reduced-motion 跳过；
+  Portal 内同样实现；两处页脚均提示「输入 rhine 试试」。
+- 首页英雄区坐标补 `TRIMONT · COLUMBIA`；页脚加 `HINT / 输入 rhine`。
+
+### 验证
+
+- `pnpm verify` 18 步全绿：49 页 / 47 SEO / 3034 链接 / 79 张图带尺寸 / 预算 92%（11786/12800 KB）、CSS 95%、单页 94%。
+- 浏览器实测：Portal 亮/暗、`/start/` 亮/暗、彩蛋浮层；移动端遥测改为单列。
+- 已知余量：CSS 预算已到 95%、单页 HTML 94%，后续新增样式需先做合并或提高预算。

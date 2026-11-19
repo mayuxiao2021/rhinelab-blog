@@ -1,0 +1,41 @@
+---
+// 全站隐藏小彩蛋：输入 rhine 唤起一次「诊断完成」浮层。
+// 纯装饰、aria-hidden、可点击/Esc 关闭；减少动态效果时不显示。
+---
+
+<div class="rl-egg" id="rl-site-egg" aria-hidden="true">
+  <div class="rl-egg__box">
+    <p class="rl-egg__kicker">RHINE LAB // DIAGNOSTIC</p>
+    <p class="rl-egg__title">ACCESS GRANTED</p>
+    <p class="rl-egg__line"><span>OBSERVER</span><b>07 / 黯</b></p>
+    <p class="rl-egg__line"><span>ARCHIVE SYNC</span><b>COMPLETE</b></p>
+    <p class="rl-egg__line"><span>STRUCTURE / DEFENSE / ECOLOGY</span><b>OK</b></p>
+    <p class="rl-egg__bar"><i /></p>
+    <button class="rl-egg__close" id="rl-site-egg-close" type="button">返回档案 / CLOSE</button>
+  </div>
+</div>
+
+<script is:inline>
+  ;(() => {
+    const egg = document.getElementById('rl-site-egg')
+    const closeButton = document.getElementById('rl-site-egg-close')
+    if (!egg) return
+    let buffer = ''
+    const close = () => egg.classList.remove('is-on')
+    window.addEventListener('keydown', event => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return
+      if (event.key === 'Escape') return close()
+      if (event.key.length !== 1) return
+      buffer = (buffer + event.key.toLowerCase()).slice(-5)
+      if (buffer !== 'rhine') return
+      buffer = ''
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      egg.classList.add('is-on')
+      window.setTimeout(close, 12000)
+    })
+    closeButton?.addEventListener('click', close)
+    egg.addEventListener('click', event => {
+      if (event.target === egg) close()
+    })
+  })()
+</script>

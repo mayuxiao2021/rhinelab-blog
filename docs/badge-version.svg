@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="226" height="20" role="img" aria-label="rhinelab v0.7.0 · 138 ITER">
-  <title>rhinelab v0.7.0 · 138 ITER</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="226" height="20" role="img" aria-label="rhinelab v0.8.0 · 139 ITER">
+  <title>rhinelab v0.8.0 · 139 ITER</title>
   <linearGradient id="rl" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#11181b"/>
     <stop offset="1" stop-color="#0c1214"/>
@@ -12,6 +12,6 @@
   </g>
   <g fill="#eae5e1" font-family="'JetBrains Mono', 'Cascadia Code', Consolas, monospace" font-size="10" letter-spacing="0.6">
     <text x="50.5" y="14" text-anchor="middle">RHINE ARCHIVE</text>
-    <text x="163.5" y="14" text-anchor="middle" fill="#11181b" font-weight="bold">v0.7.0 · 138 ITER</text>
+    <text x="163.5" y="14" text-anchor="middle" fill="#11181b" font-weight="bold">v0.8.0 · 139 ITER</text>
   </g>
 </svg>

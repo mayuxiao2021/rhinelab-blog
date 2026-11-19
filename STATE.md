@@ -5,11 +5,11 @@
 
 ## 当前状态
 
-- 版本：**v0.7.0**（`package.json`）
-- 阶段：**v0.7.0 / 根域名选择界面**——根域名 Portal、博客 /rhinelab-blog/、旧版归档 /legacy-blog/ 三处部署完成
-- 本轮：Iteration 137（作者博客完整迁移 + 8 类迁移 bug 修复）
+- 版本：**v0.8.0**（`package.json`）
+- 阶段：**v0.8.0 / 莱茵生命细节补完**——Portal 与引导页加入遥测/标本/跑马灯，全站隐藏 rhine 诊断彩蛋
+- 本轮：Iteration 138（作者博客完整迁移 + 8 类迁移 bug 修复）
 - 下一轮候选：见 `ITERATIONS.md` 末尾「下一轮候选」
-- 交付物：`release/rhinelab-blog-v0.7.0.zip`（326 文件）、`docs/MILESTONE-100.md`、README 与 `docs/` 全套
+- 交付物：`release/rhinelab-blog-v0.8.0.zip`（326 文件）、`docs/MILESTONE-100.md`、README 与 `docs/` 全套
 - 当前指标：**18 步 verify 全绿** · 49 HTML 页 / 45 sitemap URL · 预算 92%（11724/12800 KB）
 
 ## 关键命令
