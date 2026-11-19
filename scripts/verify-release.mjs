@@ -45,7 +45,10 @@ function pickZip(arg) {
   return path.join(releaseDir, candidates[0].name)
 }
 
-const zipPath = pickZip(process.argv[2])
+// 允许只传 --full / --build（此时自动取最新 zip）
+const cliArgs = process.argv.slice(2)
+const versionArg = cliArgs.find(arg => !arg.startsWith('-'))
+const zipPath = pickZip(versionArg)
 const base = path.basename(zipPath, '.zip')
 const manifestPath = path.join(releaseDir, `${base}-MANIFEST.txt`)
 
