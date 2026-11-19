@@ -5,11 +5,11 @@
 
 ## 当前状态
 
-- 版本：**v0.4.0**（`package.json`）
-- 阶段：**v0.4.0 / 莱茵生命演示站交付**——模板站、主题覆盖层（安装/验证/回滚）、版本化 zip、完整文档均已完成
-- 本轮：Iteration 132（莱茵生命演示站：8 位干员素材、`/operators/`、首页重构、移动端适配）
+- 版本：**v0.4.1**（`package.json`）
+- 阶段：**v0.4.1 / GitHub Actions 全绿**——模板站、主题覆盖层（安装/验证/回滚）、版本化 zip、完整文档均已完成
+- 本轮：Iteration 133（莱茵生命演示站：8 位干员素材、`/operators/`、首页重构、移动端适配）
 - 下一轮候选：见 `ITERATIONS.md` 末尾「下一轮候选」
-- 交付物：`release/rhinelab-blog-v0.4.0.zip`（263 文件）、`docs/MILESTONE-100.md`、README 与 `docs/` 全套
+- 交付物：`release/rhinelab-blog-v0.4.1.zip`（263 文件）、`docs/MILESTONE-100.md`、README 与 `docs/` 全套
 - 当前指标：**18 步 verify 全绿** · 39 HTML 页 / 37 sitemap URL / 263 包文件 · 预算 86%（9375/10854 KB）
 
 ## 关键命令
@@ -27,13 +27,13 @@ node scripts/package.mjs   # 打包 release/rhinelab-blog-v<version>.zip
 
 ## 里程碑后迭代摘要（100–120）
 
-- Iteration 132：里程碑交付（MILESTONE-100、100 条迭代、v0.2.90）。
-- Iteration 132–104：SEO 长度门禁、里程碑文档自动校验、og:description / gates 一致性、门禁单一数据源。
-- Iteration 132–107：沿革过滤高亮与安全上限、关于页高亮、预览图尺寸、高亮省略提示。
-- Iteration 132–109：首图 eager/fetchpriority、复制全部命令、机器状态自动重试（含计数修复）、重试参数可配置。
-- Iteration 132–112：Enter 聚焦命中标题、Twitter Card / Manifest / OpenSearch / theme-color / data-base 门禁。
-- Iteration 132–114：OpenSearch Image/Contact/Tags、子路径回归、修复 basePrefix TDZ（B61）。
-- Iteration 132–117：脚本引用与门禁脚本清单门禁、静默 catch 门禁（verify 18 步）、a11y 规则强化与自测扩到 9 类。
+- Iteration 133：里程碑交付（MILESTONE-100、100 条迭代、v0.2.90）。
+- Iteration 133–104：SEO 长度门禁、里程碑文档自动校验、og:description / gates 一致性、门禁单一数据源。
+- Iteration 133–107：沿革过滤高亮与安全上限、关于页高亮、预览图尺寸、高亮省略提示。
+- Iteration 133–109：首图 eager/fetchpriority、复制全部命令、机器状态自动重试（含计数修复）、重试参数可配置。
+- Iteration 133–112：Enter 聚焦命中标题、Twitter Card / Manifest / OpenSearch / theme-color / data-base 门禁。
+- Iteration 133–114：OpenSearch Image/Contact/Tags、子路径回归、修复 basePrefix TDZ（B61）。
+- Iteration 133–117：脚本引用与门禁脚本清单门禁、静默 catch 门禁（verify 18 步）、a11y 规则强化与自测扩到 9 类。
 
 ## 已验证（证据）
 
@@ -43,7 +43,7 @@ node scripts/package.mjs   # 打包 release/rhinelab-blog-v<version>.zip
 - Pagefind 搜索：输入「观测」返回 4 条结果（含正文摘要）。
 - 主题安装器：dry-run（零写入）/ 安装 / 幂等重装 / 回滚（含空目录清理）全部实测通过。
 - **发布包**：`release/rhinelab-blog-v0.3.7.zip`（解压后 selftest + 构建 + 链接/无障碍/对比度/Feed/预算自检全部通过）。
-- **类型检查**：`pnpm check` **0 errors / 0 warnings / 0 hints**（89 files）——Iteration 132 已把继承的 20 个错误清零。
+- **类型检查**：`pnpm check` **0 errors / 0 warnings / 0 hints**（89 files）——Iteration 133 已把继承的 20 个错误清零。
 - **目录 / 刻度轨**：文章页 `RhineToc`（编号目录、当前项高亮、移动端折叠）+ `RhineProgress`（≥1440px 刻度轨、阅读百分比、点击/键盘跳转、Swup 重绑）。
 - **a11y**：每篇文章 h1 唯一；辅助色对比度 5.28:1 / 4.74:1（AA）；skip link 可用；移动端检索面板可滚动。
 - **检索筛选**：`pagefind.filters()` 返回分类/标签计数；分类筛选实测 3 条结果；UI chip 选中态/清除/计数正常。

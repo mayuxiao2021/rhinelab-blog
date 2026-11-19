@@ -134,7 +134,7 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.4.0 真实构建产物，无后期合成。
+> 截图来自 v0.4.1 真实构建产物，无后期合成。
 
 ## 它是什么
 
@@ -260,6 +260,23 @@ theme/                # 可移植主题包 + 安装器（见 theme/README.md）
 - [x] `prefers-contrast: more` 与 `forced-colors: active` 适配
 - [x] `prefers-reduced-motion` 全量降级、键盘焦点可见、skip link、h1 语义、辅助色 AA
 
+## GitHub Actions（CI）
+
+仓库自带 [`.github/workflows/verify.yml`](.github/workflows/verify.yml)，在 `push` 到 `main` 或手动 `workflow_dispatch` 时运行：
+
+1. `pnpm install --frozen-lockfile`
+2. `pnpm check`（astro check，0 errors / 0 warnings / 0 hints）
+3. `pnpm verify`（18 步门禁：链接、无障碍、对比度、feed、预算、静默 catch 等）
+4. `pnpm test:subpath`（`/rhine-test/` 子路径回归）
+5. `node scripts/package.mjs` + `verify-release --full --build`（解压包构建校验）
+6. 上传 `dist/` 与 `release/*.zip` 为 artifact（保留 7 天）
+
+本地等价强校验：
+
+```bash
+pnpm verify && pnpm test:subpath && node scripts/package.mjs && node scripts/verify-release.mjs --full --build
+```
+
 ## 部署
 
 1. 修改 `astro.config.mjs` 的 `site` 为你的域名；
@@ -293,7 +310,7 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.4.0**（`package.json`）
+- 当前版本 **v0.4.1**（`package.json`）
 - 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
 - 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。

@@ -2,6 +2,15 @@
 
 本项目的变更记录，遵循「每轮迭代至少修一个严重 bug 或加一个创新点」的节奏。
 
+## [0.4.1] — 2026-11-19
+
+### CI / GitHub Actions
+
+- 新增 `.github/workflows/verify.yml`：push / workflow_dispatch 触发，跑 18 步 verify + 子路径回归 + 打包 + 解压包构建校验，并上传 dist / zip 产物
+- **B64**：`verify-release.mjs` 只传 `--full/--build` 时把 `--full` 误当版本号 → 支持无版本参数（自动取最新 zip）
+- **B65**：Linux 下 zip 相关命令不兼容：`tar -tf` 无法列 zip、`zip -r .` 归档无根目录；改为 unzip → python3 → bsdtar 回退，并统一归档根目录 + 条目归一化
+- GitHub Actions 连续两轮（push + workflow_dispatch）全绿，第 5 轮起稳定通过并上传 artifact
+
 ## [0.4.0] — 2026-11-19
 
 ### 演示站（非商业同人素材）

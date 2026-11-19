@@ -3389,3 +3389,28 @@
 
 1. 外部阅读器实测仍受网络限制；
 2. 立绘为第三方公开归档，商用/再分发需删除（文档已写清）。
+
+## Iteration 133 — GitHub 仓库与 Actions 迭代（10:00–10:45）
+
+### 目标
+
+用户要求「去 GitHub 开个仓库跑几轮 Action」。已创建私有仓库 `mayuxiao2021/rhinelab-blog`，用 SSH 推送，逐步把 Windows 本机通过的门禁迁到 Ubuntu runner。
+
+### 过程（5 轮失败 → 全绿）
+
+1. **run #1**：`pnpm/action-setup` 与 `packageManager` 版本重复 → 移除 action 的 version 输入。
+2. **run #2**：`verify-release --full` 把 `--full` 当版本号 → 修 CLI 参数解析（B64）。
+3. **run #3**：GNU tar 不能读 zip（Windows 上 bsdtar 可以）→ 改为 unzip / python3 / bsdtar 回退。
+4. **run #4**：Linux `zip -rq .` 归档不含根目录，条目归一化把 `docs/...` 又剥了一层 → 归档统一带 `rhinelab-blog/` 根目录，条目归一化兼容三种归档。
+5. **run #5**：push 触发全绿（含 artifact 上传）。
+6. **run #6**：`workflow_dispatch` 再跑一次，同样全绿。
+
+### 最终 workflow
+
+`pnpm install --frozen-lockfile` → `pnpm check` → `pnpm verify`（18 步）→ `pnpm test:subpath` → `node scripts/package.mjs` → `verify-release --full --build` → 上传 `dist` 与 `release/*.zip` 产物（7 天保留）。安装 `fonts-noto-cjk` 保证 OG 图中文正常。
+
+### 验证
+
+- GitHub Actions：run #5（push）与 run #6（dispatch）均 success；步骤 1–12 全绿，artifact 上传成功。
+- 本地：`pnpm verify` 18 步、`verify-release --full --build` 仍全部通过。
+- 版本推进到 v0.4.1，文档同步。
