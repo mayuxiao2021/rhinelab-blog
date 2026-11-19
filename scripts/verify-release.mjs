@@ -69,8 +69,28 @@ if (expectedSize && Number(expectedSize) !== buffer.length) {
 }
 if (expectedFiles < 0) issues.push('MANIFEST 缺少 files 行')
 
-// 用 tar（Windows 自带 bsdtar）列出 zip 条目
-const listOutput = execFileSync('tar', ['-tf', zipPath], { encoding: 'utf8' })
+// 跨平台列出 zip 条目：unzip（Linux/macOS）→ python3 zipfile → bsdtar（Windows）
+const tryExec = (command, args, options = {}) => {
+  try {
+    return execFileSync(command, args, { encoding: 'utf8', ...options })
+  } catch {
+    return null
+  }
+}
+const listZip = file => {
+  const unzip = tryExec('unzip', ['-Z1', file])
+  if (unzip !== null) return unzip
+  const python = tryExec('python3', [
+    '-c',
+    'import sys,zipfile;print("\\n".join(zipfile.ZipFile(sys.argv[1]).namelist()))',
+    file,
+  ])
+  if (python !== null) return python
+  const tar = tryExec('tar', ['-tf', file])
+  if (tar !== null) return tar
+  throw new Error('无法读取 zip（需要 unzip / python3 / bsdtar 之一）')
+}
+const listOutput = listZip(zipPath)
 const entries = listOutput
   .split(/\r?\n/)
   .map(line => line.trim())
@@ -115,7 +135,16 @@ const withBuild = process.argv.includes('--build')
 if (full && issues.length === 0) {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'rhine-release-'))
   try {
-    execFileSync('tar', ['-xf', zipPath, '-C', tempRoot], { stdio: 'inherit' })
+    const unzipOk = tryExec('unzip', ['-q', zipPath, '-d', tempRoot]) !== null
+    if (!unzipOk) {
+      const pythonOk = tryExec('python3', [
+        '-c',
+        'import sys,zipfile;zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])',
+        zipPath,
+        tempRoot,
+      ]) !== null
+      if (!pythonOk) execFileSync('tar', ['-xf', zipPath, '-C', tempRoot], { stdio: 'inherit' })
+    }
     const appDir = path.join(tempRoot, 'rhinelab-blog')
     if (!fs.existsSync(appDir)) {
       issues.push('解压后找不到 rhinelab-blog/ 目录')
