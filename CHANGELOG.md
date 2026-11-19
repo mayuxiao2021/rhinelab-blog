@@ -2,6 +2,17 @@
 
 本项目的变更记录，遵循「每轮迭代至少修一个严重 bug 或加一个创新点」的节奏。
 
+## [0.4.2] — 2026-11-19
+
+### 公开 + GitHub Pages
+
+- 仓库转为公开：<https://github.com/mayuxiao2021/rhinelab-blog>
+- 新增 `pages.yml`：`BASE_PATH=/rhinelab-blog/` 构建 + Actions 部署到 GitHub Pages
+- 在线演示：<https://mayuxiao2021.github.io/rhinelab-blog/>（备用域 <https://github.glmyx.eu.org/rhinelab-blog/>）
+- README 增加 verify / pages 徽章与在线演示入口；仓库 homepage 指向 Pages
+- 修复 `bump.mjs` 迭代号替换范围（只改「阶段 / 本轮」行，不再误伤 STATE 历史摘要）
+
+
 ## [0.4.1] — 2026-11-19
 
 ### CI / GitHub Actions

@@ -3414,3 +3414,19 @@
 - GitHub Actions：run #5（push）与 run #6（dispatch）均 success；步骤 1–12 全绿，artifact 上传成功。
 - 本地：`pnpm verify` 18 步、`verify-release --full --build` 仍全部通过。
 - 版本推进到 v0.4.1，文档同步。
+
+## Iteration 134 — 公开仓库 + GitHub Pages（11:50–12:20）
+
+### 操作
+
+- 仓库由私有转为 **public**：<https://github.com/mayuxiao2021/rhinelab-blog>（含非商业演示立绘；ASSETS 已写明版权与移除方式）。
+- 通过 API 启用 Pages（`build_type: workflow`），新增 `.github/workflows/pages.yml`：`BASE_PATH=/rhinelab-blog/` + `SITE_URL=https://mayuxiao2021.github.io` 构建 → `configure-pages` → 上传 → `deploy-pages`。
+- 推送前本地用相同 BASE_PATH 构建并跑 `check-links/check-seo`：39 页、资源与 canonical 全部带 `/rhinelab-blog/` 前缀。
+- 仓库 homepage 指向 Pages；README 增加 verify / pages 徽章与「在线演示」入口；修复 `bump.mjs` 对 STATE 历史迭代号的误替换。
+
+### 验证
+
+- `pages` run 44447843083：Build → Setup Pages → Upload → Deploy 全绿；
+- `verify` run 44447842999：18 步 + 子路径 + 打包 + 解压构建全绿；
+- 线上：<https://mayuxiao2021.github.io/rhinelab-blog/> 200，首页与 `/operators/` 标题正确；`/rhine/art/art-saria.webp`、`/pagefind/pagefind.js`、`/og/default.png` 均 200；
+- 浏览器访问被 302 到 <https://github.glmyx.eu.org/rhinelab-blog/>（Pages 代理域），页面完整渲染。

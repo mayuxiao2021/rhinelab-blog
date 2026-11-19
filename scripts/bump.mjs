@@ -80,7 +80,12 @@ if (iterationArg && /^\d+$/.test(iterationArg)) {
   const statePath = 'STATE.md'
   const stateText = read(statePath)
   if (/Iteration \d+/.test(stateText)) {
-    write(statePath, stateText.replace(/Iteration \d+/g, `Iteration ${iterationArg}`))
+    // 只替换「阶段 / 本轮」行里的当前迭代号，避免误伤历史摘要
+    const nextState = stateText.replace(
+      /(阶段：\*\*Iteration |本轮：Iteration )(\d+)/g,
+      (_m, prefix) => `${prefix}${iterationArg}`,
+    )
+    write(statePath, nextState)
     changed.push(statePath)
   }
 }

@@ -7,7 +7,10 @@
 [![Astro](https://img.shields.io/badge/Astro-6.x-BC52EE?logo=astro&logoColor=white)](https://astro.build)
 [![Fuwari](https://img.shields.io/badge/base-Fuwari%20(MIT)-blue)](https://github.com/saicaca/fuwari)
 [![License](https://img.shields.io/badge/code-MIT-green)](LICENSE)
-![rhinelab 版本与迭代数](docs/badge-version.svg)
+![rhinelab 版本与迭代数](docs/badge-version.svg) [![verify](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/verify.yml/badge.svg)](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/verify.yml) [![pages](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/pages.yml/badge.svg)](https://github.com/mayuxiao2021/rhinelab-blog/actions/workflows/pages.yml)
+
+> **在线演示（GitHub Pages）**：<https://mayuxiao2021.github.io/rhinelab-blog/> —— 使用 `BASE_PATH=/rhinelab-blog/` 构建；
+> 若该域名被代理，也可访问 <https://github.glmyx.eu.org/rhinelab-blog/>。
 
 **导航**：[预览](#预览) · [它是什么](#它是什么) · [快速开始](#快速开始) · [安装到现有博客](#把主题安装到现有-fuwari-博客) · [主题定制](docs/THEMING.md) · [设计说明](docs/DESIGN.md) · [部署](docs/DEPLOY.md) · [素材许可](docs/ASSETS.md) · [验收记录](docs/ACCEPTANCE.md) · [贡献指南](CONTRIBUTING.md) · [迭代记录](ITERATIONS.md)
 
@@ -134,7 +137,7 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.4.1 真实构建产物，无后期合成。
+> 截图来自 v0.4.2 真实构建产物，无后期合成。
 
 ## 它是什么
 
@@ -277,6 +280,8 @@ theme/                # 可移植主题包 + 安装器（见 theme/README.md）
 pnpm verify && pnpm test:subpath && node scripts/package.mjs && node scripts/verify-release.mjs --full --build
 ```
 
+另有一个 [`pages.yml`](.github/workflows/pages.yml)：push 到 `main` 后以 `BASE_PATH=/rhinelab-blog/` 构建 `dist/`，通过 GitHub Pages（Actions 部署）发布到上面的在线演示地址。
+
 ## 部署
 
 1. 修改 `astro.config.mjs` 的 `site` 为你的域名；
@@ -310,7 +315,7 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.4.1**（`package.json`）
+- 当前版本 **v0.4.2**（`package.json`）
 - 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
 - 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。

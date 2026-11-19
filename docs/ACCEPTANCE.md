@@ -1,4 +1,4 @@
-# 验收记录 · Rhine Archive Template v0.4.1
+# 验收记录 · Rhine Archive Template v0.4.2
 
 > 本文件记录最终交付版本的验收命令、实测结果与已知限制，便于接手者复现与核对。
 > 版本号以 `package.json` 与 `release/` 下最新 MANIFEST 为准。
@@ -22,7 +22,7 @@ node scripts/package.mjs       # 生成 zip + MANIFEST
 node scripts/verify-release.mjs --full --build   # 清单一致性 + 解压包自测 + 文档门禁 + 解压后 astro build + check-links
 ```
 
-## 3. 实测结果（v0.4.1 · 演示站 + CI）
+## 3. 实测结果（v0.4.2 · 演示站 + CI + Pages）
 
 - `pnpm verify`：**18/18 通过**；`astro check` 89 files 0/0/0。
 - 页面与索引：**39 页**（新增 `/operators/` 演示页）/ 39 唯一标题 / 13 段 JSON-LD / 37 canonical / 39 张 OG / 37 条 sitemap URL / 6 篇文章 / 2 分类 / 12 标签。
@@ -31,7 +31,8 @@ node scripts/verify-release.mjs --full --build   # 清单一致性 + 解压包�
 - 体积预算：总产物 6738 KB / 6912 KB（97%）、JS 85%、CSS 83%、字体 73%、单页最大 107.4 KB / 112 KB、OG 61%、41 张 `<img>` 全部带 width/height。
 - 子路径部署：`BASE_PATH=/rhine-test/` 构建 + 断链/SEO/Feed 检查全过，并恢复默认构建。
 - 解压包自身可构建：`--build` 下解压 zip → 复用 `node_modules` → `astro build` 通过 → 构建后 `check-links --strict` 通过。
-- GitHub Actions：`.github/workflows/verify.yml` 在 Ubuntu 上跑同一套 18 步 + 子路径 + 打包 + 解压构建，连续 3 轮 push/dispatch 全绿，并上传 dist 与 zip artifact。
+- GitHub Actions：`verify.yml`（18 步 + 子路径 + 打包 + 解压构建）与 `pages.yml`（构建 + Actions 部署）均全绿。
+- **在线演示（GitHub Pages）**：<https://mayuxiao2021.github.io/rhinelab-blog/>（`BASE_PATH=/rhinelab-blog/`；备用域 <https://github.glmyx.eu.org/rhinelab-blog/>）。
 - 运行时采样（本机 Chromium，静态服务）：FCP **164ms**、load **320ms**、44 资源 / 255KB、DOM 632 节点。
 - 版本沿革：**133 条迭代记录**（Iteration 0–132），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
 
