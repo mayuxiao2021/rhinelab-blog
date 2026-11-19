@@ -96,7 +96,15 @@ const entries = listOutput
   .map(line => line.trim())
   .filter(Boolean)
   .filter(line => !line.endsWith('/'))
-const entryFiles = entries.map(entry => entry.replace(/^[^/]+\//, ''))
+// 归一化：去掉可能的 ./ 前缀与打包根目录（rhinelab-blog/），
+// 兼容 Windows PowerShell、Linux Info-ZIP（无根目录）与 tar 三种归档方式
+const normalizeEntry = entry => {
+  let value = entry.replace(/\\/g, '/').replace(/^\.\//, '')
+  const rootDir = value.split('/')[0]
+  if (rootDir === 'rhinelab-blog') value = value.slice(rootDir.length + 1)
+  return value
+}
+const entryFiles = entries.map(normalizeEntry)
 if (expectedFiles >= 0 && entryFiles.length !== expectedFiles) {
   issues.push(`文件数不一致：MANIFEST ${expectedFiles} vs zip ${entryFiles.length}`)
 }

@@ -83,7 +83,11 @@ function zipDir(srcDir, outFile) {
     return
   }
   try {
-    execFileSync('zip', ['-rq', outFile, '.'], { cwd: srcDir, stdio: 'inherit' })
+    // 与 Windows 版保持一致：归档内包含 rhinelab-blog/ 根目录
+    execFileSync('zip', ['-rq', outFile, path.basename(srcDir)], {
+      cwd: path.dirname(srcDir),
+      stdio: 'inherit',
+    })
   } catch {
     execFileSync('tar', ['-czf', outFile, '-C', path.dirname(srcDir), path.basename(srcDir)], {
       stdio: 'inherit',
