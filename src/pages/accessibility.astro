@@ -1,0 +1,232 @@
+---
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { url } from '@utils/url-utils'
+import { profileConfig } from '../config'
+
+// 构建期读取版本，声明页与实际发布版本保持一致
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+const pkg = JSON.parse(readFileSync(path.join(projectRoot, 'package.json'), 'utf8'))
+const reviewDate = '2026-11-18'
+interface ContrastRow {
+  fg: string
+  bg: string
+  ratio: number
+  aa: boolean
+  aaa: boolean
+}
+interface ContrastTheme {
+  name: string
+  rows: ContrastRow[]
+}
+
+const lowestRows = (rows: ContrastRow[]) =>
+  [...rows].sort((a, b) => a.ratio - b.ratio).slice(0, 1)
+const contrast = JSON.parse(
+  readFileSync(path.join(projectRoot, 'src/data/contrast-report.json'), 'utf8'),
+) as { min_ratio: number; themes: ContrastTheme[] }
+
+const shortcuts = [
+  ['/', '打开并聚焦检索面板'],
+  ['Esc', '关闭检索面板或移动端菜单'],
+  ['↑ / ↓', '在检索结果间移动（结果面板打开时）'],
+  ['Enter', '打开当前选中的检索结果'],
+  ['Tab', '首次 Tab 会跳到「主内容」skip link'],
+  ['Ctrl/Cmd + P', '使用打印样式导出 PDF（隐藏按钮与装饰）'],
+  ['点击主题按钮', '在亮色 / 暗色主题间切换'],
+  ['g 然后 h / a / t / s / r / b / c', '依次跳到：首页 / 归档 / 时间线 / 统计 / 随机 / 订阅 / 制作说明'],
+  ['?', '打开键盘快捷键浮层（Esc / 背景点击 / 关闭按钮退出，焦点被限制在浮层内）'],
+  ['点击标题 #', '复制该章节的绝对链接（底部提示，保留页面跳转）'],
+]
+
+const checks = [
+  ['scripts/check-links.mjs --strict', '站内链接、锚点、资源与 sitemap 一致性'],
+  ['scripts/check-a11y.mjs', 'img alt、可访问名称、外链 rel、标题层级、单 h1、aria 引用、重复 id、aria-live 冲突、可聚焦元素隐藏、role=img 命名等静态检查'],
+  ['scripts/check-contrast.mjs', '亮/暗两套主题关键颜色组合的 WCAG 对比度（正常文本 ≥ 4.5:1）'],
+  ['scripts/check-feed.mjs', 'RSS / JSON Feed 结构、GUID 唯一性与 stats/sitemap 一致性'],
+  ['scripts/check-docs.mjs', '文档相对链接、截图有效性与版本号一致性'],
+  ['scripts/check-budget.mjs', '总产物体积、JS/CSS、字体、OG 与单页 HTML 预算'],
+  ['scripts/check-seo.mjs', '标题唯一性、meta description、canonical、OG 尺寸与 JSON-LD 结构'],
+  ['theme/selftest.mjs', '主题覆盖层安装、幂等、校验与回滚自测'],
+]
+
+const github = profileConfig.links.find(link => link.name === 'GitHub')?.url
+---
+
+<MainGridLayout title="可访问性" description="键盘操作、对比度、减少动效与静态无障碍门禁说明，含 17 条规则、手动复验步骤与运行时组件行为">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">A11Y / 可访问性</p>
+    <h1 class="rl-stats-head__title">可访问性</h1>
+    <p class="rl-stats-head__desc">
+      本站以「档案」为视觉语言，但可访问性优先于装饰：键盘可完成主要操作，动效尊重系统设置，颜色对比度有静态门禁。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>LAST REVIEW / 最近审查</span>
+      <b>{reviewDate}</b>
+      <span>VERSION / 版本</span>
+      <b>v{pkg.version}</b>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-keys">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-keys">KEYBOARD / 键盘操作</span>
+      <span class="rl-panel__note">NO MOUSE REQUIRED</span>
+    </div>
+    <table class="rl-a11y__table">
+      <thead>
+        <tr><th scope="col">按键</th><th scope="col">作用</th></tr>
+      </thead>
+      <tbody>
+        {
+          shortcuts.map(([key, desc]) => (
+            <tr>
+              <td><kbd>{key}</kbd></td>
+              <td>{desc}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-vision">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-vision">VISION &amp; MOTION / 视觉与动效</span>
+    </div>
+    <ul class="rl-a11y__list">
+      <li><b>对比度</b>：正文、次级文字、黄铜强调色与代码配色在亮/暗主题下均满足 WCAG AA（由 <code>check-contrast.mjs</code> 校验）。</li>
+      <li><b>减少动效</b>：<code>prefers-reduced-motion: reduce</code> 下关闭扫描线、脉冲与过渡动画。</li>
+      <li><b>高对比度 / 强制颜色</b>：支持 <code>prefers-contrast: more</code> 与 <code>forced-colors: active</code>，边框与文字令牌会切换到高对比值。</li>
+      <li><b>打印</b>：隐藏按钮、导航与装饰，正文单栏输出，适合另存为 PDF。</li>
+      <li><b>焦点</b>：所有交互元素保留可见焦点环；skip link 在首次 Tab 时出现；快捷键浮层内 Tab / Shift+Tab 循环，不会逃到背景内容。</li>
+      <li><b>状态播报</b>：检索结果数量使用 <code>role="status" aria-live="polite"</code>，屏幕阅读器可感知结果变化。</li>
+      <li><b>当前位置</b>：目录与阅读进度轨的当前小节使用 <code>aria-current</code> 标记。</li>
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-motion">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-motion">MOTION / 减少动效</span>
+      <span class="rl-panel__note">PREFERS-REDUCED-MOTION</span>
+    </div>
+    <ul class="rl-readers__list">
+      <li><b>全局兜底</b><span>系统开启「减少动效」时，所有元素与伪元素的 animation / transition 压到 0.01ms，平滑滚动关闭，覆盖组件与第三方库。</span></li>
+      <li><b>组件规则</b><span>进度条刻度、画廊卡片、目录项、相关文章另有针对性规则；系统动效偏好与组件规则双重生效。</span></li>
+      <li><b>手动复验</b><span>DevTools → Rendering → Emulate CSS media feature → <code>prefers-reduced-motion: reduce</code>，页面不应再有位移/淡入动画。</span></li>
+    </ul>
+    <div class="rl-motion-row">
+      <p class="rl-motion-pref" id="rl-motion-pref" aria-live="polite">系统动效偏好：检测中…</p>
+      <button class="rl-sitemap__retry" id="rl-motion-preview" type="button" aria-pressed="false">预览减少动效</button>
+    </div>
+    <script>
+      const motionNode = document.getElementById('rl-motion-pref')
+      const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+      const renderMotion = () => {
+        if (!motionNode) return
+        motionNode.textContent = motionQuery.matches
+          ? '系统动效偏好：减少动效（本页动画已压制，动画时长 0.01ms）'
+          : '系统动效偏好：标准动效（页面动效按设计播放）'
+        motionNode.classList.toggle('is-reduced', motionQuery.matches)
+      }
+      renderMotion()
+      motionQuery.addEventListener?.('change', renderMotion)
+
+      const preview = document.getElementById('rl-motion-preview')
+      preview?.addEventListener('click', () => {
+        const reduced = document.documentElement.classList.toggle('rl-reduce-motion')
+        preview.setAttribute('aria-pressed', reduced ? 'true' : 'false')
+        preview.textContent = reduced ? '关闭动效预览' : '预览减少动效'
+      })
+    </script>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-widgets">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-widgets">WIDGETS / 运行时小组件</span>
+      <span class="rl-panel__note">PROGRESSIVE ENHANCEMENT</span>
+    </div>
+    <ul class="rl-readers__list">
+      <li><b>状态播报</b><span>机器状态、动效偏好、订阅源体积等动态结果使用 <code>aria-live="polite"</code>，屏幕阅读器会播报变化。</span></li>
+      <li><b>按钮状态</b><span>刷新/重新检查进行中会设置 <code>disabled</code> 与「刷新中…」文案，避免重复操作。</span></li>
+      <li><b>超时降级</b><span>所有运行时请求 8 秒超时，失败展示「不可用」而不是无限加载；禁用 JavaScript 仍可阅读正文与订阅。</span></li>
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-checks">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-checks">STATIC CHECKS / 静态门禁</span>
+      <span class="rl-panel__note">pnpm verify</span>
+    </div>
+    <ul class="rl-a11y__list">
+      {
+        checks.map(([script, desc]) => (
+          <li>
+            <code>{script}</code>
+            <span>{desc}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-contrast">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-contrast">CONTRAST / 对比度数值</span>
+      <span class="rl-panel__note">WCAG AA ≥ {contrast.min_ratio}:1 · 构建期实测</span>
+    </div>
+    <div class="rl-contrast">
+      {
+        contrast.themes.map(theme => (
+          <div class="rl-contrast__theme">
+            <p class="rl-contrast__label">{theme.name}</p>
+            <p class="rl-contrast__lowest">
+              LOWEST / 最低：<code>{lowestRows(theme.rows)[0]?.fg}</code> on{' '}
+              <code>{lowestRows(theme.rows)[0]?.bg}</code> ·{' '}
+              <b>{lowestRows(theme.rows)[0]?.ratio.toFixed(2)}:1</b>
+            </p>
+            <table class="rl-a11y__table">
+              <thead>
+                <tr><th scope="col">组合</th><th scope="col">对比度</th><th scope="col">等级</th></tr>
+              </thead>
+              <tbody>
+                {[...theme.rows].sort((a, b) => a.ratio - b.ratio).map(row => (
+                  <tr>
+                    <td><code>{row.fg}</code> on <code>{row.bg}</code></td>
+                    <td class="rl-contrast__ratio">{row.ratio.toFixed(2)}:1</td>
+                    <td>{row.aaa ? 'AAA' : row.aa ? 'AA' : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
+      }
+    </div>
+    <p class="rl-a11y__hint">
+      表格已按对比度**升序**排列（最低在前），便于优先检查风险项；阈值：AA ≥ 4.5:1，AAA ≥ 7:1。
+      数值由 <code>scripts/check-contrast.mjs</code> 在构建前写入
+      <code>src/data/contrast-report.json</code>，页面只读取数据、不重复计算。
+    </p>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="a11y-limits">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="a11y-limits">LIMITS / 已知限制</span>
+    </div>
+    <ul class="rl-a11y__list">
+      <li><b>检索</b>：依赖 JavaScript 与 Pagefind 客户端索引；禁用脚本时请使用归档、RSS 或 JSON Feed。</li>
+      <li><b>图表与公式</b>：Mermaid 需 JavaScript 渲染（打印时可能显示为代码文本）；关闭样式时 KaTeX 公式退化为普通文本。</li>
+      <li><b>离线</b>：不注册 Service Worker（设计决策见 <code>docs/DESIGN.md</code>），不支持整站离线阅读。</li>
+      <li><b>第三方嵌入</b>：默认不加载评论/统计脚本；如启用，需要自行评估其可访问性。</li>
+      <li><b>屏幕阅读器</b>：已做静态结构与键盘检查，尚未进行 NVDA / VoiceOver 全量人工回归。</li>
+    </ul>
+  </section>
+
+  <p class="rl-a11y__note">
+    如果发现键盘操作、对比度或屏幕阅读器相关的问题，
+    {github ? <a href={github} target="_blank" rel="noopener noreferrer">在 GitHub 提 issue</a> : <a href={url('/about/')}>通过关于页联系</a>}。
+  </p>
+</MainGridLayout>

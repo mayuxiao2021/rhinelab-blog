@@ -1,0 +1,112 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { getSortedPosts, getCategoryList, getTagList } from '@utils/content-utils'
+import { getPostUrlBySlug, url } from '@utils/url-utils'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+
+const posts = await getSortedPosts()
+const categories = await getCategoryList()
+const tags = await getTagList()
+const pad = (n: number) => String(n).padStart(2, '0')
+
+const maxTagCount = Math.max(1, ...tags.map(tag => tag.count))
+const sortedTags = [...tags].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh-CN'))
+const share = (count: number, total: number) => (total ? Math.round((count / total) * 100) : 0)
+
+const latestByCategory = new Map<string, (typeof posts)[number]>()
+for (const post of posts) {
+  const name = post.data.category || '未分类'
+  if (!latestByCategory.has(name)) latestByCategory.set(name, post)
+}
+
+// 标签云的视觉权重：按条目数映射字号与字重
+const cloudWeight = (count: number) => {
+  const ratio = count / maxTagCount
+  return {
+    size: (0.75 + ratio * 0.5).toFixed(3),
+    weight: ratio >= 0.66 ? 700 : ratio >= 0.33 ? 600 : 500,
+  }
+}
+---
+
+<MainGridLayout title="分类与标签" description="全部档案的分类分布与标签云，按条目数加权排序，可直接进入分类或标签归档浏览">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">TOPICS / 分类与标签</p>
+    <h1 class="rl-stats-head__title">档案的编目维度</h1>
+    <p class="rl-stats-head__desc">
+      分类决定条目归属，标签用于交叉检索。标签字号与条目数成正比，颜色越深表示条目越多。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>CATEGORIES / 分类</span>
+      <b>{pad(categories.length)}</b>
+      <span>TAGS / 标签</span>
+      <b>{pad(tags.length)}</b>
+      <span>ENTRIES / 条目</span>
+      <b>{pad(posts.length)}</b>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="topics-categories">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="topics-categories">CATEGORIES / 分类分布</span>
+      <span class="rl-panel__note">{pad(categories.length)} GROUPS</span>
+    </div>
+    <ul class="rl-cat-list">
+      {
+        categories.map(item => {
+          const latest = latestByCategory.get(item.name)
+          return (
+            <li class="rl-cat">
+              <div class="rl-cat__head">
+                <a class="rl-cat__name" href={url(`/archive/category/${item.name}/`)}>
+                  {item.name}
+                </a>
+                <span class="rl-cat__count">
+                  {pad(item.count)} FILES · {share(item.count, posts.length)}%
+                </span>
+              </div>
+              <div class="rl-cat__track">
+                <i style={`width: ${Math.round((item.count / posts.length) * 100)}%`} />
+              </div>
+              {latest && (
+                <p class="rl-cat__latest">
+                  LATEST / 最近：
+                  <a href={getPostUrlBySlug(latest.id.replace(/\/index$/, ''))}>
+                    {formatDateToYYYYMMDD(latest.data.published)} · {latest.data.title}
+                  </a>
+                </p>
+              )}
+            </li>
+          )
+        })
+      }
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="topics-tags">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="topics-tags">TAG CLOUD / 标签云</span>
+      <span class="rl-panel__note">{pad(tags.length)} LABELS</span>
+    </div>
+    <ul class="rl-cloud">
+      {
+        sortedTags.map(tag => {
+          const style = cloudWeight(tag.count)
+          return (
+            <li>
+              <a
+                class="rl-cloud__chip"
+                href={url(`/archive/tag/${tag.name}/`)}
+                style={`font-size: ${style.size}rem; font-weight: ${style.weight};`}
+              >
+                <span class="rl-cloud__hash">#</span>
+                {tag.name}
+                <span class="rl-cloud__count">{pad(tag.count)}</span>
+              </a>
+            </li>
+          )
+        })
+      }
+    </ul>
+  </section>
+</MainGridLayout>

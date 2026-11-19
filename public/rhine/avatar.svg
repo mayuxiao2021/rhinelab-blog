@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" role="img" aria-label="Archive observer avatar">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0v40" fill="none" stroke="#080a08" stroke-width="1" opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="480" height="480" fill="#e7e3d9"/>
+  <rect width="480" height="480" fill="url(#grid)"/>
+  <!-- 角标 -->
+  <g stroke="#9b7247" stroke-width="2" opacity=".8" fill="none">
+    <path d="M28 28h28M28 28v28M452 28h-28M452 28v28M28 452h28M28 452v-28M452 452h-28M452 452v-28"/>
+  </g>
+  <!-- 头像剪影 -->
+  <g>
+    <circle cx="240" cy="196" r="82" fill="#11181b"/>
+    <path d="M96 480c4-108 66-152 144-152s140 44 144 152Z" fill="#11181b"/>
+    <path d="M240 352c-38 0-62 16-74 44M240 352c38 0 62 16 74 44" stroke="#e7e3d9" stroke-width="6" fill="none" opacity=".55"/>
+    <!-- 实验服领口 -->
+    <path d="M204 344 240 400l36-56" stroke="#e7e3d9" stroke-width="7" fill="none" opacity=".75"/>
+  </g>
+  <!-- 护目镜 -->
+  <g fill="none" stroke="#c5a16b" stroke-width="6">
+    <rect x="176" y="178" width="56" height="34" rx="8" fill="#c5a16b" fill-opacity=".16"/>
+    <rect x="248" y="178" width="56" height="34" rx="8" fill="#c5a16b" fill-opacity=".16"/>
+    <path d="M232 194h16"/>
+    <path d="M176 190h-22M304 190h22"/>
+  </g>
+  <!-- 观测者编号 -->
+  <g font-family="JetBrains Mono, monospace" fill="#77756d" font-size="13" letter-spacing="3">
+    <text x="34" y="432">OBSERVER-07</text>
+    <text x="34" y="452" opacity=".7">SPECIMEN / FIELD</text>
+  </g>
+  <g font-family="JetBrains Mono, monospace" fill="#9b7247" font-size="13" letter-spacing="4">
+    <text x="352" y="432">RL</text>
+  </g>
+</svg>

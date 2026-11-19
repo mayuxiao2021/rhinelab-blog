@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Subscribe shortcut">
+  <rect width="192" height="192" fill="#11181b"/>
+  <g fill="none" stroke="#c5a16b" stroke-width="7" stroke-linecap="square">
+    <path d="M60 78a54 54 0 0 1 54 54"/>
+    <path d="M60 108a24 24 0 0 1 24 24"/>
+    <circle cx="60" cy="132" r="6" fill="#c5a16b" stroke="none"/>
+    <path d="M108 60h28v28"/>
+  </g>
+</svg>

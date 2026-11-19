@@ -1,0 +1,120 @@
+---
+interface Heading {
+  depth: number
+  slug: string
+  text: string
+}
+
+interface Props {
+  headings: Heading[]
+}
+
+const { headings } = Astro.props
+// rehype-autolink-headings 会把「#」作为文本追加到标题里，目录中需去掉
+const clean = (text: string) => text.replace(/\s*#\s*$/, '').trim()
+const items = (headings ?? [])
+  .filter(h => h.depth === 2 || h.depth === 3)
+  .map(h => ({ ...h, text: clean(h.text) }))
+---
+
+{
+  items.length >= 2 && (
+    <details class="rl-toc card-base" open data-pagefind-ignore>
+      <summary class="rl-toc__summary">
+        <span class="rl-kicker">CONTENTS / 目录</span>
+        <span class="rl-toc__count">{String(items.length).padStart(2, '0')} SECTIONS</span>
+      </summary>
+      <ol class="rl-toc__list">
+        {items.map((h, i) => (
+          <li class:list={['rl-toc__item', `rl-toc__item--d${h.depth}`]}>
+            <a href={`#${h.slug}`} data-toc-target={h.slug}>
+              <span class="rl-toc__no">{String(i + 1).padStart(2, '0')}</span>
+              <span class="rl-toc__text">{h.text || '（未命名小节）'}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </details>
+  )
+}
+
+<script>
+  type TocTarget = { id: string; el: HTMLElement; link: HTMLAnchorElement }
+  let tocCleanup: (() => void) | undefined
+
+  function collapseRhineTocOnMobile() {
+    if (window.innerWidth >= 768) return
+    for (const toc of document.querySelectorAll<HTMLDetailsElement>('.rl-toc')) {
+      toc.removeAttribute('open')
+    }
+  }
+
+  function initRhineTocSpy() {
+    tocCleanup?.()
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.rl-toc a[data-toc-target]'))
+    const targets: TocTarget[] = []
+    for (const link of links) {
+      const id = link.dataset.tocTarget || ''
+      const el = id ? document.getElementById(id) : null
+      if (el) targets.push({ id, el, link })
+    }
+    if (targets.length === 0) return
+
+    const setActive = (activeId: string) => {
+      for (const { id, link } of targets) {
+        const isActive = id === activeId
+        link.classList.toggle('is-active', isActive)
+        if (isActive) link.setAttribute('aria-current', 'location')
+        else link.removeAttribute('aria-current')
+      }
+    }
+
+    const probe = () => {
+      // 与进度轨相同：以视口 30% 处作为当前阅读位置
+      const line = window.innerHeight * 0.3
+      let activeId = targets[0].id
+      for (const { id, el } of targets) {
+        if (el.getBoundingClientRect().top <= line) activeId = id
+      }
+      setActive(activeId)
+    }
+
+    let raf = 0
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        probe()
+      })
+    }
+    const onClick = (event: Event) => {
+      const link = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[data-toc-target]')
+      if (!link) return
+      const id = link.dataset.tocTarget
+      if (id) setActive(id)
+      if (window.innerWidth < 768) {
+        link.closest<HTMLDetailsElement>('details.rl-toc')?.removeAttribute('open')
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    document.addEventListener('click', onClick)
+    probe()
+
+    tocCleanup = () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      document.removeEventListener('click', onClick)
+      cancelAnimationFrame(raf)
+    }
+    window.__rlTocCleanup = tocCleanup
+  }
+
+  collapseRhineTocOnMobile()
+  initRhineTocSpy()
+  document.addEventListener('astro:after-swap', () => {
+    collapseRhineTocOnMobile()
+    initRhineTocSpy()
+  })
+</script>

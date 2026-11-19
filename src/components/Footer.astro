@@ -1,0 +1,35 @@
+---
+import { profileConfig } from '../config'
+import { url } from '../utils/url-utils'
+import pkg from '../../package.json'
+
+const year = new Date().getFullYear()
+const buildVersion = `v${pkg.version}`
+---
+
+<div class="rl-footer card-base max-w-[var(--page-width)] mx-auto">
+  <div class="rl-footer__grid">
+    <div class="rl-footer__id">
+      RHINE ARCHIVE / 莱茵档案<br />
+      OBSERVER: <b>{profileConfig.name}</b><br />
+      NODE: <b>SECTOR-03</b> · BUILD: <b>{buildVersion}</b>
+    </div>
+    <div class="rl-footer__meta">
+      <span>© {year} {profileConfig.name}</span>
+      <a href={url('rss.xml')} target="_blank" rel="noopener">RSS</a>
+      <a href={url('feed.json')} target="_blank" rel="noopener">JSON</a>
+      <a href={url('series/')}>SERIES</a>
+      <a href={url('changelog/')}>CHANGELOG</a>
+      <a href={url('random/')}>RANDOM</a>
+      <a href={url('subscribe/')}>SUBSCRIBE</a>
+      <a href={url('timeline/')}>TIMELINE</a>
+      <a href={url('sitemap-index.xml')} target="_blank" rel="noopener">SITEMAP</a>
+      <a href="https://astro.build" target="_blank" rel="noopener">ASTRO</a>
+      <a href="https://github.com/saicaca/fuwari" target="_blank" rel="noopener">FUWARI</a>
+      <span>CC BY-NC-SA 4.0</span>
+    </div>
+    <p class="rl-footer__note">
+      <b>同人声明 / FAN DISCLAIMER：</b>本站使用「莱茵生命」风格的原创同人主题模板，与《明日方舟》及其权利人鹰角网络（Hypergryph）无任何隶属或合作关系，不包含任何官方游戏素材。全部图形由 CSS / SVG 自制，代码以 MIT 许可开源。
+    </p>
+  </div>
+</div>

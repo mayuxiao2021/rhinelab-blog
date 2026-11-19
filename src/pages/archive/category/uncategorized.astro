@@ -1,0 +1,13 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import ArchivePanel from "@components/ArchivePanel.astro";
+import {UNCATEGORIZED} from "@constants/constants";
+import { siteConfig } from "../../../config";
+---
+
+<MainGridLayout
+    title="未分类"
+    description={`${siteConfig.title} 中尚未归类的条目归档，按发布时间倒序排列，含摘要与阅读时长`}
+>
+    <ArchivePanel categories={[UNCATEGORIZED]} title="未分类档案" kicker="UNCLASSIFIED / 未分类"></ArchivePanel>
+</MainGridLayout>

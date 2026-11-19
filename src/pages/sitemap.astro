@@ -1,0 +1,252 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { getCategoryList, getSortedPosts, getTagList } from '@utils/content-utils'
+import { getCategoryUrl, getPostUrlBySlug, url } from '@utils/url-utils'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+
+const posts = await getSortedPosts()
+const categories = await getCategoryList()
+const tags = await getTagList()
+
+const postsByYear = new Map<number, typeof posts>()
+for (const post of posts) {
+  const year = post.data.published.getFullYear()
+  const list = postsByYear.get(year) ?? []
+  list.push(post)
+  postsByYear.set(year, list)
+}
+const postYears = [...postsByYear.entries()].sort((a, b) => b[0] - a[0])
+
+const pages = [
+  { href: url('/'), label: '首页 / HOME', desc: '最新条目与站点封面' },
+  { href: url('/operators/'), label: '研究员名录 / OPERATORS', desc: '8 位莱茵生命干员的档案与立绘（非商业演示）' },
+  { href: url('/archive/'), label: '归档 / ARCHIVE', desc: '按年份折叠的全部索引' },
+  { href: url('/timeline/'), label: '时间线 / TIMELINE', desc: '按时间排列的刻度线' },
+  { href: url('/stats/'), label: '统计 / STATS', desc: '条目、字数、年度对比与热力图' },
+  { href: url('/topics/'), label: '分类与标签 / TOPICS', desc: '按机构分类与关键词浏览' },
+  { href: url('/series/'), label: '系列 / SERIES', desc: '连续阅读的实验记录' },
+  { href: url('/about/'), label: '关于 / ABOUT', desc: '站点说明与导航枢纽' },
+  { href: url('/subscribe/'), label: '订阅 / SUBSCRIBE', desc: 'RSS、JSON Feed 与 OpenSearch' },
+  { href: url('/readers/'), label: '阅读器兼容 / READERS', desc: '三种订阅源、兼容处理与阅读器建议' },
+  { href: url('/privacy/'), label: '隐私与数据 / PRIVACY', desc: '数据最小化声明、本地存储与素材边界' },
+  { href: url('/changelog/'), label: '版本沿革 / CHANGELOG', desc: '模板包发布记录' },
+  { href: url('/accessibility/'), label: '可访问性 / A11Y', desc: '键盘、对比度与已知限制' },
+  { href: url('/colophon/'), label: '制作说明 / COLOPHON', desc: '构建链、色板与生成脚本' },
+  { href: url('/random/'), label: '随机档案 / RANDOM', desc: '随机抽取一条记录' },
+]
+
+const machine = [
+  { href: url('/sitemap-index.xml'), label: 'sitemap-index.xml', desc: 'XML 站点地图索引' },
+  { href: url('/robots.txt'), label: 'robots.txt', desc: '爬虫规则与 sitemap 声明' },
+  { href: url('/rss.xml'), label: 'rss.xml', desc: 'RSS 2.0 全文订阅' },
+  { href: url('/feed.json'), label: 'feed.json', desc: 'JSON Feed 1.1 全文订阅' },
+  { href: url('/feed-summary.json'), label: 'feed-summary.json', desc: 'JSON Feed 1.1 摘要版（标题 / 摘要 / 截断纯文本）' },
+  { href: url('/opensearch.xml'), label: 'opensearch.xml', desc: '浏览器站内搜索描述' },
+  { href: url('/manifest.webmanifest'), label: 'manifest.webmanifest', desc: 'PWA 清单（含快捷方式）' },
+  { href: url('/stats.json'), label: 'stats.json', desc: '机器可读统计（计数 / 分类 / 标签 / 文章）' },
+  { href: url('/build-info.json'), label: 'build-info.json', desc: '构建指纹（版本 / 迭代数 / 构建时间）' },
+]
+---
+
+<MainGridLayout title="站点索引" description="莱茵档案全部页面、文章、分类、标签与机器可读索引，含 9 个机器入口的实时状态与体积">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">SITEMAP / 站点索引</p>
+    <h1 class="rl-stats-head__title">站点索引</h1>
+    <p class="rl-stats-head__desc">
+      面向人和爬虫的全站索引：{pages.length} 个页面、{posts.length} 篇文章、{categories.length} 个分类、{tags.length} 个标签，
+      以及订阅与机器可读入口。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>PAGES / 页面</span><b>{String(pages.length).padStart(2, '0')}</b>
+      <span>POSTS / 文章</span><b>{String(posts.length).padStart(2, '0')}</b>
+      <span>CATEGORIES / 分类</span><b>{String(categories.length).padStart(2, '0')}</b>
+      <span>TAGS / 标签</span><b>{String(tags.length).padStart(2, '0')}</b>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="sitemap-pages">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="sitemap-pages">PAGES / 页面</span>
+    </div>
+    <div class="rl-sitemap">
+      {
+        pages.map(page => (
+          <a class="rl-sitemap__card" href={page.href}>
+            <span class="rl-sitemap__label">{page.label}</span>
+            <span class="rl-sitemap__desc">{page.desc}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="sitemap-posts">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="sitemap-posts">POSTS / 文章</span>
+      <span class="rl-panel__note">{String(posts.length).padStart(2, '0')} FILES</span>
+    </div>
+    {
+      postYears.map(([year, yearPosts], yearIndex) => (
+        <details class="rl-sitemap__year" open={yearIndex === 0}>
+          <summary class="rl-sitemap__year-label">
+            {year}<span>{String(yearPosts.length).padStart(2, '0')} FILES</span>
+          </summary>
+          <ul class="rl-sitemap__list">
+            {yearPosts.map(post => (
+              <li>
+                <a href={getPostUrlBySlug(post.id.replace(/\/index$/, ''))}>
+                  <span class="rl-sitemap__date">{formatDateToYYYYMMDD(post.data.published)}</span>
+                  <span class="rl-sitemap__title">{post.data.title}</span>
+                  <span class="rl-sitemap__meta">{post.data.category || '未分类'}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))
+    }
+  </section>
+
+  <div class="rl-sitemap-grid">
+    <section class="rl-panel card-base" aria-labelledby="sitemap-categories">
+      <div class="rl-panel__head">
+        <span class="rl-kicker" id="sitemap-categories">CATEGORIES / 分类</span>
+      </div>
+      <ul class="rl-sitemap__chips">
+        {
+          categories.map(category => (
+            <li>
+              <a class="rl-chip" href={getCategoryUrl(category.name)}>
+                {category.name}<span>{category.count}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="rl-panel card-base" aria-labelledby="sitemap-tags">
+      <div class="rl-panel__head">
+        <span class="rl-kicker" id="sitemap-tags">TAGS / 标签</span>
+      </div>
+      <ul class="rl-sitemap__chips">
+        {
+          tags.map(tag => (
+            <li>
+              <a class="rl-chip" href={url(`/archive/tag/${tag.name}/`)}>
+                {tag.name}<span>{tag.count}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <section class="rl-panel card-base" aria-labelledby="sitemap-machine" data-retry-count="1" data-retry-delay="700">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="sitemap-machine">MACHINE / 订阅与机器索引</span>
+      <span class="rl-panel__note">
+        <button class="rl-sitemap__retry" id="rl-machine-retry" type="button">重新检查</button>
+        <span id="rl-machine-summary" aria-live="polite">CHECKING…</span>
+      </span>
+    </div>
+    <ul class="rl-sitemap__list">
+      {
+        machine.map(item => (
+          <li>
+            <a href={item.href} target="_blank" rel="noopener noreferrer">
+              <span class="rl-sitemap__date">↗</span>
+              <span class="rl-sitemap__title">{item.label}</span>
+              <span class="rl-sitemap__meta">{item.desc}</span>
+            </a>
+            <span class="rl-sitemap__status" data-machine-url={item.href}>CHECKING…</span>
+            <button
+              class="rl-sitemap__copy"
+              type="button"
+              data-rl-copy-url={item.href}
+              aria-label={`复制 ${item.label} 链接`}
+            >复制</button>
+          </li>
+        ))
+      }
+    </ul>
+
+    <noscript>
+      <p class="rl-sitemap__noscript">实时状态需要 JavaScript；也可以直接点击上面的机器入口访问。</p>
+    </noscript>
+
+    <script>
+      const statusNodes = [...document.querySelectorAll('[data-machine-url]')]
+      const summary = document.getElementById('rl-machine-summary')
+      const retry = document.getElementById('rl-machine-retry') as HTMLButtonElement | null
+      const readRetryConfig = () => {
+        const section = document.querySelector('[data-retry-count]')
+        return {
+          maxRetries: Math.max(0, Number(section?.getAttribute('data-retry-count') ?? 1)),
+          retryDelay: Math.max(0, Number(section?.getAttribute('data-retry-delay') ?? 700)),
+        }
+      }
+      const timedFetch = async (url: string) => {
+        const controller = new AbortController()
+        const timer = window.setTimeout(() => controller.abort(), 8000)
+        return await fetch(url, { signal: controller.signal }).finally(() => window.clearTimeout(timer))
+      }
+      const runChecks = () => {
+        const { maxRetries, retryDelay } = readRetryConfig()
+        let okCount = 0
+        let doneCount = 0
+        if (retry) retry.disabled = true
+        if (summary) {
+          summary.textContent = 'CHECKING…'
+          summary.classList.remove('is-fail')
+        }
+        for (const node of statusNodes) {
+          node.textContent = 'CHECKING…'
+          node.classList.remove('is-ok', 'is-fail')
+        }
+        const flush = () => {
+          if (!summary) return
+          const now = new Date()
+          const stamp = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+          const done = doneCount === statusNodes.length
+          summary.textContent = `${okCount}/${statusNodes.length} OK${done ? ' · ' + stamp : ''}`
+          summary.classList.toggle('is-fail', okCount !== statusNodes.length && done)
+          if (done && retry) retry.disabled = false
+        }
+        const checkNode = (node: Element, target: string): Promise<void> => {
+          const attempt = (retried: number): Promise<void> =>
+            timedFetch(target)
+              .then(async response => {
+                if (!response.ok) throw new Error(String(response.status))
+                const text = await response.text()
+                const bytes = new Blob([text]).size
+                node.textContent = `${response.status} OK · ${(bytes / 1024).toFixed(1)}KB`
+                node.classList.add('is-ok')
+                okCount += 1
+              })
+              .catch(async () => {
+                // 静态托管偶发抖动：失败后 700ms 自动重试一次
+                if (retried < maxRetries) {
+                  await new Promise(resolve => window.setTimeout(resolve, retryDelay))
+                  return attempt(retried + 1)
+                }
+                node.textContent = 'UNAVAILABLE · 见 docs/DEPLOY.md 排查'
+                node.classList.add('is-fail')
+              })
+          return attempt(0)
+        }
+        for (const node of statusNodes) {
+          const target = node.getAttribute('data-machine-url')
+          if (!target) continue
+          void checkNode(node, target).finally(() => {
+            doneCount += 1
+            flush()
+          })
+        }
+      }
+      runChecks()
+      retry?.addEventListener('click', runChecks)
+    </script>
+  </section>
+</MainGridLayout>

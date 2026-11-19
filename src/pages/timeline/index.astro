@@ -1,0 +1,92 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { getSortedPosts } from '@utils/content-utils'
+import { getPostUrlBySlug } from '@utils/url-utils'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+
+const posts = await getSortedPosts()
+const pad = (n: number) => String(n).padStart(2, '0')
+
+type YearGroup = {
+  year: number
+  posts: typeof posts
+}
+
+const byYear = new Map<number, typeof posts>()
+for (const post of posts) {
+  const year = post.data.published.getFullYear()
+  const list = byYear.get(year) ?? []
+  list.push(post)
+  byYear.set(year, list)
+}
+
+const years: YearGroup[] = [...byYear.entries()]
+  .map(([year, items]) => ({ year, posts: items }))
+  .sort((a, b) => b.year - a.year)
+
+const first = posts.at(-1)?.data.published
+const last = posts[0]?.data.published
+const fmt = (date?: Date) => (date ? formatDateToYYYYMMDD(date) : '—')
+const monthDay = (date: Date) => `${pad(date.getMonth() + 1)}.${pad(date.getDate())}`
+---
+
+<MainGridLayout title="时间线" description="按年份与日期排列全部档案，显示编目跨度与每年条目数，可快速定位某一年或某一天的记录">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">TIMELINE / 档案时间线</p>
+    <h1 class="rl-stats-head__title">编目沿革</h1>
+    <p class="rl-stats-head__desc">
+      所有档案按发布时间倒序排列；每一年的条目以刻度节点挂在同一条时间线上，年份之间以发丝线分隔。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>YEARS / 年份</span>
+      <b>{pad(years.length)}</b>
+      <span>ENTRIES / 条目</span>
+      <b>{pad(posts.length)}</b>
+      <span>SPAN / 跨度</span>
+      <b>{fmt(first)} — {fmt(last)}</b>
+    </div>
+  </section>
+
+  <nav class="rl-timeline__nav" aria-label="年份跳转">
+    {
+      years.map(group => (
+        <a href={`#timeline-${group.year}`}>
+          {group.year}
+          <em>{pad(group.posts.length)}</em>
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="rl-timeline">
+    {
+      years.map(group => (
+        <section class="rl-timeline__year" aria-labelledby={`timeline-${group.year}`}>
+          <header class="rl-timeline__year-head">
+            <span class="rl-timeline__year-num" id={`timeline-${group.year}`}>
+              {group.year}
+            </span>
+            <span class="rl-timeline__year-meta">{pad(group.posts.length)} ENTRIES / 条目</span>
+          </header>
+
+          <ol class="rl-timeline__list">
+            {group.posts.map(post => (
+              <li class="rl-timeline__item">
+                <span class="rl-timeline__date" aria-hidden="true">
+                  {monthDay(post.data.published)}
+                </span>
+                <a href={getPostUrlBySlug(post.id.replace(/\/index$/, ''))} class="rl-timeline__link">
+                  <span class="rl-timeline__title">{post.data.title}</span>
+                  <span class="rl-timeline__meta">
+                    {post.data.category || '未分类'}
+                    {post.data.tags.length > 0 && <em>· {post.data.tags.slice(0, 2).join(' / ')}</em>}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</MainGridLayout>

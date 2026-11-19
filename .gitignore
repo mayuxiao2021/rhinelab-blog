@@ -1,0 +1,39 @@
+# 依赖与构建产物
+node_modules/
+dist/
+.astro/
+.tmp-build/
+.output/
+
+# 环境变量
+.env
+.env.*
+!.env.example
+
+# 编辑器与系统
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# 压缩包（发布产物单独存放）
+*.zip
+
+# 本地主题试验
+.rhine-backup/
+
+# 主题开发过程产物
+.shots/
+.build-*.log
+.preview.log
+.tmp-install/
+.tmp-pkgtest/
+
+# 构建期生成的 OG 图
+public/og/*.png
+
+# 发布包与本地缓存
+release/
+.tools/

@@ -1,0 +1,80 @@
+---
+import { getSortedPosts } from '@/utils/content-utils'
+import { getPostUrlBySlug } from '@/utils/url-utils'
+import { formatDateToYYYYMMDD } from '@/utils/date-utils'
+
+interface Props {
+  id: string
+  category?: string
+  tags?: string[]
+  limit?: number
+}
+
+const { id, category = '', tags = [], limit = 3 } = Astro.props
+
+const currentId = id.replace(/\/index$/, '')
+const posts = await getSortedPosts()
+
+const scored = posts
+  .filter(post => post.id.replace(/\/index$/, '') !== currentId)
+  .map(post => {
+    const sharedTags = (post.data.tags ?? []).filter(tag => tags.includes(tag))
+    const sameCategory = Boolean(category) && post.data.category === category
+    const reasons = [
+      ...(sameCategory ? ['同分类 / SAME CAT'] : []),
+      ...sharedTags.slice(0, 2).map(tag => `#${tag}`),
+    ]
+    return {
+      post,
+      reasons,
+      score: sharedTags.length * 2 + (sameCategory ? 3 : 0),
+    }
+  })
+  .filter(item => item.score > 0)
+  .sort(
+    (a, b) =>
+      b.score - a.score ||
+      b.post.data.published.valueOf() - a.post.data.published.valueOf(),
+  )
+  .slice(0, limit)
+---
+
+{
+  scored.length > 0 && (
+    <section class="rl-related" data-pagefind-ignore aria-labelledby="rl-related-title">
+      <div class="rl-related__head">
+        <h2 id="rl-related-title" class="rl-kicker">
+          RELATED / 相关档案
+        </h2>
+        <span class="rl-related__count">
+          {String(scored.length).padStart(2, '0')} FILES
+        </span>
+      </div>
+      <ol class="rl-related__list">
+        {scored.map(({ post, reasons }, i) => (
+          <li>
+            <a
+              href={getPostUrlBySlug(post.id.replace(/\/index$/, ''))}
+              class="rl-related__item"
+            >
+              <span class="rl-related__no">R-{String(i + 1).padStart(2, '0')}</span>
+              <span class="rl-related__body">
+                <span class="rl-related__name">{post.data.title}</span>
+                <span class="rl-related__meta">
+                  {formatDateToYYYYMMDD(post.data.published)} ·{' '}
+                  {post.data.category || 'UNCLASSIFIED'}
+                  {reasons.length > 0 && (
+                    <span class="rl-related__match">{reasons.join(' · ')}</span>
+                  )}
+                </span>
+              </span>
+              <span class="rl-related__go" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}

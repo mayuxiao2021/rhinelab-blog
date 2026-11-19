@@ -1,0 +1,42 @@
+{
+  "verify": [
+    "astro check",
+    "generate-badge",
+    "check-contrast --write-data",
+    "check-docs",
+    "theme/selftest",
+    "generate-og",
+    "generate-icons",
+    "astro build",
+    "pagefind",
+    "optimize-dist",
+    "check-links --strict",
+    "check-a11y",
+    "check-a11y-selftest",
+    "check-seo",
+    "check-contrast",
+    "check-feed",
+    "check-catch",
+    "check-budget"
+  ],
+  "release": [
+    "package",
+    "verify-release --full"
+  ],
+  "scripts": [
+    "scripts/check-links.mjs",
+    "scripts/check-a11y.mjs",
+    "scripts/check-a11y-selftest.mjs",
+    "scripts/check-seo.mjs",
+    "scripts/check-contrast.mjs",
+    "scripts/check-feed.mjs",
+    "scripts/check-budget.mjs",
+    "scripts/check-catch.mjs",
+    "scripts/check-docs.mjs",
+    "scripts/generate-badge.mjs",
+    "scripts/generate-og.mjs",
+    "scripts/generate-icons.mjs",
+    "scripts/optimize-dist.mjs",
+    "theme/selftest.mjs"
+  ]
+}

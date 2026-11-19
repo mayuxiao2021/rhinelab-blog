@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="Archive blog preview">
+  <rect width="640" height="400" fill="#eae5e1"/>
+  <rect x="24" y="24" width="592" height="352" fill="#edebe4" stroke="#aaa59a" stroke-width="1.5"/>
+  <path d="M24 72h592" stroke="#aaa59a" stroke-width="1.5"/>
+  <g fill="none" stroke="#9b7247" stroke-width="1.5">
+    <circle cx="52" cy="48" r="9"/>
+    <circle cx="52" cy="48" r="4" stroke-dasharray="2 3"/>
+    <path d="m47 51 5-6 5 6" stroke-width="2"/>
+  </g>
+  <g fill="#77756d" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="3">
+    <text x="72" y="52">RHINE ARCHIVE / 档案室</text>
+    <text x="462" y="52">SECTOR 03</text>
+  </g>
+  <g fill="#080a08" font-family="JetBrains Mono, monospace" font-size="34" letter-spacing="1">
+    <text x="52" y="140">X-001</text>
+  </g>
+  <g fill="#5a584e" font-family="Roboto, sans-serif" font-size="17">
+    <text x="52" y="176">把博客做成一座档案室</text>
+  </g>
+  <g fill="#77756d" font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="2">
+    <text x="52" y="202">FILE / 档案 · X-001</text>
+    <text x="52" y="218">DATE / 日期 · 2026.11.01</text>
+  </g>
+  <path d="M52 196h536" stroke="#aaa59a" stroke-width="1" stroke-dasharray="3 4"/>
+  <g fill="#edebe4" stroke="#aaa59a" stroke-width="1">
+    <rect x="52" y="240" width="252" height="112"/>
+    <rect x="336" y="240" width="252" height="112"/>
+  </g>
+  <g fill="#9b7247" font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="2">
+    <text x="66" y="260">ENTRIES / 条目</text>
+    <text x="350" y="260">STATUS / 状态</text>
+  </g>
+  <g fill="#080a08" font-family="JetBrains Mono, monospace" font-size="22">
+    <text x="66" y="292">05</text>
+    <text x="350" y="292">OPEN</text>
+  </g>
+  <g fill="none" stroke="#9b7247" stroke-width="1" opacity=".55">
+    <circle cx="560" cy="330" r="42"/>
+    <circle cx="560" cy="330" r="31" stroke-dasharray="2 5"/>
+    <path d="M560 288v14M560 359v14M518 330h14M588 330h14"/>
+  </g>
+</svg>

@@ -1,0 +1,128 @@
+---
+import path from 'path'
+import PostMetadata from './PostMeta.astro'
+import ImageWrapper from './misc/ImageWrapper.astro'
+import { Icon } from 'astro-icon/components'
+import { getDir } from '../utils/url-utils'
+import { render } from 'astro:content'
+
+interface Props {
+  class?: string
+  entry: any
+  title: string
+  url: string
+  published: Date
+  tags: string[]
+  category: string
+  image: string
+  description: string
+  draft: boolean
+  style: string
+  index?: number
+}
+const { entry, title, url, published, tags, category, image, description, style, index } =
+  Astro.props
+const className = Astro.props.class
+
+const hasCover = image !== undefined && image !== null && image !== ''
+const coverWidth = '28%'
+const fileNo = `X-${String(index ?? 1).padStart(3, '0')}`
+
+const { remarkPluginFrontmatter } = await render(entry)
+---
+
+<div
+  class:list={[
+    'rl-card card-base flex flex-col-reverse md:flex-col w-full overflow-hidden relative',
+    className,
+  ]}
+  style={style}
+>
+  <div
+    class:list={[
+      'rl-card__body relative',
+      {
+        'w-full md:w-[calc(100%_-_52px_-_12px)]': !hasCover,
+        'w-full md:w-[calc(100%_-_var(--coverWidth)_-_12px)]': hasCover,
+      },
+    ]}
+  >
+    <div class="rl-card__head">
+      <span class="rl-card__idx">FILE / 档案 · {fileNo}</span>
+      <span class="rl-card__class">{category || 'UNCLASSIFIED'}</span>
+    </div>
+
+    <a href={url} class="rl-card__title group">
+      {title}
+      <Icon
+        class="hidden md:inline-block align-middle ml-2 text-[1.5rem] text-[var(--rl-amber)] opacity-0 transition group-hover:opacity-100"
+        name="material-symbols:arrow-forward-rounded"
+      />
+    </a>
+
+    <!-- metadata -->
+    <PostMetadata
+      published={published}
+      tags={tags}
+      category={category}
+      hideTagsForMobile={true}
+      class="mb-4"></PostMetadata>
+
+    <!-- description -->
+    <div class="rl-card__desc">{description}</div>
+
+    <div class="rl-card__foot">
+      <span>{remarkPluginFrontmatter.words} WORDS / 字</span>
+      <i>/</i>
+      <span>{remarkPluginFrontmatter.minutes} MIN / 分钟</span>
+      <span class="ml-auto">ACCESS →</span>
+    </div>
+  </div>
+
+  {
+    hasCover && (
+      <a
+        href={url}
+        aria-label={title}
+        class:list={[
+          'group rl-cover',
+          'max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0',
+          'md:w-[var(--coverWidth)] relative md:absolute md:top-3 md:bottom-3 md:right-3 overflow-hidden active:scale-[0.98]',
+        ]}
+      >
+        <div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition"></div>
+        <div class="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center ">
+          <Icon
+            name="material-symbols:chevron-right-rounded"
+            class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
+          />
+        </div>
+        <ImageWrapper
+          src={image}
+          basePath={path.join('content/posts/', getDir(entry.id))}
+          alt="Cover Image of the Post"
+          class="w-full h-full"
+        />
+      </a>
+    )
+  }
+
+  {
+    !hasCover && (
+      <a
+        href={url}
+        aria-label={title}
+        class="rl-open hidden md:flex btn-regular w-[3.25rem] absolute right-3 top-3 bottom-3 active:scale-95"
+      >
+        <Icon
+          name="material-symbols:chevron-right-rounded"
+          class="transition text-[var(--rl-amber-ink)] text-4xl mx-auto"
+        />
+      </a>
+    )
+  }
+</div>
+<div class="rl-divider transition border-t-[1px] border-dashed mx-6 md:hidden"></div>
+
+<style define:vars={{ coverWidth }}>
+</style>

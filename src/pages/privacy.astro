@@ -1,0 +1,115 @@
+---
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { profileConfig, siteConfig } from '../config'
+import { url } from '@utils/url-utils'
+
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+const pkg = JSON.parse(readFileSync(path.join(projectRoot, 'package.json'), 'utf8'))
+const reviewDate = '2026-11-18'
+
+const storage = [
+  ['theme', '亮色 / 暗色主题偏好', '永久（除非清除浏览器数据）'],
+  ['hue', '主题色相偏移（若启用）', '永久'],
+  ['rl-toc-open', '文章目录折叠状态', '永久'],
+  ['rl-search-history', '最近检索词（最多若干条，可单条删除/清空）', '永久'],
+]
+
+const github = profileConfig.links.find(link => link.name === 'GitHub')?.url
+---
+
+<MainGridLayout title="隐私与数据" description="本站的数据最小化声明：不追踪、无 Cookie、仅在浏览器本地保存偏好">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">PRIVACY / 隐私与数据</p>
+    <h1 class="rl-stats-head__title">不追踪，只记住偏好</h1>
+    <p class="rl-stats-head__desc">
+      「{siteConfig.title}」是纯静态站点：没有后端、没有第三方统计脚本、没有广告与追踪像素。
+      浏览器本地只保存少量偏好设置，用于主题、目录与检索体验。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>TRACKING / 追踪脚本</span>
+      <b>00</b>
+      <span>COOKIES / Cookie</span>
+      <b>00</b>
+      <span>STORAGE / 本地存储项</span>
+      <b>{String(storage.length).padStart(2, '0')}</b>
+      <span>FETCH / 运行时请求</span>
+      <b>SAME-ORIGIN</b>
+      <span>LAST REVIEW / 最近审查</span>
+      <b>{reviewDate}</b>
+      <span>VERSION / 版本</span>
+      <b>v{pkg.version}</b>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="privacy-local">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="privacy-local">LOCAL STORAGE / 本地存储</span>
+    </div>
+    <div class="rl-readers__table-wrap">
+      <table class="rl-readers__table">
+        <thead>
+          <tr><th scope="col">键名</th><th scope="col">用途</th><th scope="col">保留时间</th></tr>
+        </thead>
+        <tbody>
+          {
+            storage.map(([key, use, ttl]) => (
+              <tr>
+                <td><code>{key}</code></td>
+                <td>{use}</td>
+                <td>{ttl}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="rl-readers__hint">
+      全部数据只存在于你的浏览器；清除站点数据即可删除。本站不读取、不上传这些值。
+    </p>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="privacy-third">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="privacy-third">THIRD PARTIES / 第三方与外部链接</span>
+    </div>
+    <ul class="rl-readers__list">
+      <li><b>无分析服务</b><span>不接入 Google Analytics、Umami、Plausible 等统计服务。</span></li>
+      <li><b>无 Cookie</b><span>本站不设置 Cookie；主题等偏好使用 localStorage。</span></li>
+      <li><b>评论</b><span>默认不启用第三方评论系统；如部署者自行启用，其数据处理由该服务负责。</span></li>
+      <li><b>外部链接</b><span>正文外链会在新标签打开并带 <code>rel="noopener noreferrer"</code>；外部站点的隐私政策适用其自身规则。</span></li>
+      <li><b>运行时小组件</b><span>统计/阅读器/站点索引/制作说明中的小组件只向<strong>本站静态文件</strong>发起 GET（build-info.json、rss/feed、机器端点），不携带表单数据、不上传内容。</span></li>
+      <li><b>托管日志</b><span>静态托管服务商（如 Nginx、CDN、GitHub Pages）可能记录访问日志，这属于部署方配置。</span></li>
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="privacy-rights">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="privacy-rights">RIGHTS / 你的控制权</span>
+    </div>
+    <ul class="rl-readers__list">
+      <li><b>清除数据</b><span>浏览器设置 → 站点数据 → 删除；或使用无痕窗口访问，不产生持久数据。</span></li>
+      <li><b>禁用脚本</b><span>禁用 JavaScript 后检索、主题切换与图表不可用，但正文与订阅仍可阅读（见 <a href={url('/readers/')}>阅读器兼容</a>）。</span></li>
+      <li><b>不收集</b><span>本站没有账号、表单提交与后端数据库，因此不存在“导出/删除账号数据”流程。</span></li>
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="privacy-fan">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="privacy-fan">FAN CONTENT / 同人与素材边界</span>
+    </div>
+    <p class="rl-readers__hint">
+      本站是以《明日方舟》「莱茵生命」视觉语言为灵感的<strong>同人风格主题模板</strong>，与鹰角网络（Hypergryph）及其关联方无任何隶属、合作或授权关系；
+      页面中<strong>不包含任何官方游戏素材</strong>（角色立绘、场景图、音频、Logo 等），全部图形为自制 CSS / SVG。
+      代码以 MIT 许可开放，字体与图标按各自 OFL / Apache-2.0 / CC-BY 许可使用，详见
+      <a href={url('/colophon/')}>制作说明</a>。
+    </p>
+    <p class="rl-readers__hint">
+      如对内容或素材有疑问，可通过
+      {github ? <a href={github} target="_blank" rel="noopener noreferrer">GitHub</a> : <a href={url('/about/')}>关于页</a>}
+      联系维护者。
+    </p>
+  </section>
+</MainGridLayout>

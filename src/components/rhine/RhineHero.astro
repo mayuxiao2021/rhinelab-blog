@@ -1,0 +1,117 @@
+---
+import RhineMark from './RhineMark.astro'
+import { siteConfig } from '@/config'
+import { getSortedPosts, getCategoryList } from '@/utils/content-utils'
+import { getTagList } from '@/utils/content-utils'
+import { url } from '@utils/url-utils'
+
+const posts = await getSortedPosts()
+const categories = await getCategoryList()
+const tags = await getTagList()
+
+const latest = posts[0]?.data.published ?? new Date()
+const fmt = new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+const dateLabel = fmt.format(latest).replaceAll('/', '.')
+const pad = (n: number) => String(n).padStart(2, '0')
+---
+
+<section class="rhine-hero rhine-hero--demo" aria-labelledby="rhine-hero-title">
+  <div class="rhine-hero__scan" aria-hidden="true"></div>
+  <div class="rhine-hero__ticks" aria-hidden="true">
+    <i></i><i></i><i></i><i></i>
+  </div>
+  <span class="rhine-hero__coords" aria-hidden="true">
+    SECTOR 03 / 31°49′N 117°13′E / RL-ARCHIVE
+  </span>
+
+  <div class="rhine-hero__art" aria-hidden="true">
+    <span class="rhine-hero__wash"></span>
+    <img
+      class="rhine-hero__art-item rhine-hero__art-item--back"
+      src={url('/rhine/art/art-saria.webp')}
+      alt=""
+      width="1400"
+      height="1400"
+      loading="eager"
+    />
+    <img
+      class="rhine-hero__art-item rhine-hero__art-item--mid"
+      src={url('/rhine/art/card-saria.webp')}
+      alt=""
+      width="700"
+      height="700"
+      loading="eager"
+    />
+    <img
+      class="rhine-hero__art-item rhine-hero__art-item--front"
+      src={url('/rhine/art/card-muelsyse.webp')}
+      alt=""
+      width="700"
+      height="700"
+      loading="eager"
+    />
+    <span class="rhine-hero__halo"></span>
+  </div>
+
+  <div class="rhine-hero__content">
+    <p class="rhine-hero__kicker">
+      <RhineMark class="rhine-hero__mark" size={18} />
+      莱茵生命 · 同人档案风格 <b>UNOFFICIAL</b>
+    </p>
+
+    <h1 class="rhine-hero__title" id="rhine-hero-title">
+      {siteConfig.title}<em>.</em>
+    </h1>
+    <span class="rhine-hero__en">RHINE LAB-STYLE / PERSONAL ARCHIVE</span>
+
+    <p class="rhine-hero__lede">
+      记录实验、失效与复原。所有条目以可复现为前提——
+      这里是一个人的研究档案室，不是公告栏。
+    </p>
+
+    <div class="rhine-hero__cta">
+      <a class="rl-btn rl-btn--solid" href={url('/operators/')}>
+        研究员名录 <span aria-hidden="true">→</span>
+      </a>
+      <a class="rl-btn" href={url('/archive/')}>
+        调阅全部条目
+      </a>
+    </div>
+
+    <div class="rhine-hero__meta">
+      <div>
+        <span>ENTRIES / 条目</span>
+        <b>{pad(posts.length)}</b>
+      </div>
+      <div>
+        <span>OPERATORS / 干员</span>
+        <b>08</b>
+      </div>
+      <div>
+        <span>CATEGORIES / 分类</span>
+        <b>{pad(categories.length)}</b>
+      </div>
+      <div>
+        <span>TAGS / 标签</span>
+        <b>{pad(tags.length)}</b>
+      </div>
+      <div>
+        <span>UPDATED / 更新</span>
+        <b>{dateLabel}</b>
+      </div>
+      <div>
+        <span>STATUS / 状态</span>
+        <b class="rl-live">OPERATIONAL</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="rhine-hero__strip" aria-hidden="true">
+    <span>RHINE LAB</span><i></i><span>FIELD ARCHIVE</span><i></i><span>非商业同人演示</span><i></i>
+    <span>RHINE LAB</span><i></i><span>FIELD ARCHIVE</span><i></i><span>非商业同人演示</span><i></i>
+  </div>
+</section>

@@ -1,0 +1,153 @@
+---
+import { Icon } from 'astro-icon/components'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+
+interface Props {
+  title: string
+  published: Date
+}
+
+const { title, published } = Astro.props
+const date = formatDateToYYYYMMDD(published)
+---
+
+<div class="rl-share" data-pagefind-ignore aria-label="分享与引用">
+  <span class="rl-share__label">SHARE / 分享</span>
+  <button
+    type="button"
+    class="rl-share__btn"
+    data-rl-share="link"
+    aria-label="复制本页链接"
+  >
+    <Icon name="material-symbols:link-rounded" />
+    <span data-rl-share-text>复制链接</span>
+  </button>
+  <button
+    type="button"
+    class="rl-share__btn"
+    data-rl-share="cite"
+    data-title={title}
+    data-date={date}
+    aria-label="复制引用信息"
+  >
+    <Icon name="material-symbols:format-quote-rounded" />
+    <span data-rl-share-text>复制引用</span>
+  </button>
+  <button
+    type="button"
+    class="rl-share__btn"
+    data-rl-share="md"
+    data-title={title}
+    aria-label="复制 Markdown 链接"
+  >
+    <Icon name="material-symbols:code-rounded" />
+    <span data-rl-share-text>MD 引用</span>
+  </button>
+  <button
+    type="button"
+    class="rl-share__btn"
+    data-rl-share="print"
+    aria-label="打印或另存为 PDF"
+  >
+    <Icon name="material-symbols:print-rounded" />
+    <span data-rl-share-text>打印 / PDF</span>
+  </button>
+  <button
+    type="button"
+    class="rl-share__btn rl-share__btn--native"
+    data-rl-share="native"
+    data-title={title}
+    aria-label="系统分享"
+  >
+    <Icon name="material-symbols:ios-share-rounded" />
+    <span data-rl-share-text>分享</span>
+  </button>
+  <span class="rl-share__status" data-rl-share-status role="status" aria-live="polite"></span>
+</div>
+
+<script>
+  // 用事件委托绑定一次：Swup 换页不会重新执行页面模块脚本，但 document 监听一直有效。
+  let statusTimer = 0
+
+  const setStatus = (text: string) => {
+    const status = document.querySelector<HTMLElement>('[data-rl-share-status]')
+    if (!status) return
+    status.textContent = text
+    window.clearTimeout(statusTimer)
+    statusTimer = window.setTimeout(() => {
+      status.textContent = ''
+    }, 2400)
+  }
+
+  const flashButton = (button: HTMLButtonElement, text: string) => {
+    const label = button.querySelector<HTMLElement>('[data-rl-share-text]')
+    if (!label) return
+    const original = label.dataset.original ?? label.textContent ?? ''
+    label.dataset.original = original
+    label.textContent = text
+    window.setTimeout(() => {
+      label.textContent = original
+    }, 1800)
+  }
+
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  document.addEventListener('click', async (event) => {
+    const button = (event.target as Element | null)?.closest<HTMLButtonElement>('[data-rl-share]')
+    if (!button) return
+    const mode = button.dataset.rlShare
+    const title = button.dataset.title || document.title
+    const date = button.dataset.date || ''
+    const url = window.location.href
+
+    if (mode === 'link') {
+      const done = await copyText(url)
+      flashButton(button, done ? '已复制' : '复制失败')
+      setStatus(done ? '链接已复制到剪贴板' : '复制失败，请手动复制地址栏')
+      return
+    }
+
+    if (mode === 'cite') {
+      const cite = `「${title}」，莱茵档案，${date}。${url}`
+      const done = await copyText(cite)
+      flashButton(button, done ? '已复制' : '复制失败')
+      setStatus(done ? '引用信息已复制' : '复制失败，请手动复制')
+      return
+    }
+
+    if (mode === 'md') {
+      const done = await copyText(`[${title}](${url})`)
+      flashButton(button, done ? '已复制' : '复制失败')
+      setStatus(done ? 'Markdown 链接已复制' : '复制失败，请手动复制')
+      return
+    }
+
+    if (mode === 'print') {
+      window.print()
+      setStatus('已调起打印，可直接另存为 PDF')
+      return
+    }
+
+    if (mode === 'native') {
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({ title, url })
+          setStatus('分享面板已打开')
+        } catch {
+          setStatus('已取消分享')
+        }
+      } else {
+        const done = await copyText(url)
+        flashButton(button, done ? '已复制' : '复制失败')
+        setStatus(done ? '当前浏览器不支持系统分享，已复制链接' : '复制失败，请手动复制')
+      }
+    }
+  })
+</script>

@@ -1,0 +1,449 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { getSortedPosts, getCategoryList, getTagList } from '@utils/content-utils'
+import { getPostUrlBySlug, url } from '@utils/url-utils'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+import { render } from 'astro:content'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+const iterationCount = (readFileSync(path.join(projectRoot, 'ITERATIONS.md'), 'utf8').match(/^## Iteration /gm) ?? []).length
+const pkg = JSON.parse(readFileSync(path.join(projectRoot, 'package.json'), 'utf8'))
+const changelogAnchor = `#v${String(pkg.version).replace(/\./g, '-')}`
+
+const posts = await getSortedPosts()
+
+const entries = await Promise.all(
+  posts.map(async post => {
+    const { remarkPluginFrontmatter } = await render(post)
+    return {
+      id: post.id.replace(/\/index$/, ''),
+      title: post.data.title,
+      published: post.data.published,
+      category: post.data.category || '未分类',
+      words: Number(remarkPluginFrontmatter.words ?? 0),
+      chars: Number(remarkPluginFrontmatter.chars ?? 0),
+      minutes: Number(remarkPluginFrontmatter.minutes ?? 0),
+    }
+  }),
+)
+
+const categories = await getCategoryList()
+const tags = await getTagList()
+
+const totalWords = entries.reduce((sum, post) => sum + post.words, 0)
+const totalChars = entries.reduce((sum, post) => sum + post.chars, 0)
+const totalMinutes = entries.reduce((sum, post) => sum + post.minutes, 0)
+
+const maxCategory = Math.max(1, ...categories.map(item => item.count))
+const topTags = [...tags].sort((a, b) => b.count - a.count).slice(0, 8)
+const maxTag = Math.max(1, ...topTags.map(item => item.count))
+
+const longest = [...entries].sort((a, b) => b.words - a.words).slice(0, 5)
+
+const monthly = new Map<string, number>()
+for (const post of entries) {
+  const key = `${post.published.getFullYear()}-${String(post.published.getMonth() + 1).padStart(2, '0')}`
+  monthly.set(key, (monthly.get(key) ?? 0) + 1)
+}
+const months = [...monthly.entries()].sort(([a], [b]) => a.localeCompare(b))
+const maxMonth = Math.max(1, ...months.map(([, count]) => count))
+
+// ---- 最近 365 天编目热力图 ----
+const dayCounts = new Map<string, number>()
+const dayChars = new Map<string, number>()
+for (const post of entries) {
+  const key = formatDateToYYYYMMDD(post.published)
+  dayCounts.set(key, (dayCounts.get(key) ?? 0) + 1)
+  dayChars.set(key, (dayChars.get(key) ?? 0) + post.chars)
+}
+// 注意：formatDateToYYYYMMDD 基于 toISOString（UTC），而热力图游标是本地日期；
+// 直接用它会因时区偏移一天。这里用本地日期格式保持一致。
+const ymdLocal = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+const today = new Date()
+today.setHours(0, 0, 0, 0)
+const heatStart = new Date(today)
+heatStart.setDate(heatStart.getDate() - 364)
+heatStart.setDate(heatStart.getDate() - heatStart.getDay()) // 对齐到周日
+type HeatDay = { key: string; count: number; chars: number; label: string }
+const heatDays: HeatDay[] = []
+const cursor = new Date(heatStart)
+while (cursor <= today) {
+  const key = ymdLocal(cursor)
+  heatDays.push({
+    key,
+    count: dayCounts.get(key) ?? 0,
+    chars: dayChars.get(key) ?? 0,
+    label: key,
+  })
+  cursor.setDate(cursor.getDate() + 1)
+}
+const heatWeeks: HeatDay[][] = []
+for (let i = 0; i < heatDays.length; i += 7) heatWeeks.push(heatDays.slice(i, i + 7))
+const maxDay = Math.max(1, ...dayCounts.values())
+const heatLevel = (count: number) =>
+  count === 0 ? 0 : Math.min(4, Math.max(1, Math.ceil((count / maxDay) * 4)))
+const activeDays = [...dayCounts.values()].filter(count => count > 0).length
+
+// ---- 年度对比 ----
+const byYear = new Map<number, { count: number; words: number; chars: number; minutes: number }>()
+for (const post of entries) {
+  const year = post.published.getFullYear()
+  const item = byYear.get(year) ?? { count: 0, words: 0, chars: 0, minutes: 0 }
+  item.count += 1
+  item.words += post.words
+  item.chars += post.chars
+  item.minutes += post.minutes
+  byYear.set(year, item)
+}
+const yearRows = [...byYear.entries()].sort((a, b) => b[0] - a[0])
+const maxYearCount = Math.max(1, ...yearRows.map(([, value]) => value.count))
+const yearRowsWithDelta = yearRows.map(([year, value], index) => {
+  const prev = yearRows[index + 1]
+  const prevWords = prev?.[1].words ?? 0
+  const deltaWords = prev ? value.words - prevWords : null
+  const deltaPct = prev && prevWords > 0 && deltaWords !== null ? Math.round((deltaWords / prevWords) * 100) : null
+  const prevChars = prev?.[1].chars ?? 0
+  const deltaChars = prev ? value.chars - prevChars : null
+  const deltaCharsPct = prev && prevChars > 0 && deltaChars !== null ? Math.round((deltaChars / prevChars) * 100) : null
+  return { year, ...value, prevYear: prev?.[0] ?? null, deltaWords, deltaPct, deltaChars, deltaCharsPct }
+})
+
+// 月份标签：取每周第一天所在月份，间隔不足 3 周的月份跳过，避免重叠
+const heatMonths: { label: string; index: number }[] = []
+let lastMonthKey = -1
+let lastMonthIndex = -4
+heatWeeks.forEach((week, index) => {
+  const label = week[0]?.label ?? ''
+  const year = Number(label.slice(0, 4))
+  const month = Number(label.slice(5, 7))
+  if (!Number.isFinite(year) || !Number.isFinite(month)) return
+  const key = year * 12 + month
+  if (key === lastMonthKey) return
+  if (index - lastMonthIndex < 3) {
+    lastMonthKey = key
+    return
+  }
+  heatMonths.push({ label: month === 1 ? `${year}.01` : `${month}月`, index })
+  lastMonthKey = key
+  lastMonthIndex = index
+})
+
+const firstDate = entries.at(-1)?.published
+const lastDate = entries[0]?.published
+const fmt = (date?: Date) => (date ? formatDateToYYYYMMDD(date) : '—')
+const pad = (n: number) => String(n).padStart(2, '0')
+const share = (count: number, total: number) => (total ? Math.round((count / total) * 100) : 0)
+
+const yearsLabel = (count: number) => `${String(count).padStart(2, '0')} YEARS`
+
+const kpis = [
+  { label: 'ENTRIES / 条目', value: entries.length, unit: 'FILES' },
+  { label: 'WORDS / 总字数', value: totalWords.toLocaleString('en-US'), unit: 'WORDS' },
+  { label: 'CHARS / 字符', value: totalChars.toLocaleString('en-US'), unit: 'CHARS' },
+  { label: 'READING / 总阅读', value: totalMinutes, unit: 'MIN' },
+  { label: 'CATEGORIES / 分类', value: categories.length, unit: 'GROUPS' },
+  { label: 'TAGS / 标签', value: tags.length, unit: 'LABELS' },
+]
+---
+
+<MainGridLayout title="档案统计" description="档案统计：条目数、字数、阅读时长、编目周期、年度对比、分类分布与构建产物构成">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">STATISTICS / 档案统计</p>
+    <h1 class="rl-stats-head__title">这座档案室的数据</h1>
+    <p class="rl-stats-head__desc">
+      条目、字数、编目周期与分类分布，全部在构建期计算，不依赖任何第三方统计服务。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>PERIOD / 编目周期</span>
+      <b>{fmt(firstDate)} — {fmt(lastDate)}</b>
+      <span>ITER / 迭代</span>
+      <b>{iterationCount}</b>
+      {iterationCount >= 100 ? (
+        <a class="rl-stats-milestone" href={url('/changelog/' + changelogAnchor)}>MILESTONE 100</a>
+      ) : null}
+      <span>GENERATED / 生成于构建期</span>
+      <a class="rl-stats-head__machine" href={url('/stats.json')}>MACHINE / stats.json ↗</a>
+    </div>
+  </section>
+
+  <div class="rl-kpi-grid">
+    {
+      kpis.map((item, i) => (
+        <div class="rl-kpi card-base" style={`animation-delay: calc(var(--content-delay) + ${i * 60}ms)`}>
+          <span class="rl-kpi__label">{item.label}</span>
+          <b class="rl-kpi__value">{item.value}</b>
+          <span class="rl-kpi__unit">{item.unit}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <section class="rl-panel card-base">
+    <div class="rl-panel__head">
+      <span class="rl-kicker">MONTHLY / 月度入档</span>
+      <span class="rl-panel__note">{months.length} MONTHS</span>
+    </div>
+    <ol class="rl-chart">
+      {
+        months.map(([month, count]) => (
+          <li class="rl-chart__row">
+            <span class="rl-chart__label">{month}</span>
+            <span class="rl-chart__track">
+              <i style={`width: ${Math.round((count / maxMonth) * 100)}%`} />
+            </span>
+            <span class="rl-chart__value">{pad(count)}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="rl-panel card-base">
+    <div class="rl-panel__head">
+      <span class="rl-kicker">BY YEAR / 年度对比</span>
+      <span class="rl-panel__note">{yearsLabel(yearRows.length)}</span>
+    </div>
+    <ul class="rl-yearbars">
+      {
+        yearRowsWithDelta.map(row => (
+          <li class="rl-yearbars__row">
+            <span class="rl-yearbars__year">{row.year}</span>
+            <span class="rl-yearbars__track">
+              <i style={`width: ${Math.round((row.count / maxYearCount) * 100)}%`} />
+            </span>
+            <span class="rl-yearbars__meta">
+              {pad(row.count)} FILES · {row.words.toLocaleString('en-US')} WORDS · {row.chars.toLocaleString('en-US')} CHARS · {row.minutes} MIN
+              {row.prevYear && row.deltaWords !== null ? (
+                <span class={`rl-yearbars__delta${row.deltaWords < 0 ? ' is-down' : ''}`}>
+                  Δ {row.deltaWords >= 0 ? '+' : ''}{row.deltaWords.toLocaleString('en-US')} WORDS
+                  {row.deltaPct !== null ? ` (${row.deltaPct >= 0 ? '+' : ''}${row.deltaPct}%)` : ''}
+                </span>
+              ) : null}
+              {row.prevYear && row.deltaChars !== null ? (
+                <span class={`rl-yearbars__delta${row.deltaChars < 0 ? ' is-down' : ''}`}>
+                  Δ {row.deltaChars >= 0 ? '+' : ''}{row.deltaChars.toLocaleString('en-US')} CHARS
+                  {row.deltaCharsPct !== null ? ` (${row.deltaCharsPct >= 0 ? '+' : ''}${row.deltaCharsPct}%)` : ''}
+                </span>
+              ) : null}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base">
+    <div class="rl-panel__head">
+      <span class="rl-kicker">ACTIVITY / 最近一年编目</span>
+      <span class="rl-panel__note">{activeDays} ACTIVE DAYS · 365 DAYS</span>
+    </div>
+    <div class="rl-heatmap" role="img" aria-label={`最近一年编目热力图：${activeDays} 天有更新`}>
+      <div class="rl-heatmap__months" style={`grid-template-columns: repeat(${heatWeeks.length}, 9px)`}>
+        {heatMonths.map(month => (
+          <span style={`grid-column-start: ${month.index + 1}`}>{month.label}</span>
+        ))}
+      </div>
+      <div class="rl-heatmap__weeks">
+        {
+          heatWeeks.map(week => (
+            <div class="rl-heatmap__week">
+              {week.map(day => (
+                <span
+                  class={`rl-heatmap__cell is-l${heatLevel(day.count)}`}
+                  title={`${day.label} · ${day.count} 条 · ${day.chars} 字符`}
+                />
+              ))}
+            </div>
+          ))
+        }
+      </div>
+      <div class="rl-heatmap__legend" aria-hidden="true">
+        <span>LESS / 少</span>
+        <i class="is-l0" /><i class="is-l1" /><i class="is-l2" /><i class="is-l3" /><i class="is-l4" />
+        <span>MORE / 多</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="rl-stats-grid">
+    <section class="rl-panel card-base">
+      <div class="rl-panel__head">
+        <span class="rl-kicker">CATEGORIES / 分类分布</span>
+        <span class="rl-panel__note">{entries.length} FILES</span>
+      </div>
+      <ul class="rl-bars">
+        {
+          categories.map(item => (
+            <li class="rl-bars__row">
+              <span class="rl-bars__label">{item.name}</span>
+              <span class="rl-bars__track">
+                <i style={`width: ${Math.round((item.count / maxCategory) * 100)}%`} />
+              </span>
+              <span class="rl-bars__value">
+                {pad(item.count)}
+                <em>{share(item.count, entries.length)}%</em>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="rl-panel card-base">
+      <div class="rl-panel__head">
+        <span class="rl-kicker">TOP TAGS / 高频标签</span>
+        <span class="rl-panel__note">TOP {topTags.length}</span>
+      </div>
+      <ul class="rl-bars">
+        {
+          topTags.map(item => (
+            <li class="rl-bars__row">
+              <span class="rl-bars__label">#{item.name}</span>
+              <span class="rl-bars__track">
+                <i style={`width: ${Math.round((item.count / maxTag) * 100)}%`} />
+              </span>
+              <span class="rl-bars__value">
+                {pad(item.count)}
+                <em>{share(item.count, entries.length)}%</em>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <section class="rl-panel card-base">
+    <div class="rl-panel__head">
+      <span class="rl-kicker">LONGEST / 最长条目</span>
+      <span class="rl-panel__note">BY WORDS</span>
+    </div>
+    <ol class="rl-longest">
+      {
+        longest.map((post, i) => (
+          <li>
+            <a href={getPostUrlBySlug(post.id)} class="rl-longest__item">
+              <span class="rl-longest__no">L-{pad(i + 1)}</span>
+              <span class="rl-longest__title">{post.title}</span>
+              <span class="rl-longest__meta">
+                {post.words.toLocaleString('en-US')} WORDS / {post.minutes} MIN
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="asset-breakdown">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="asset-breakdown">ASSETS / 构建产物构成</span>
+      <span class="rl-panel__note">
+        <button class="rl-sitemap__retry" id="rl-asset-refresh" type="button">刷新</button>
+        <span id="rl-asset-total">BUILD-INFO.JSON</span>
+        <span id="rl-asset-generated" class="rl-assetlist__generated">GENERATED / —</span>
+      </span>
+    </div>
+    <ul class="rl-assetlist" id="rl-asset-breakdown">
+      <li><span>读取 build-info.json 中…</span></li>
+    </ul>
+    <p class="rl-readers__hint">
+      数据来自部署后可直接访问的 <a href={url('/build-info.json')}>/build-info.json</a>（构建期写入、optimize 后回填体积）。
+      TOP FILES 中最大的是 Mermaid / KaTeX 的<strong>异步 chunk</strong>：仅当页面出现图表或公式时才加载，首屏不引入。
+    </p>
+  </section>
+
+  <script>
+    const list = document.getElementById('rl-asset-breakdown')
+    const totalLabel = document.getElementById('rl-asset-total')
+    const refresh = document.getElementById('rl-asset-refresh') as HTMLButtonElement | null
+    const labels: Record<string, string> = {
+      html: 'HTML',
+      js: 'JS',
+      css: 'CSS',
+      woff2: 'FONTS',
+      png: 'PNG',
+      svg: 'SVG',
+      webp: 'WEBP',
+      json: 'JSON',
+      xml: 'XML',
+      other: 'OTHER',
+    }
+    const formatKb = (value: number) => `${(value / 1024).toFixed(1)} KB`
+    const timedFetch = async (url: URL) => {
+      const controller = new AbortController()
+      const timer = window.setTimeout(() => controller.abort(), 8000)
+      return await fetch(url, { signal: controller.signal }).finally(() => window.clearTimeout(timer))
+    }
+    const generatedLabel = document.getElementById('rl-asset-generated')
+    const loadAssets = async () => {
+      if (refresh) {
+        refresh.disabled = true
+        refresh.textContent = '刷新中…'
+      }
+      if (totalLabel) totalLabel.textContent = 'REFRESHING…'
+      try {
+        const response = await timedFetch(new URL('../build-info.json', window.location.href))
+        if (!response.ok) throw new Error(String(response.status))
+        const info = await response.json()
+        const byType = info?.assets?.byType as Record<string, number> | undefined
+        if (!list || !byType) return
+        const entries = Object.entries(byType).sort((a, b) => Number(b[1]) - Number(a[1]))
+        const max = Math.max(...entries.map(([, bytes]) => Number(bytes)), 1)
+        list.innerHTML = ''
+        for (const [type, bytes] of entries) {
+          const size = Number(bytes)
+          const share = info.assets.bytes ? Math.round((size / info.assets.bytes) * 100) : 0
+          const row = document.createElement('li')
+          row.className = 'rl-assetlist__row'
+          row.innerHTML =
+            '<span class="rl-assetlist__name">' + (labels[type] || type.toUpperCase()) + '</span>' +
+            '<span class="rl-assetlist__track"><i style="width:' + Math.max(2, Math.round((size / max) * 100)) + '%"></i></span>' +
+            '<span class="rl-assetlist__value">' + formatKb(size) + ' · ' + share + '%</span>'
+          list.appendChild(row)
+        }
+        const largest = info?.assets?.largest as Array<{ file: string; bytes: number }> | undefined
+        if (Array.isArray(largest) && largest.length > 0) {
+          const divider = document.createElement('li')
+          divider.className = 'rl-assetlist__divider'
+          divider.textContent = 'TOP FILES / 最大文件'
+          list.appendChild(divider)
+          for (const item of largest) {
+            const row = document.createElement('li')
+            row.className = 'rl-assetlist__row rl-assetlist__row--file'
+            row.innerHTML =
+              '<span class="rl-assetlist__name">' + String(item.bytes / 1024 >= 1000 ? (item.bytes / 1048576).toFixed(2) + 'MB' : (item.bytes / 1024).toFixed(1) + 'KB') + '</span>' +
+              '<span class="rl-assetlist__track rl-assetlist__track--file">' + item.file + '</span>' +
+              '<span class="rl-assetlist__value">' + (info.assets.bytes ? ((item.bytes / info.assets.bytes) * 100).toFixed(1) : '0.0') + '%</span>'
+            list.appendChild(row)
+          }
+        }
+        if (totalLabel) totalLabel.textContent = `${info.assets.files ?? '—'} FILES · ${formatKb(info.assets.bytes ?? 0)}`
+        if (generatedLabel && info.generated_at) {
+          const when = new Date(info.generated_at)
+          if (!Number.isNaN(when.valueOf())) {
+            generatedLabel.textContent =
+              'GENERATED / ' +
+              `${when.getFullYear()}.${String(when.getMonth() + 1).padStart(2, '0')}.${String(when.getDate()).padStart(2, '0')} ` +
+              `${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}`
+          }
+        }
+      } catch {
+        if (totalLabel) totalLabel.textContent = 'BUILD-INFO 不可用'
+        if (list) list.innerHTML = '<li><span>构建指纹暂不可用（本地 dev 或尚未部署 optimize 后的产物）。</span></li>'
+      } finally {
+        if (refresh) {
+          refresh.disabled = false
+          refresh.textContent = '刷新'
+        }
+      }
+    }
+    refresh?.addEventListener('click', loadAssets)
+    void loadAssets()
+  </script>
+</MainGridLayout>

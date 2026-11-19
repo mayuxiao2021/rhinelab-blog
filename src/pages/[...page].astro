@@ -1,0 +1,136 @@
+---
+import type { GetStaticPaths } from 'astro'
+import PostPage from '../components/PostPage.astro'
+import Pagination from '../components/control/Pagination.astro'
+import RhineHero from '../components/rhine/RhineHero.astro'
+import { PAGE_SIZE } from '../constants/constants'
+import { rhineOperators } from '../data/operators'
+import MainGridLayout from '../layouts/MainGridLayout.astro'
+import { getSortedPosts } from '../utils/content-utils'
+import { url } from '../utils/url-utils'
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const allBlogPosts = await getSortedPosts()
+  return paginate(allBlogPosts, { pageSize: PAGE_SIZE })
+}) satisfies GetStaticPaths
+// https://github.com/withastro/astro/issues/6507#issuecomment-1489916992
+
+const { page } = Astro.props
+
+const len = page.data.length
+const teaser = rhineOperators.filter(operator =>
+  ['muelsyse', 'saria', 'ifrit', 'dorothy'].includes(operator.slug),
+)
+---
+
+<MainGridLayout>
+    {page.currentPage === 1 && <RhineHero />}
+    {page.currentPage === 1 && (
+      <>
+        <section class="rl-org" aria-labelledby="rl-org-title">
+          <div class="rl-org__head">
+            <p class="rl-kicker">ORGANISATION / 组织概览</p>
+            <h2 id="rl-org-title">莱茵生命 · 哥伦比亚</h2>
+            <p class="rl-org__lede">
+              一家在公开资料里被反复提及、又始终语焉不详的研究机构。下面三块，是我们为这座档案室整理的工作面。
+            </p>
+          </div>
+          <div class="rl-org__grid">
+            <article class="rl-org__card">
+              <span class="rl-org__no">01</span>
+              <h3>结构研究</h3>
+              <p>从源石技艺到材料相变，把「不可控」拆成可测量的变量，再逐项归档。</p>
+              <span class="rl-org__tag">STRUCTURE / 材料 · 源石</span>
+            </article>
+            <article class="rl-org__card">
+              <span class="rl-org__no">02</span>
+              <h3>防卫与临床</h3>
+              <p>保护样本，也保护记录记录的人。医疗与防卫在同一个实验台上交接。</p>
+              <span class="rl-org__tag">DEFENSE / 医疗 · 防卫</span>
+            </article>
+            <article class="rl-org__card">
+              <span class="rl-org__no">03</span>
+              <h3>生态与野外</h3>
+              <p>把实验室搬到极地与湿地，观测那些不会配合实验的对象。</p>
+              <span class="rl-org__tag">ECOLOGY / 生态 · 科考</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="rl-field" aria-labelledby="rl-field-title">
+          <div class="rl-section-head">
+            <p class="rl-kicker">FIELD RECORDS / 设施与野外</p>
+            <h2 id="rl-field-title">三处正在运行的实验场</h2>
+            <p>从温室到极地，再到结构实验室。照片没有拍到的部分，用档案补上。</p>
+          </div>
+          <div class="rl-field__grid">
+            <article class="rl-field__card">
+              <img src={url('/rhine/art/art-muelsyse.webp')} alt="" width="1400" height="1323" loading="lazy" aria-hidden="true" />
+              <div class="rl-field__body">
+                <span class="rl-field__no">SITE / 01</span>
+                <h3>生态温室</h3>
+                <p>水、光照与生长节律。这里的变量比人多。</p>
+              </div>
+            </article>
+            <article class="rl-field__card">
+              <img src={url('/rhine/art/art-magallan.webp')} alt="" width="1400" height="1400" loading="lazy" aria-hidden="true" />
+              <div class="rl-field__body">
+                <span class="rl-field__no">SITE / 02</span>
+                <h3>极地科考站</h3>
+                <p>风速、冰层与无人机的航迹，构成一套会移动的地图。</p>
+              </div>
+            </article>
+            <article class="rl-field__card">
+              <img src={url('/rhine/art/art-saria.webp')} alt="" width="1400" height="1400" loading="lazy" aria-hidden="true" />
+              <div class="rl-field__body">
+                <span class="rl-field__no">SITE / 03</span>
+                <h3>结构实验室</h3>
+                <p>把防护测试做成可复现的实验，再让记录承担后果。</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="rl-teaser" aria-labelledby="rl-teaser-title">
+          <div class="rl-section-head">
+            <p class="rl-kicker">PERSONNEL / 研究员</p>
+            <h2 id="rl-teaser-title">近期调阅的档案</h2>
+            <p>四份优先调阅的人事记录。完整名录见 <a href={url('/operators/')}>研究员名录</a>。</p>
+          </div>
+          <div class="rl-teaser__grid">
+            {teaser.map((operator, index) => (
+              <a class:list={['rl-teaser__card', `rl-teaser__card--${operator.slug}`]} href={url('/operators/')}>
+                <img
+                  src={url(operator.card)}
+                  alt={`${operator.cn}档案立绘`}
+                  width="700"
+                  height="700"
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                />
+                <span class="rl-teaser__meta">
+                  <span class="rl-teaser__code">{operator.code}</span>
+                  <span class="rl-teaser__name">{operator.cn}</span>
+                  <span class="rl-teaser__role">{operator.role}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section class="rl-banner" aria-label="莱茵生命档案室">
+          <div class="rl-banner__art" aria-hidden="true">
+            <img src={url('/rhine/art/art-dorothy.webp')} alt="" width="1400" height="1400" loading="lazy" />
+            <img src={url('/rhine/art/art-muelsyse.webp')} alt="" width="1400" height="1323" loading="lazy" />
+          </div>
+          <div class="rl-banner__text">
+            <p class="rl-kicker">RHINE LAB / FIELD NOTE</p>
+            <p class="rl-banner__quote">“记录不是为了证明我们做过什么，而是为了让下一次实验不必从零开始。”</p>
+            <p class="rl-banner__by">— 观测者 07 · 档案室手记</p>
+            <a class="rl-btn rl-btn--solid" href={url('/operators/')}>进入名录 <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+      </>
+    )}
+    <PostPage page={page}></PostPage>
+    <Pagination class="mx-auto onload-animation" page={page} style=`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`></Pagination>
+</MainGridLayout>

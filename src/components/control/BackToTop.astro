@@ -1,0 +1,89 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<!-- There can't be a filter on parent element, or it will break `fixed` -->
+<div class="back-to-top-wrapper hidden lg:block">
+    <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()">
+        <span class="back-to-top-ring" aria-hidden="true"></span>
+        <button aria-label="Back to Top" class="btn-card h-[3.75rem] w-[3.75rem]">
+            <Icon name="material-symbols:keyboard-arrow-up-rounded" class="mx-auto"></Icon>
+        </button>
+    </div>
+</div>
+
+<style>
+.back-to-top-wrapper {
+    width: 3.75rem;
+    height: 3.75rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.back-to-top-btn {
+    color: var(--primary);
+    font-size: 2.25rem;
+    font-weight: bold;
+    border: none;
+    position: fixed;
+    right: 1.25rem;
+    bottom: 11rem;
+    opacity: 1;
+    cursor: pointer;
+    transform: none;
+    --rl-progress: 0;
+}
+.back-to-top-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--rl-amber, #9b7247) calc(var(--rl-progress) * 1%),
+        transparent 0
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    pointer-events: none;
+    opacity: 0.9;
+}
+.back-to-top-btn i {
+    font-size: 1.75rem;
+}
+.back-to-top-btn.hide {
+    transform: translateX(4rem) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+}
+.back-to-top-btn:active {
+    transform: scale(0.92);
+}
+</style>
+
+<script is:raw is:inline>
+function backToTop() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scroll({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+}
+
+function updateBackToTop() {
+    const btn = document.getElementById('back-to-top-btn');
+    if (!btn) return;
+
+    const doc = document.documentElement;
+    const scrollTop = window.scrollY || doc.scrollTop || 0;
+    const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+    const progress = Math.min(100, Math.max(0, Math.round((scrollTop / max) * 100)));
+    btn.style.setProperty('--rl-progress', String(progress));
+
+    const scrollable = Math.max(0, doc.scrollHeight - window.innerHeight);
+    const shouldShow = scrollable > window.innerHeight * 0.6 && scrollTop > 300;
+    if (shouldShow) btn.classList.remove('hide');
+    else btn.classList.add('hide');
+}
+
+window.addEventListener('scroll', updateBackToTop, { passive: true });
+window.addEventListener('resize', updateBackToTop, { passive: true });
+document.addEventListener('astro:page-load', updateBackToTop);
+document.addEventListener('astro:after-swap', updateBackToTop);
+updateBackToTop();
+</script>

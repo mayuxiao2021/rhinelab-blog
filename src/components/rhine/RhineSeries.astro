@@ -1,0 +1,85 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { getSeriesInfo } from '@utils/series-utils'
+import { getPostUrlBySlug } from '@utils/url-utils'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+
+interface Props {
+  posts: CollectionEntry<'posts'>[]
+  entry: CollectionEntry<'posts'>
+}
+
+const { posts, entry } = Astro.props
+const series = getSeriesInfo(posts, entry)
+const currentIndex = series ? series.items.findIndex(item => item.entry.id === entry.id) : -1
+const pad = (n: number) => String(n).padStart(2, '0')
+---
+
+{
+  series && (
+    <section class="rl-series" aria-labelledby="rl-series-title">
+      <header class="rl-series__head">
+        <span class="rl-kicker" id="rl-series-title">
+          SERIES / 系列 · {series.name}
+        </span>
+        <span class="rl-series__count">
+          {pad(currentIndex + 1)} / {pad(series.items.length)}
+        </span>
+      </header>
+
+      <div class="rl-series__ticks" aria-hidden="true">
+        {series.items.map((_, index) => (
+          <i class:list={{ 'is-done': index <= currentIndex, 'is-current': index === currentIndex }} />
+        ))}
+      </div>
+
+      <ol class="rl-series__list">
+        {series.items.map((item, index) => {
+          const isCurrent = item.entry.id === entry.id
+          return (
+            <li class:list={['rl-series__item', { 'is-current': isCurrent }]}>
+              <a
+                href={getPostUrlBySlug(item.entry.id.replace(/\/index$/, ''))}
+                class="rl-series__link"
+                aria-current={isCurrent ? 'page' : undefined}
+              >
+                <span class="rl-series__no">{pad(index + 1)}</span>
+                <span class="rl-series__title">{item.entry.data.title}</span>
+                <span class="rl-series__meta">{formatDateToYYYYMMDD(item.entry.data.published)}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ol>
+
+      <div class="rl-series__nav">
+      {currentIndex > 0 && (
+        <a
+          class="rl-series__next rl-series__next--prev"
+          href={getPostUrlBySlug(
+            series.items[currentIndex - 1].entry.id.replace(/\/index$/, ''),
+          )}
+        >
+          <span class="rl-series__next-arrow" aria-hidden="true">←</span>
+          <span class="rl-series__next-kicker">PREV / 上一篇</span>
+          <span class="rl-series__next-title">{series.items[currentIndex - 1].entry.data.title}</span>
+        </a>
+      )}
+      {currentIndex < series.items.length - 1 ? (
+        <a
+          class="rl-series__next"
+          href={getPostUrlBySlug(
+            series.items[currentIndex + 1].entry.id.replace(/\/index$/, ''),
+          )}
+        >
+          <span class="rl-series__next-kicker">NEXT / 下一站</span>
+          <span class="rl-series__next-title">{series.items[currentIndex + 1].entry.data.title}</span>
+          <span class="rl-series__next-arrow" aria-hidden="true">→</span>
+        </a>
+      ) : (
+        <p class="rl-series__next rl-series__next--done">系列已归档 / SERIES COMPLETE</p>
+      )}
+      </div>
+    </section>
+  )
+}

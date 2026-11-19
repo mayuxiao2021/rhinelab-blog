@@ -1,0 +1,43 @@
+---
+import Profile from "./Profile.astro";
+import Tags from "./Tags.astro";
+import Categories from "./Categories.astro";
+import Links from "./Links.astro";  // 导入友链模块
+import { layoutConfig } from '../../config'
+import type { LayoutConfig, SidebarWidgetId } from '../../types/config'
+
+const className = Astro.props.class;
+
+// 部件 id -> 组件
+const WIDGETS: Record<SidebarWidgetId, any> = {
+  profile: Profile,
+  categories: Categories,
+  tags: Tags,
+  links: Links,
+};
+
+// 布局配置（本地管理端可编辑）；缺省回退到主题原始布局
+const cfg: LayoutConfig['sidebar'] = layoutConfig?.sidebar ?? {
+  top: ['profile'],
+  sticky: ['categories', 'tags', 'links'],
+}
+const toList = (ids: SidebarWidgetId[]) =>
+  (Array.isArray(ids) ? ids.map((id) => WIDGETS[id]).filter(Boolean) : [])
+const topWidgets = toList(cfg.top);
+const stickyWidgets = toList(cfg.sticky);
+---
+
+<div id="sidebar" class={`${className} w-full`}>
+    {topWidgets.length > 0 && (
+        <div class="flex flex-col w-full gap-4 mb-4">
+            {topWidgets.map((W) => <W />)}
+        </div>
+    )}
+    {stickyWidgets.length > 0 && (
+        <div class="flex flex-col w-full gap-4 sticky top-4">
+            {stickyWidgets.map((W, i) => (
+                <W class="onload-animation" style={`animation-delay: ${150 + i * 50}ms`} />
+            ))}
+        </div>
+    )}
+</div>

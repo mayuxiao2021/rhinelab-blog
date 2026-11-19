@@ -1,0 +1,126 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { render } from 'astro:content'
+import { getSortedPosts } from '@utils/content-utils'
+import { getPostUrlBySlug } from '@utils/url-utils'
+import { formatDateToYYYYMMDD } from '@utils/date-utils'
+
+const posts = await getSortedPosts()
+const pad = (n: number) => String(n).padStart(2, '0')
+
+// 系列统计：字数与阅读时长（基于 remark frontmatter）
+const postStats = new Map<string, { words: number; minutes: number }>()
+for (const post of posts) {
+  const { remarkPluginFrontmatter } = await render(post)
+  postStats.set(post.id, {
+    words: Number(remarkPluginFrontmatter.words ?? 0),
+    minutes: Number(remarkPluginFrontmatter.minutes ?? 0),
+  })
+}
+
+const groups = new Map<string, typeof posts>()
+for (const post of posts) {
+  const name = post.data.series?.trim()
+  if (!name) continue
+  const list = groups.get(name) ?? []
+  list.push(post)
+  groups.set(name, list)
+}
+
+const seriesList = [...groups.entries()]
+  .map(([name, items]) => {
+    const sorted = [...items].sort(
+      (a, b) =>
+        (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0) ||
+        +a.data.published - +b.data.published,
+    )
+    const words = sorted.reduce((sum, item) => sum + (postStats.get(item.id)?.words ?? 0), 0)
+    const minutes = sorted.reduce((sum, item) => sum + (postStats.get(item.id)?.minutes ?? 0), 0)
+    const updatedAt = sorted.reduce<Date | undefined>((max, item) => {
+      const date = item.data.updated ?? item.data.published
+      return !max || date > max ? date : max
+    }, undefined)
+    return {
+      name,
+      items: sorted,
+      start: sorted[0]?.data.published,
+      end: sorted.at(-1)?.data.published,
+      updatedAt,
+      words,
+      minutes,
+    }
+  })
+  .filter(group => group.items.length >= 2)
+  .sort((a, b) => b.items.length - a.items.length || a.name.localeCompare(b.name, 'zh-CN'))
+
+const totalEntries = seriesList.reduce((sum, group) => sum + group.items.length, 0)
+const fmt = (date?: Date) => (date ? formatDateToYYYYMMDD(date) : '—')
+---
+
+<MainGridLayout title="系列" description="按系列读取档案：同一系列按编号顺序排列，标注跨度、进度与总阅读时长，方便连续阅读">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">SERIES / 系列索引</p>
+    <h1 class="rl-stats-head__title">按系列读取档案</h1>
+    <p class="rl-stats-head__desc">
+      同一系列按 <code>seriesOrder</code> 排序；只有一条的系列不单独成组。文章页底部也会显示当前系列的进度与相邻条目。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>SERIES / 系列</span>
+      <b>{pad(seriesList.length)}</b>
+      <span>ENTRIES / 系列条目</span>
+      <b>{pad(totalEntries)}</b>
+      <span>TOTAL / 全部档案</span>
+      <b>{pad(posts.length)}</b>
+    </div>
+  </section>
+
+  {
+    seriesList.length === 0 ? (
+      <section class="rl-panel card-base">
+        <div class="rl-panel__head">
+          <span class="rl-kicker">EMPTY / 暂无系列</span>
+        </div>
+        <p class="rl-stats-head__desc">给文章 frontmatter 加 `series` 与 `seriesOrder` 字段即可自动聚合。</p>
+      </section>
+    ) : (
+      seriesList.map((group, index) => (
+        <section class="rl-series rl-series--index card-base" aria-labelledby={`rl-series-${index}`}>
+          <header class="rl-series__head">
+            <span class="rl-kicker" id={`rl-series-${index}`}>
+              SERIES {pad(index + 1)} / 系列 · {group.name}
+            </span>
+            <span class="rl-series__count">
+              {pad(group.items.length)} FILES · {group.words.toLocaleString('en-US')} WORDS · {group.minutes} MIN
+              {group.updatedAt ? <> · UPDATED {formatDateToYYYYMMDD(group.updatedAt).replace(/-/g, '.')}</> : null}
+            </span>
+          </header>
+
+          <div class="rl-series__ticks" aria-hidden="true">
+            {group.items.map(() => (
+              <i class="is-done" />
+            ))}
+          </div>
+
+          <ol class="rl-series__list">
+            {group.items.map((post, itemIndex) => (
+              <li class="rl-series__item">
+                <a
+                  href={getPostUrlBySlug(post.id.replace(/\/index$/, ''))}
+                  class="rl-series__link"
+                >
+                  <span class="rl-series__no">{pad(itemIndex + 1)}</span>
+                  <span class="rl-series__title">{post.data.title}</span>
+                  <span class="rl-series__meta">{formatDateToYYYYMMDD(post.data.published)}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+
+          <p class="rl-series__range">
+            PERIOD / 跨度 <b>{fmt(group.start)} — {fmt(group.end)}</b>
+          </p>
+        </section>
+      ))
+    )
+  }
+</MainGridLayout>

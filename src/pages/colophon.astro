@@ -1,0 +1,188 @@
+---
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { url } from '@utils/url-utils'
+import gatesData from '../data/gates.json'
+import { siteConfig } from '../config'
+
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+const pkg = JSON.parse(readFileSync(path.join(projectRoot, 'package.json'), 'utf8'))
+const iterations = readFileSync(path.join(projectRoot, 'ITERATIONS.md'), 'utf8')
+const iterationCount = (iterations.match(/^## Iteration /gm) ?? []).length
+
+const fonts = [
+  { name: 'Roboto', license: 'Apache-2.0', use: '拉丁正文' },
+  { name: 'JetBrains Mono', license: 'OFL-1.1', use: '编号 / 微标签 / 终端文本' },
+  { name: 'PingFang SC / Microsoft YaHei / Noto Sans SC', license: '系统字体', use: '中文正文（不打包）' },
+]
+
+const icons = [
+  { name: 'Material Symbols', license: 'Apache-2.0', use: 'UI 图标（构建期内联）' },
+  { name: 'Font Awesome Free', license: 'CC-BY-4.0（图标）', use: '品牌与少量实心图标' },
+]
+
+const deps = [
+  ['Astro', '静态站点框架'],
+  ['Fuwari', '主题基座（MIT）'],
+  ['Tailwind CSS', '原子化样式'],
+  ['Svelte', '交互组件'],
+  ['Pagefind', '全文检索'],
+  ['Swup', '页面过渡'],
+  ['KaTeX', '数学公式'],
+  ['Mermaid', '图表'],
+  ['PhotoSwipe', '图片灯箱'],
+  ['Shiki', '代码高亮'],
+]
+
+const scripts = [
+  ['generate-badge.mjs', '版本 + 迭代数徽章（自制 SVG，离线、无第三方服务）'],
+  ['generate-og.mjs', '每篇文章构建期生成 1200×630 OG 分享图（128 色调色板）'],
+  ['generate-icons.mjs', '从自制 favicon.svg 栅格化 PWA 与快捷方式图标'],
+  ['optimize-dist.mjs', '移除旧字体格式 / 未使用 Pagefind UI 资源'],
+  ['check-links.mjs', '链接、锚点、资源与 sitemap 一致性'],
+  ['check-a11y.mjs', '静态无障碍与链接安全检查（17 条规则）'],
+  ['check-a11y-selftest.mjs', '无障碍规则 fixture 自测（违规必报 / 合规必过）'],
+  ['check-seo.mjs', '标题唯一性、meta description、canonical 与 JSON-LD 结构'],
+  ['check-contrast.mjs', 'WCAG 对比度门禁（并生成可访问性页数据）'],
+  ['check-feed.mjs', 'Feed 结构、一致性与阅读器兼容预检'],
+  ['check-docs.mjs', '文档相对链接、截图与版本号一致性'],
+  ['check-budget.mjs', '产物体积预算'],
+  ['bump.mjs', '版本号一键升级（package / README / STATE / CHANGELOG 骨架）'],
+  ['package.mjs', '发布 zip + MANIFEST（含 sha256）'],
+  ['verify-release.mjs', '发布包与 MANIFEST 的 sha256 / 文件数 / 必需文件校验'],
+]
+
+const swatches = [
+  ['bg', '背景'],
+  ['surface', '卡片'],
+  ['ink', '正文'],
+  ['muted', '次级文字'],
+  ['line', '分隔线'],
+  ['amber', '黄铜强调'],
+  ['amber-ink', '强调文字'],
+  ['code-bg', '代码底'],
+]
+---
+
+<MainGridLayout title="制作说明" description="模板包的构建链、字体、图标、生成脚本与许可说明，含 15 个门禁脚本、产物构成与构建时间">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">COLOPHON / 制作说明</p>
+    <h1 class="rl-stats-head__title">制作说明</h1>
+    <p class="rl-stats-head__desc">
+      「{siteConfig.title}」是一个可安装的 Astro 主题模板包：代码开放、图形全部自制、不包含任何游戏素材。
+      这一页记录它是怎么被构建出来的。
+    </p>
+    <p class="rl-colophon__build">
+      BUILD / {Astro.generator} · rhinelab v{pkg.version} · {iterationCount} ITER · Node ≥22.12 · pnpm 9 · STATIC OUTPUT
+    </p>
+    <p class="rl-colophon__build-meta" id="rl-colophon-build-meta">LAST BUILD / 读取 build-info.json 中…</p>
+    <script>
+      const metaNode = document.getElementById('rl-colophon-build-meta')
+      const controller = new AbortController()
+      const timer = window.setTimeout(() => controller.abort(), 8000)
+      fetch(new URL('../build-info.json', window.location.href), { signal: controller.signal })
+        .then(response => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
+        .then(info => {
+          if (!metaNode) return
+          const assets = info?.assets
+          const when = info?.generated_at ? new Date(info.generated_at) : null
+          const stamp = when && !Number.isNaN(when.valueOf())
+            ? `${when.getFullYear()}.${String(when.getMonth() + 1).padStart(2, '0')}.${String(when.getDate()).padStart(2, '0')} ${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}`
+            : '—'
+          metaNode.textContent =
+            `LAST BUILD / ${stamp}（本地时间）· ${assets?.files ?? '—'} FILES · ` +
+            `${assets?.bytes ? (assets.bytes / 1048576).toFixed(2) + ' MB' : '—'} · ` +
+            `${Array.isArray(info?.gates) ? info.gates.length : '—'} GATES`
+        })
+        .finally(() => window.clearTimeout(timer))
+        .catch(() => {
+          if (metaNode) metaNode.textContent = 'LAST BUILD / build-info.json 暂不可用（本地 dev 或未部署）'
+        })
+    </script>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="colophon-gates">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="colophon-gates">GATES / 门禁顺序</span>
+      <span class="rl-panel__note">pnpm verify</span>
+    </div>
+    <ol class="rl-colophon__flow">
+      {gatesData.verify.map(gate => <li>{gate}</li>)}
+    </ol>
+    <p class="rl-colophon__note">
+      {gatesData.verify.length} 步 `pnpm verify` 门禁，任何一步失败即视为本轮不可交付；清单唯一来源是
+      <code>src/data/gates.json</code>（build-info 与本站流程都从它生成）。
+    </p>
+    <ol class="rl-colophon__flow rl-colophon__flow--release">
+      {gatesData.release.map(gate => <li>{gate}</li>)}
+    </ol>
+    <p class="rl-colophon__note">
+      发布包还会在解压后重跑主题自测与文档门禁（<code>verify:release --full</code>），全链路共
+      {gatesData.verify.length + gatesData.release.length} 步。
+    </p>
+  </section>
+
+  <div class="rl-colophon">
+    <section class="rl-panel card-base">
+      <div class="rl-panel__head">
+        <span class="rl-kicker">BUILD / 构建链</span>
+        <span class="rl-panel__note">STATIC · ZERO RUNTIME</span>
+      </div>
+      <ul class="rl-colophon__list">
+        {deps.map(([name, desc]) => (
+          <li><b>{name}</b><span>{desc}</span></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="rl-panel card-base">
+      <div class="rl-panel__head">
+        <span class="rl-kicker">TYPE / 字体与图标</span>
+      </div>
+      <ul class="rl-colophon__list">
+        {fonts.map(font => (
+          <li><b>{font.name}</b><span>{font.use} · {font.license}</span></li>
+        ))}
+        {icons.map(icon => (
+          <li><b>{icon.name}</b><span>{icon.use} · {icon.license}</span></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="rl-panel card-base">
+      <div class="rl-panel__head">
+        <span class="rl-kicker">PALETTE / 色板</span>
+        <span class="rl-panel__note">LIGHT &amp; DARK</span>
+      </div>
+      <div class="rl-colophon__swatches">
+        {swatches.map(([token, label]) => (
+          <div class="rl-colophon__swatch">
+            <span class="rl-colophon__chip" style={`background: var(--rl-${token})`} aria-hidden="true" />
+            <span class="rl-colophon__token">--rl-{token}</span>
+            <span class="rl-colophon__label">{label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="rl-panel card-base">
+      <div class="rl-panel__head">
+        <span class="rl-kicker">SCRIPTS / 生成与校验</span>
+        <span class="rl-panel__note">pnpm verify</span>
+      </div>
+      <ul class="rl-colophon__list">
+        {scripts.map(([name, desc]) => (
+          <li><b><code>{name}</code></b><span>{desc}</span></li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  <p class="rl-colophon__note">
+    图形（徽标 / 头像 / favicon / 背景准星 / 装饰线）全部为手写 SVG 或 CSS，随代码以 MIT 提供；
+    字体与图标按各自许可保留声明，详见仓库 <code>docs/ASSETS.md</code>。本站与《明日方舟》及其权利人无任何隶属关系。
+    查看 <a href={url('/accessibility/')}>可访问性说明</a> 或 <a href={url('/subscribe/')}>订阅方式</a>。
+  </p>
+</MainGridLayout>

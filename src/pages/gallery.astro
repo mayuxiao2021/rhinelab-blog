@@ -1,0 +1,69 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { url } from '@utils/url-utils'
+
+const projects = [
+  {
+    title: '莱茵档案博客',
+    en: 'RHINE ARCHIVE / BLOG',
+    description: '你现在看到的这套模板：Astro + Fuwari 基座，暖纸质档案美学，亮暗双模式，纯 CSS/SVG 图形。',
+    image: '/rhine/project-blog.svg',
+    link: 'https://astro.build',
+    tags: ['Astro', 'Fuwari', 'CSS'],
+  },
+  {
+    title: '检索终端',
+    en: 'RETRIEVAL TERMINAL',
+    description: '基于 Pagefind 的静态全文检索：构建期生成索引，零服务端依赖，随站点一起发布。',
+    image: '/rhine/project-search.svg',
+    link: 'https://pagefind.app',
+    tags: ['Pagefind', 'Search'],
+  },
+]
+---
+
+<MainGridLayout title="项目索引" description="正在进行的实验与项目：按状态分组的项目索引，含进度、技术栈与相关文章入口">
+  <section class="rl-index-head card-base">
+    <p class="rl-kicker">INDEX / 项目索引</p>
+    <h1 class="rl-index-head__title">在做的实验</h1>
+    <p class="rl-index-head__desc">
+      这里陈列仍在维护的项目与工具。每一项都标注了它的用途与依赖边界——
+      能被别人复现的，才放进索引。
+    </p>
+  </section>
+
+  <div class="rl-gallery">
+    {
+      projects.map((project, i) => (
+        <a
+          href={project.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rl-gcard card-base"
+          style={`animation-delay: calc(var(--content-delay) + ${i * 75}ms)`}
+        >
+          <div class="rl-gcard__cover">
+            <img
+              src={url(project.image)}
+              alt={`${project.title} 预览`}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+              width="640"
+              height="400"
+            />
+          </div>
+          <div class="rl-gcard__body">
+            <span class="rl-kicker">{project.en}</span>
+            <h2 class="rl-gcard__title">{project.title}</h2>
+            <p class="rl-gcard__desc">{project.description}</p>
+            <div class="rl-gcard__tags">
+              {project.tags.map(tag => (
+                <span>{tag}</span>
+              ))}
+            </div>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</MainGridLayout>

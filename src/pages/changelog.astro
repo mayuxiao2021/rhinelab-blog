@@ -1,0 +1,81 @@
+---
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import MarkdownIt from 'markdown-it'
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { url } from '@utils/url-utils'
+
+const parser = new MarkdownIt({ html: true })
+// src/pages/changelog.astro → 上三级即项目根目录
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+const raw = readFileSync(path.join(projectRoot, 'CHANGELOG.md'), 'utf8')
+
+const releases = [...raw.matchAll(/^## \[([^\]]+)\][^\n]*?(\d{4}-\d{2}-\d{2})/gm)].map(match => ({
+  version: match[1],
+  date: match[2],
+}))
+const latest = releases[0]
+
+// 去掉文件顶部的一级标题，页面自己渲染 H1
+const body = raw.replace(/^# .*\r?\n/m, '')
+const html = parser.render(body).replace(/<h2>([\s\S]*?)<\/h2>/g, (match, inner) => {
+  const version = String(inner).match(/(\d+\.\d+\.\d+)/)?.[1]
+  if (!version) return match
+  const id = `v${version.replace(/\./g, '-')}`
+  return `<h2 id="${id}">${inner}<a class="rl-changelog__anchor" href="#${id}" aria-label="链接到此版本">#</a></h2>`
+})
+
+// 最近 6 个版本直接展示，较旧版本折叠，避免页面无限变长（也绕开单图 WebP 高度上限）
+const VISIBLE_RELEASES = 6
+const htmlParts = html.split(/(?=<h2 )/g)
+const htmlLead = htmlParts.shift() ?? ''
+const htmlVisible = htmlParts.slice(0, VISIBLE_RELEASES).join('')
+const htmlOlder = htmlParts.slice(VISIBLE_RELEASES).join('')
+const olderCount = Math.max(0, htmlParts.length - VISIBLE_RELEASES)
+const olderVersions = [...htmlOlder.matchAll(/<h2 id="v[\d-]+">\s*\[?([\d.]+)\]?/g)].map(match => match[1])
+const olderRange = olderVersions.length > 1 ? 'v' + olderVersions[olderVersions.length - 1] + ' – v' + olderVersions[0] : ''
+const olderSummary = '更早的版本 / EARLIER RELEASES' + (olderRange ? '　' + olderRange : '') + '（' + olderCount + '）'
+const olderBlock = htmlOlder
+  ? '<details class="rl-changelog__older"><summary>' + olderSummary + '</summary>' + htmlOlder + '</details>'
+  : ''
+const htmlFolded = htmlLead + htmlVisible + olderBlock
+---
+
+<MainGridLayout title="版本沿革" description="模板包版本记录：每个版本的修复、创新与体积变化，最近版本直接展示，更早版本可折叠与关键词过滤">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">CHANGELOG / 版本沿革</p>
+    <h1 class="rl-stats-head__title">版本沿革</h1>
+    <p class="rl-stats-head__desc">
+      本页在构建期直接读取仓库根目录的 <code>CHANGELOG.md</code> 渲染，发布记录与代码保持同一份来源，不重复维护。
+      最近 {VISIBLE_RELEASES} 个版本直接展示，更早版本折叠。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>RELEASES / 发布</span>
+      <b>{String(releases.length).padStart(2, '0')}</b>
+      <span>LATEST / 最新</span>
+      <b>{latest?.version ?? '—'}</b>
+      <span>DATE / 日期</span>
+      <b>{latest?.date ?? '—'}</b>
+      <a class="rl-stats-head__machine" href={url('/build-info.json')}>MACHINE / build-info.json ↗</a>
+    </div>
+  </section>
+
+  <div class="rl-changelog__filter card-base">
+    <label class="rl-changelog__filter-label" for="rl-changelog-filter">FILTER / 过滤版本记录</label>
+    <input
+      id="rl-changelog-filter"
+      class="rl-changelog__filter-input"
+      type="search"
+      placeholder="版本号或关键词，例如 0.2.7 / feed / 对比度"
+      autocomplete="off"
+    />
+    <button id="rl-changelog-clear" class="rl-changelog__clear" type="button" hidden>清除 / CLEAR</button>
+    <span id="rl-changelog-count" class="rl-changelog__filter-count" aria-live="polite">{releases.length} 个版本</span>
+    <p id="rl-changelog-empty" class="rl-changelog__empty" hidden>没有匹配的版本，换个关键词试试。</p>
+  </div>
+
+  <article class="rl-changelog card-base rl-prose" set:html={htmlFolded} />
+
+  <script is:inline src={url('/rhine/changelog.js')} defer></script>
+</MainGridLayout>

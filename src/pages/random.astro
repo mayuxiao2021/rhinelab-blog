@@ -1,0 +1,53 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { getSortedPosts } from '@utils/content-utils'
+import { getPostUrlBySlug, url } from '@utils/url-utils'
+
+const posts = await getSortedPosts()
+const list = posts.map(post => ({
+  title: post.data.title,
+  url: getPostUrlBySlug(post.id.replace(/\/index$/, '')),
+}))
+---
+
+<MainGridLayout title="随机档案" description="从档案库中随机抽取一条记录" noindex>
+  <section class="rl-random card-base">
+    <p class="rl-kicker">RANDOM / 随机抽取</p>
+    <h1 class="rl-random__title">正在抽取档案…</h1>
+    <p class="rl-random__desc">
+      如果你看到这一页超过一瞬，说明脚本被禁用或尚未跳转：
+      <a href={url('/archive/')}>打开归档索引</a>，或从下面的清单里手动挑一条。
+    </p>
+    <div class="rl-random__spinner" aria-hidden="true"><i></i><i></i><i></i></div>
+    <p class="rl-random__again">
+      <a class="rl-btn" href={url('/random/')}>再抽一次 / DRAW AGAIN</a>
+    </p>
+    <ol class="rl-random__list">
+      {
+        list.slice(0, 5).map(post => (
+          <li>
+            <a href={post.url}>{post.title}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <script is:inline define:vars={{ posts: list, archiveUrl: url('/archive/') }}>
+    if (!new URLSearchParams(location.search).has('no')) {
+      setTimeout(() => {
+        try {
+          if (!Array.isArray(posts) || posts.length === 0) {
+            location.replace(archiveUrl)
+            return
+          }
+          const pick = posts[Math.floor(Math.random() * posts.length)]
+          if (pick?.url) location.replace(pick.url)
+          else location.replace(archiveUrl)
+        } catch (error) {
+          location.replace(archiveUrl)
+        }
+      }, 350)
+    }
+  </script>
+</MainGridLayout>

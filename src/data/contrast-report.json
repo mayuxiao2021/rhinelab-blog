@@ -1,0 +1,304 @@
+{
+  "generator": "rhinelab-blog/check-contrast",
+  "min_ratio": 4.5,
+  "themes": [
+    {
+      "name": "LIGHT / 亮色",
+      "rows": [
+        {
+          "fg": "ink",
+          "bg": "bg",
+          "fg_color": "#080a08",
+          "bg_color": "#eae5e1",
+          "ratio": 15.88,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "ink-2",
+          "bg": "bg",
+          "fg_color": "#5a584e",
+          "bg_color": "#eae5e1",
+          "ratio": 5.71,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "muted",
+          "bg": "bg",
+          "fg_color": "#5f5d55",
+          "bg_color": "#eae5e1",
+          "ratio": 5.28,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "bg",
+          "fg_color": "#6f4c20",
+          "bg_color": "#eae5e1",
+          "ratio": 6.15,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink",
+          "bg": "surface",
+          "fg_color": "#080a08",
+          "bg_color": "#edebe4",
+          "ratio": 16.65,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "muted",
+          "bg": "surface",
+          "fg_color": "#5f5d55",
+          "bg_color": "#edebe4",
+          "ratio": 5.53,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "surface",
+          "fg_color": "#6f4c20",
+          "bg_color": "#edebe4",
+          "ratio": 6.45,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink",
+          "bg": "tint",
+          "fg_color": "#080a08",
+          "bg_color": "rgba(8, 10, 8, 0.05)",
+          "ratio": 14.31,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "muted",
+          "bg": "surface-2",
+          "fg_color": "#5f5d55",
+          "bg_color": "#e7e3d9",
+          "ratio": 5.15,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink-2",
+          "bg": "surface-2",
+          "fg_color": "#5a584e",
+          "bg_color": "#e7e3d9",
+          "ratio": 5.57,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "surface-2",
+          "fg_color": "#6f4c20",
+          "bg_color": "#e7e3d9",
+          "ratio": 6,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink-2",
+          "bg": "amber-wash",
+          "fg_color": "#5a584e",
+          "bg_color": "rgba(155, 114, 71, 0.1)",
+          "ratio": 5.15,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink",
+          "bg": "amber-wash",
+          "fg_color": "#080a08",
+          "bg_color": "rgba(155, 114, 71, 0.1)",
+          "ratio": 14.32,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "code-ink",
+          "bg": "code-bg",
+          "fg_color": "#cdd6d0",
+          "bg_color": "#101719",
+          "ratio": 12.19,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "paper",
+          "bg": "amber-ink",
+          "fg_color": "#eae5e1",
+          "bg_color": "#6f4c20",
+          "ratio": 6.15,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "amber-wash-3",
+          "fg_color": "#6f4c20",
+          "bg_color": "rgba(155, 114, 71, 0.26)",
+          "ratio": 4.66,
+          "aa": true,
+          "aaa": false
+        }
+      ]
+    },
+    {
+      "name": "DARK / 暗色",
+      "rows": [
+        {
+          "fg": "ink",
+          "bg": "bg",
+          "fg_color": "#e0e3dc",
+          "bg_color": "#11181b",
+          "ratio": 13.83,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "ink-2",
+          "bg": "bg",
+          "fg_color": "#b9c0bc",
+          "bg_color": "#11181b",
+          "ratio": 9.68,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "muted",
+          "bg": "bg",
+          "fg_color": "#a6b0b1",
+          "bg_color": "#11181b",
+          "ratio": 8.09,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "bg",
+          "fg_color": "#d9b988",
+          "bg_color": "#11181b",
+          "ratio": 9.61,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "ink",
+          "bg": "surface",
+          "fg_color": "#e0e3dc",
+          "bg_color": "#202a2f",
+          "ratio": 11.29,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "muted",
+          "bg": "surface",
+          "fg_color": "#a6b0b1",
+          "bg_color": "#202a2f",
+          "ratio": 6.6,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "surface",
+          "fg_color": "#d9b988",
+          "bg_color": "#202a2f",
+          "ratio": 7.84,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "ink",
+          "bg": "tint",
+          "fg_color": "#e0e3dc",
+          "bg_color": "rgba(224, 227, 220, 0.06)",
+          "ratio": 12.11,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "muted",
+          "bg": "surface-2",
+          "fg_color": "#a6b0b1",
+          "bg_color": "#2a363b",
+          "ratio": 5.6,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink-2",
+          "bg": "surface-2",
+          "fg_color": "#b9c0bc",
+          "bg_color": "#2a363b",
+          "ratio": 6.71,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "surface-2",
+          "fg_color": "#d9b988",
+          "bg_color": "#2a363b",
+          "ratio": 6.66,
+          "aa": true,
+          "aaa": false
+        },
+        {
+          "fg": "ink-2",
+          "bg": "amber-wash",
+          "fg_color": "#b9c0bc",
+          "bg_color": "rgba(197, 161, 107, 0.12)",
+          "ratio": 7.98,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "ink",
+          "bg": "amber-wash",
+          "fg_color": "#e0e3dc",
+          "bg_color": "rgba(197, 161, 107, 0.12)",
+          "ratio": 11.4,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "code-ink",
+          "bg": "code-bg",
+          "fg_color": "#c8d2cc",
+          "bg_color": "#0b1113",
+          "ratio": 12.27,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "paper",
+          "bg": "amber-ink",
+          "fg_color": "#11181b",
+          "bg_color": "#d9b988",
+          "ratio": 9.61,
+          "aa": true,
+          "aaa": true
+        },
+        {
+          "fg": "amber-ink",
+          "bg": "amber-wash-3",
+          "fg_color": "#d9b988",
+          "bg_color": "rgba(197, 161, 107, 0.28)",
+          "ratio": 5.67,
+          "aa": true,
+          "aaa": false
+        }
+      ]
+    }
+  ]
+}

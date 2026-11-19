@@ -1,0 +1,80 @@
+---
+// 代码块一键复制：包裹 Shiki 生成的 <pre>，注入复制按钮；
+// 通过 document 级事件在 Swup 换页后重新增强，不重复绑定。
+---
+
+<script>
+  const COPY_TEXT = '复制'
+  const COPIED_TEXT = '已复制'
+  const FAILED_TEXT = '复制失败'
+
+  async function copyText(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      try {
+        const area = document.createElement('textarea')
+        area.value = text
+        area.setAttribute('readonly', '')
+        area.style.position = 'fixed'
+        area.style.left = '-9999px'
+        document.body.appendChild(area)
+        area.select()
+        // 旧浏览器降级路径：execCommand 已废弃，仅在 Clipboard API 不可用时使用
+        const ok = (document as unknown as { execCommand: (cmd: string) => boolean }).execCommand('copy')
+        area.remove()
+        return ok
+      } catch {
+        return false
+      }
+    }
+  }
+
+  function enhanceCodeBlocks() {
+    const container = document.getElementById('post-container')
+    if (!container) return
+
+    container.querySelectorAll('pre').forEach(pre => {
+      if (pre.closest('.rl-code-wrap')) return
+      if (pre.getAttribute('data-language') === 'mermaid') return
+      if (pre.closest('.mermaid-container')) return
+
+      const wrap = document.createElement('div')
+      wrap.className = 'rl-code-wrap'
+      pre.parentNode?.insertBefore(wrap, pre)
+      wrap.appendChild(pre)
+
+      const lang = document.createElement('span')
+      lang.className = 'rl-code-lang'
+      lang.textContent = pre.getAttribute('data-language') || 'text'
+      lang.setAttribute('aria-hidden', 'true')
+
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'rl-code-copy'
+      button.setAttribute('aria-label', '复制这段代码')
+      button.textContent = COPY_TEXT
+
+      button.addEventListener('click', async () => {
+        const code = pre.querySelector('code')?.innerText ?? pre.innerText
+        const ok = await copyText(code)
+        button.textContent = ok ? COPIED_TEXT : FAILED_TEXT
+        button.classList.toggle('is-done', ok)
+        button.setAttribute('aria-label', ok ? '已复制这段代码' : '复制失败')
+        window.setTimeout(() => {
+          button.textContent = COPY_TEXT
+          button.classList.remove('is-done')
+          button.setAttribute('aria-label', '复制这段代码')
+        }, 1600)
+      })
+
+      wrap.appendChild(lang)
+      wrap.appendChild(button)
+    })
+  }
+
+  enhanceCodeBlocks()
+  document.addEventListener('astro:page-load', enhanceCodeBlocks)
+  document.addEventListener('astro:after-swap', enhanceCodeBlocks)
+</script>

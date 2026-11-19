@@ -1,0 +1,159 @@
+---
+
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+import { getEntry, render } from 'astro:content'
+import { i18n } from "../i18n/translation";
+import I18nKey from "../i18n/i18nKey";
+import Markdown from "@components/misc/Markdown.astro";
+import { url } from "@utils/url-utils";
+
+const aboutPost = await getEntry('spec', 'about')
+
+if (!aboutPost) {
+    throw new Error('缺少 About 内容：src/content/spec/about.md')
+}
+
+const { Content } = await render(aboutPost)
+
+const hubLinks = [
+    { href: url('/operators/'), label: 'OPERATORS / 研究员名录', desc: '8 位莱茵生命干员的档案、立绘与摘录（非商业演示）' },
+    { href: url('/series/'), label: 'SERIES / 系列', desc: '按主题连续阅读的实验记录' },
+    { href: url('/timeline/'), label: 'TIMELINE / 时间线', desc: '所有条目按时间排成一条刻度线' },
+    { href: url('/stats/'), label: 'STATS / 统计', desc: '条目、字数、年度对比与编目热力图' },
+    { href: url('/topics/'), label: 'TOPICS / 分类与标签', desc: '按机构分类与关键词浏览' },
+    { href: url('/changelog/'), label: 'CHANGELOG / 版本沿革', desc: '模板包的每一次修复与创新' },
+    { href: url('/subscribe/'), label: 'SUBSCRIBE / 订阅', desc: 'RSS、JSON Feed 与 OpenSearch 接入' },
+    { href: url('/random/'), label: 'RANDOM / 随机档案', desc: '从档案库里随机抽一条记录' },
+    { href: url('/archive/'), label: 'ARCHIVE / 全部归档', desc: '按年份折叠的完整索引' },
+    { href: url('/accessibility/'), label: 'A11Y / 可访问性', desc: '键盘操作、对比度与静态门禁说明' },
+    { href: url('/colophon/'), label: 'COLOPHON / 制作说明', desc: '构建链、字体图标、色板与生成脚本' },
+    { href: url('/sitemap/'), label: 'SITEMAP / 站点索引', desc: '全部页面、文章、分类、标签与机器入口' },
+    { href: url('/readers/'), label: 'READERS / 阅读器兼容', desc: '三种订阅源、兼容处理与常见阅读器建议' },
+    { href: url('/privacy/'), label: 'PRIVACY / 隐私与数据', desc: '无追踪、无 Cookie、仅本地偏好与素材边界' },
+]
+
+---
+<MainGridLayout title={i18n(I18nKey.about)} description="关于莱茵档案：模板定位、设计语言、素材边界、隐私声明与站点导航入口">
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+        <div class="card-base z-10 px-9 py-6 relative w-full" data-pagefind-body>
+            <Markdown class="mt-2 rl-prose">
+                <Content />
+            </Markdown>
+        </div>
+    </div>
+
+    <section class="rl-hub card-base" aria-labelledby="rl-hub-title">
+        <div class="rl-hub__head">
+            <p class="rl-kicker">INDEX / 站点导航</p>
+            <h2 class="rl-hub__title" id="rl-hub-title">从这里继续</h2>
+        </div>
+        <div class="rl-hub__filter">
+          <label class="rl-kicker" for="rl-hub-filter">FILTER / 过滤入口</label>
+          <input id="rl-hub-filter" class="rl-hub__filter-input" type="search" placeholder="按名称或描述过滤，例如 feed / 统计" autocomplete="off" />
+          <span id="rl-hub-count" class="rl-hub__filter-count" aria-live="polite">{hubLinks.length} 个入口</span>
+          <button id="rl-hub-clear" class="rl-hub__clear" type="button" hidden>清除</button>
+        </div>
+        <p id="rl-hub-empty" class="rl-hub__empty" hidden>没有匹配的入口，换个关键词试试。</p>
+        <div class="rl-hub__grid">
+            {hubLinks.map(link => (
+                <a class="rl-hub__card" href={link.href}>
+                    <span class="rl-hub__label">{link.label}</span>
+                    <span class="rl-hub__desc">{link.desc}</span>
+                    <span class="rl-hub__arrow" aria-hidden="true">→</span>
+                </a>
+            ))}
+        </div>
+        <script>
+          const cards = [...document.querySelectorAll('.rl-hub__card')] as HTMLElement[]
+          const input = document.getElementById('rl-hub-filter') as HTMLInputElement
+          const count = document.getElementById('rl-hub-count')
+          const empty = document.getElementById('rl-hub-empty')
+          const clear = document.getElementById('rl-hub-clear')
+          const syncUrl = (raw: string) => {
+            try {
+              const next = new URL(window.location.href)
+              if (raw) next.searchParams.set('q', raw)
+              else next.searchParams.delete('q')
+              window.history.replaceState(null, '', next)
+            } catch {
+              /* 忽略 */
+            }
+          }
+          const unmark = (root: HTMLElement) => {
+            for (const mark of root.querySelectorAll('mark.rl-hl')) {
+              mark.replaceWith(...Array.from(mark.childNodes))
+              mark.remove()
+            }
+          }
+          const highlight = (root: HTMLElement, terms: string[]) => {
+            if (terms.length === 0) return
+            const pattern = new RegExp(`(${terms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi')
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+            const textNodes: Text[] = []
+            let node: Node | null
+            while ((node = walker.nextNode())) textNodes.push(node as Text)
+            for (const textNode of textNodes) {
+              const value = textNode.nodeValue ?? ''
+              if (!pattern.test(value)) continue
+              pattern.lastIndex = 0
+              const fragment = document.createDocumentFragment()
+              let lastIndex = 0
+              let match: RegExpExecArray | null
+              while ((match = pattern.exec(value))) {
+                if (match.index > lastIndex) fragment.appendChild(document.createTextNode(value.slice(lastIndex, match.index)))
+                const mark = document.createElement('mark')
+                mark.className = 'rl-hl'
+                mark.textContent = match[0]
+                fragment.appendChild(mark)
+                lastIndex = match.index + match[0].length
+              }
+              if (lastIndex < value.length) fragment.appendChild(document.createTextNode(value.slice(lastIndex)))
+              textNode.replaceWith(fragment)
+            }
+          }
+          const filter = (updateUrl = false) => {
+            const raw = input.value.trim()
+            const terms = raw.toLowerCase().split(/\s+/).filter(Boolean)
+            let matched = 0
+            for (const card of cards) {
+              const text = (card.textContent || '').toLowerCase()
+              const hit = terms.length === 0 || terms.every(term => text.includes(term))
+              card.hidden = !hit
+              unmark(card)
+              if (hit) {
+                matched += 1
+                highlight(card, terms)
+              }
+            }
+            if (count) count.textContent = terms.length > 0 ? `匹配 ${matched} / ${cards.length}` : `${cards.length} 个入口`
+            if (empty) empty.hidden = !(terms.length > 0) || matched > 0
+            if (clear) clear.hidden = terms.length === 0
+            if (updateUrl) syncUrl(raw)
+          }
+          try {
+            const q = new URLSearchParams(window.location.search).get('q')
+            if (q) input.value = q
+          } catch {
+            /* 忽略 */
+          }
+          input?.addEventListener('input', () => filter(true))
+          clear?.addEventListener('click', () => {
+            input.value = ''
+            filter(true)
+            input.focus()
+          })
+          input?.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && input.value) {
+              input.value = ''
+              filter(true)
+            }
+          })
+          filter()
+        </script>
+
+        <p class="rl-hub__note">
+            代码以 MIT 开放，图形全部自制 CSS / SVG，不包含任何《明日方舟》官方素材。
+        </p>
+    </section>
+</MainGridLayout>

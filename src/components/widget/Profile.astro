@@ -1,0 +1,70 @@
+---
+import ImageWrapper from '../misc/ImageWrapper.astro'
+import { Icon } from 'astro-icon/components'
+import { profileConfig } from '../../config'
+import { url } from '../../utils/url-utils'
+
+const config = profileConfig
+---
+
+<div class="rl-profile card-base p-4 relative overflow-hidden">
+  <div class="rl-profile__id">
+    <span>SPECIMEN / 标本卡</span>
+    <b>OBSERVER-07</b>
+  </div>
+  <a
+    aria-label="前往关于页"
+    href={url('/about/')}
+    class="rl-profile__avatar group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3 max-w-[240px] lg:max-w-none overflow-hidden active:scale-[0.985]"
+  >
+    <div
+      class="absolute transition pointer-events-none group-hover:bg-black/25 group-active:bg-black/40 w-full h-full z-50 flex items-center justify-center"
+    >
+      <Icon
+        name="material-symbols:person-outline-rounded"
+        class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl"
+      />
+    </div>
+    <ImageWrapper
+      src={config.avatar || ''}
+      alt="作者头像"
+      width={480}
+      height={480}
+      class="mx-auto lg:w-full h-full lg:mt-0"></ImageWrapper>
+  </a>
+  <div class="px-2">
+    <div class="rl-profile__name text-xl text-center mb-1">{config.name}</div>
+    <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2"></div>
+    <div class="rl-profile__bio text-center mb-2.5">{config.bio}</div>
+    <div class="rl-profile__links flex gap-2 justify-center mb-1">
+      {
+        config.links.length > 1 &&
+          config.links.map(item => (
+            <a
+              rel="me noopener noreferrer"
+              aria-label={item.name}
+              href={item.url}
+              target="_blank"
+              class="btn-regular rounded-lg h-10 w-10 active:scale-90"
+            >
+              <Icon name={item.icon} class="text-[1.4rem]" />
+            </a>
+          ))
+      }
+      {
+        config.links.length == 1 && (
+          <a
+            rel="me noopener noreferrer"
+            aria-label={config.links[0].name}
+            href={config.links[0].url}
+            target="_blank"
+            class="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95"
+          >
+            <Icon name={config.links[0].icon} class="text-[1.5rem]" />
+            {config.links[0].name}
+          </a>
+        )
+      }
+    </div>
+  </div>
+</div>

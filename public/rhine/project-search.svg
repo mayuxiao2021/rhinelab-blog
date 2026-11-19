@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="Search terminal preview">
+  <rect width="640" height="400" fill="#11181b"/>
+  <rect x="24" y="24" width="592" height="352" fill="#202a2f" stroke="#536166" stroke-width="1.5"/>
+  <path d="M24 72h592" stroke="#536166" stroke-width="1.5"/>
+  <g fill="#a6b0b1" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="3">
+    <text x="52" y="52">RETRIEVAL TERMINAL / 检索</text>
+    <text x="500" y="52">v1.5.2</text>
+  </g>
+  <g fill="none" stroke="#c5a16b" stroke-width="1.5">
+    <circle cx="60" cy="104" r="6"/>
+    <path d="m64 108 7 7"/>
+  </g>
+  <path d="M84 110h520" stroke="#536166" stroke-width="1"/>
+  <g fill="#e0e3dc" font-family="Roboto, sans-serif" font-size="15">
+    <text x="52" y="152">检索结果 / 6 条档案</text>
+  </g>
+  <g fill="#a6b0b1" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="2">
+    <text x="52" y="186">FILE / 档案 · X-001</text>
+    <text x="52" y="242">FILE / 档案 · X-002</text>
+    <text x="52" y="298">FILE / 档案 · X-003</text>
+  </g>
+  <g fill="#e0e3dc" font-family="Roboto, sans-serif" font-size="14">
+    <text x="52" y="204">建站日志：把博客做成一座档案室</text>
+    <text x="52" y="260">观测日志：暗色与亮色之间的可读性</text>
+    <text x="52" y="316">实验复现：一条命令重建整座档案室</text>
+  </g>
+  <g stroke="#536166" stroke-width="1">
+    <path d="M52 218h536M52 274h536M52 330h536"/>
+  </g>
+  <g fill="#c5a16b" font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="2">
+    <text x="52" y="364">READ / 读取</text>
+    <text x="120" y="364">OPEN / 打开</text>
+    <text x="188" y="364">ARCHIVE / 归档</text>
+  </g>
+</svg>

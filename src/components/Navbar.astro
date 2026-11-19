@@ -1,0 +1,153 @@
+---
+import { Icon } from 'astro-icon/components'
+import { navBarConfig, siteConfig } from '../config'
+import { LinkPresets } from '../constants/link-presets'
+import type { LinkPreset, NavBarLink } from '../types/config'
+import { url } from '../utils/url-utils'
+import LightDarkSwitch from './LightDarkSwitch.svelte'
+import Search from './Search.svelte'
+import DisplaySettings from './widget/DisplaySettings.svelte'
+import NavMenuPanel from './widget/NavMenuPanel.astro'
+import RhineMark from './rhine/RhineMark.astro'
+const className = Astro.props.class
+
+const links: NavBarLink[] = navBarConfig.links.map(
+  (item: NavBarLink | LinkPreset): NavBarLink => {
+    if (typeof item === 'number') {
+      return LinkPresets[item]
+    }
+    return item
+  },
+)
+---
+<div id="navbar" class="sticky top-0 z-50 onload-animation">
+    <div class="absolute h-8 left-0 right-0 -top-8 bg-transparent transition"></div>
+    <div class:list={[
+        className,
+        "overflow-visible max-w-[var(--page-width)] h-[4.5rem] rounded-t-none mx-auto flex items-center justify-between px-4 backdrop-blur-xl bg-white/70 dark:bg-black/30 border-b border-black/5 dark:border-white/5 shadow-sm"]}>
+        <a href={url('/')} class="btn-plain scale-animation rhine-brand h-[3.25rem] active:scale-95" aria-label={`${siteConfig.title} 首页`}>
+            <RhineMark class="rhine-brand__mark" size={27} />
+            <span class="rhine-brand__text">
+                <span class="rhine-brand__name">{siteConfig.title}</span>
+                <span class="rhine-brand__tag">RHINE ARCHIVE / 档案室</span>
+            </span>
+        </a>
+        <div class="hidden md:flex">
+            {links.map((l) => {
+                return <a aria-label={l.name} href={l.external ? l.url : url(l.url)} target={l.external ? "_blank" : null}
+                          rel={l.external ? "noopener noreferrer" : null}
+                          class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
+                >
+                    <div class="flex items-center">
+                        {l.name}
+                        {l.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>}
+                    </div>
+                </a>;
+            })}
+        </div>
+        <div class="flex">
+            <!--<SearchPanel client:load>-->
+            <Search client:load />
+            {!siteConfig.themeColor.fixed && (
+                    <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch">
+                        <Icon name="material-symbols:palette-outline" class="text-[1.25rem]"></Icon>
+                    </button>
+            )}
+            <LightDarkSwitch client:load></LightDarkSwitch>
+            <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:hidden" id="nav-menu-switch">
+                <Icon name="material-symbols:menu-rounded" class="text-[1.25rem]"></Icon>
+            </button>
+        </div>
+        <NavMenuPanel links={links}></NavMenuPanel>
+        <DisplaySettings client:only="svelte">
+            <Icon slot="restore-icon" name="fa6-solid:arrow-rotate-left" class="text-[0.875rem]"></Icon>
+        </DisplaySettings>
+    </div>
+</div>
+
+<style>
+</style>
+
+<script>
+
+function switchTheme() {
+    if (localStorage.theme === 'dark') {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+    }
+}
+
+// 用 onclick 赋值而不是 addEventListener：Swup 换页后本函数会再次执行，
+// addEventListener 会累积监听器，导致主题切换/菜单按钮一次点击被触发多次。
+function loadButtonScript() {
+    const switchBtn = document.getElementById("scheme-switch");
+    if (switchBtn) switchBtn.onclick = () => switchTheme();
+
+    // themeColor.fixed=true 时没有调色按钮：必须做空值保护。
+    const settingBtn = document.getElementById("display-settings-switch");
+    if (settingBtn) {
+        settingBtn.onclick = () => {
+            document.getElementById("display-setting")?.classList.toggle("float-panel-closed");
+        };
+    }
+
+    const menuPanel = document.getElementById("nav-menu-panel");
+    const closeMenuPanel = () => menuPanel?.classList.add("float-panel-closed");
+    const menuBtn = document.getElementById("nav-menu-switch");
+    if (menuBtn) {
+        menuBtn.onclick = () => menuPanel?.classList.toggle("float-panel-closed");
+    }
+
+    // 菜单里的导航链接点击后立即收起；换页后也要收起，避免旧菜单盖住新页面。
+    if (menuPanel) {
+        for (const link of menuPanel.querySelectorAll("a")) link.onclick = closeMenuPanel;
+    }
+}
+
+loadButtonScript();
+
+document.addEventListener('astro:after-swap', () => {
+    document.getElementById("nav-menu-panel")?.classList.add("float-panel-closed");
+    loadButtonScript();
+}, { once: false });
+
+// 键盘：Esc 关闭移动端菜单；/ 聚焦（或打开）搜索
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        document.getElementById("nav-menu-panel")?.classList.add("float-panel-closed");
+        return;
+    }
+    if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target as HTMLElement | null;
+    const typing =
+        !!target &&
+        (target.tagName === "INPUT" ||
+            target.tagName === "TEXTAREA" ||
+            target.tagName === "SELECT" ||
+            target.isContentEditable);
+    if (typing) return;
+    event.preventDefault();
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+        document.querySelector<HTMLInputElement>("#search-bar input")?.focus();
+    } else {
+        document.getElementById("search-switch")?.click();
+        setTimeout(() => document.querySelector<HTMLInputElement>("#search-panel input")?.focus(), 80);
+    }
+});
+</script>
+
+{import.meta.env.PROD && <script is:inline define:vars={{scriptUrl: url('/pagefind/pagefind.js')}}>
+async function loadPagefind() {
+    const pagefind = await import(scriptUrl)
+    await pagefind.options({
+        'excerptLength': 20
+    })
+    pagefind.init()
+    window.pagefind = pagefind
+    pagefind.search('')     // speed up the first search
+}
+loadPagefind()
+</script>}

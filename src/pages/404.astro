@@ -1,0 +1,62 @@
+---
+// src/pages/404.astro —— 莱茵档案式「档案不存在」
+import MainGridLayout from '../layouts/MainGridLayout.astro'
+import { i18n } from '../i18n/translation'
+import I18nKey from '../i18n/i18nKey'
+import { url, getPostUrlBySlug, getCategoryUrl } from '../utils/url-utils'
+import { getSortedPosts, getCategoryList } from '../utils/content-utils'
+
+const recent = (await getSortedPosts()).slice(0, 3)
+const categories = (await getCategoryList()).filter(category => category.count > 0).slice(0, 6)
+---
+
+<MainGridLayout title={i18n(I18nKey.pageNotFound)} description={i18n(I18nKey.pageNotFound)} noindex>
+  <div class="rl-404">
+    <div class="rl-404__code" aria-hidden="true"><b>4</b>0<b>4</b></div>
+    <p class="rl-404__label">FILE NOT FOUND / 检索失败</p>
+    <h1 class="rl-404__title">该档案不在索引中</h1>
+    <p class="rl-404__desc">
+      请求的条目可能已被移出编目、尚未归档，或编号输入有误。
+      你可以回到总览，或使用检索终端重新定位。
+    </p>
+    <div class="rl-404__recent">
+      <p class="rl-kicker">RECENT / 最近归档案卷</p>
+      <ol class="rl-404__recent-list">
+        {recent.map((post, index) => (
+          <li>
+            <a href={getPostUrlBySlug(post.id.replace(/\/index$/, ''))} class="rl-404__recent-link">
+              <span class="rl-404__recent-no">X-00{index + 1}</span>
+              <span class="rl-404__recent-title">{post.data.title}</span>
+              <span class="rl-404__recent-meta">{post.data.category || '未分类'}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    {categories.length > 0 && (
+      <div class="rl-404__categories">
+        <p class="rl-kicker">BROWSE / 按分类查找</p>
+        <ul class="rl-404__chips">
+          {categories.map(category => (
+            <li>
+              <a class="rl-chip" href={getCategoryUrl(category.name)}>
+                {category.name}<span>{category.count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <div class="rl-404__actions">
+      <a class="rl-btn rl-btn--solid" href={url('/')}>← 返回总览</a>
+      <a class="rl-btn" href={url('/archive/')}>打开索引</a>
+      <a class="rl-btn" href={url('/random/')}>随机档案</a>
+      <a class="rl-btn" href={url('/subscribe/')}>订阅更新</a>
+      <button class="rl-btn" type="button" onclick="document.getElementById('search-switch')?.click()">
+        检索终端
+      </button>
+    </div>
+  </div>
+</MainGridLayout>

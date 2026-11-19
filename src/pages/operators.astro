@@ -1,0 +1,142 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import RhineMark from '@components/rhine/RhineMark.astro'
+import { rhineOperators } from '../data/operators'
+import { url } from '@utils/url-utils'
+
+const featured = rhineOperators.filter(operator =>
+  ['muelsyse', 'saria', 'dorothy'].includes(operator.slug),
+)
+const artSize: Record<string, { width: number; height: number }> = {
+  muelsyse: { width: 1400, height: 1323 },
+  saria: { width: 1400, height: 1400 },
+  dorothy: { width: 1400, height: 1400 },
+  silence: { width: 1317, height: 1186 },
+  ifrit: { width: 1400, height: 1400 },
+  ptilopsis: { width: 1024, height: 1024 },
+  mayer: { width: 1400, height: 1400 },
+  magallan: { width: 1400, height: 1400 },
+}
+const star = (count: number) => '★'.repeat(count)
+---
+
+<MainGridLayout
+  title="研究员名录"
+  description="莱茵生命研究员名录：8 位干员的代号、职务、专业方向与档案摘录，含三幅大型立绘与全员档案卡。"
+>
+  <section class="rl-ops-hero" aria-labelledby="rl-ops-title">
+    <div class="rl-ops-hero__grid" aria-hidden="true"></div>
+    <div class="rl-ops-hero__head">
+      <p class="rl-kicker"><RhineMark size={16} /> RHINE LAB / PERSONNEL REGISTRY</p>
+      <h1 id="rl-ops-title" class="rl-ops-hero__title">研究员名录<em>.</em></h1>
+      <p class="rl-ops-hero__en">OPERATORS · COLUMBIA BRANCH · RL-01 → RL-08</p>
+      <p class="rl-ops-hero__lede">
+        八份仍在更新的人事档案。编号、职务与专业方向来自公开资料，摘录是我们为这座档案室写的注脚。
+        点击任意一位，可前往外部资料页查看完整履历。
+      </p>
+      <div class="rl-ops-hero__stats">
+        <div><span>RECORDS / 档案</span><b>08</b></div>
+        <div><span>FACTION / 阵营</span><b>RHINE LAB</b></div>
+        <div><span>REGION / 区域</span><b>COLUMBIA</b></div>
+        <div><span>STATUS / 状态</span><b class="rl-live">ACTIVE</b></div>
+      </div>
+    </div>
+    <div class="rl-ops-hero__side" aria-hidden="true">
+      <img src={url('/rhine/art/art-muelsyse.webp')} alt="" width="1400" height="1323" />
+    </div>
+  </section>
+
+  <section class="rl-feature" aria-labelledby="rl-feature-title">
+    <div class="rl-section-head">
+      <p class="rl-kicker">FEATURED / 重点档案</p>
+      <h2 id="rl-feature-title">三份优先调阅</h2>
+      <p>大型立绘来自公开素材库，仅用于非商业演示；版权归原权利人所有。</p>
+    </div>
+    <div class="rl-feature__grid">
+      {
+        featured.map((operator, index) => (
+          <article class:list={['rl-figure', `rl-figure--${operator.slug}`]} style={`--i:${index}`}>
+            <a class="rl-figure__link" href={operator.link} target="_blank" rel="noopener noreferrer">
+              <span class="rl-figure__frame">
+                <img
+                  src={url(operator.art)}
+                  alt={`${operator.cn}立绘`}
+                  width={artSize[operator.slug].width}
+                  height={artSize[operator.slug].height}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={index === 0 ? 'high' : undefined}
+                />
+              </span>
+              <span class="rl-figure__meta">
+                <span class="rl-figure__code">{operator.code} / {operator.en}</span>
+                <span class="rl-figure__name">{operator.cn}</span>
+                <span class="rl-figure__role">{operator.role} · {operator.profession}</span>
+              </span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="rl-roster" aria-labelledby="rl-roster-title">
+    <div class="rl-section-head">
+      <p class="rl-kicker">ROSTER / 全员</p>
+      <h2 id="rl-roster-title">八份档案</h2>
+      <p>按档案编号排列。每张卡片可点击进入外部资料页；立绘为透明背景的公开素材。</p>
+    </div>
+    <div class="rl-roster__grid">
+      {
+        rhineOperators.map(operator => (
+          <article class="rl-dossier">
+            <a class="rl-dossier__link" href={operator.link} target="_blank" rel="noopener noreferrer">
+              <span class="rl-dossier__top">
+                <span class="rl-dossier__code">{operator.code}</span>
+                <span class="rl-dossier__rarity" aria-label={`${operator.rarity} 星`}>{star(operator.rarity)}</span>
+              </span>
+              <span class="rl-dossier__figure">
+                <img
+                  src={url(operator.card)}
+                  alt={`${operator.cn}档案立绘`}
+                  width="700"
+                  height="700"
+                  loading="lazy"
+                />
+              </span>
+              <span class="rl-dossier__body">
+                <span class="rl-dossier__names">
+                  <span class="rl-dossier__cn">{operator.cn}</span>
+                  <span class="rl-dossier__en">{operator.en}</span>
+                </span>
+                <span class="rl-dossier__role">{operator.role} · {operator.profession}</span>
+                <span class="rl-dossier__note">{operator.note}</span>
+                <span class="rl-dossier__tags">
+                  {operator.tags.map(tag => <span class="rl-dossier__tag">{tag}</span>)}
+                </span>
+              </span>
+              <span class="rl-dossier__foot">
+                <span>PROFESSION / {operator.professionEn}</span>
+                <span aria-hidden="true">OPEN ↗</span>
+              </span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="rl-ops-note card-base">
+    <p class="rl-kicker">NOTICE / 使用说明</p>
+    <h2>关于素材</h2>
+    <p>
+      本页人物立绘来自公开的明日方舟素材归档（Aceship/Arknight-Images），版权归鹰角网络（Hypergryph）所有，
+      仅用于<strong>非商业</strong>的同人风格演示；不构成官方合作或授权。若你要把本模板用于商业用途，
+      请自行替换为拥有授权的素材。组织名、角色名与设定相关权利均归原权利人所有。
+    </p>
+    <p class="rl-ops-note__links">
+      <a href={url('/about/')}>关于这座档案室</a>
+      <a href={url('/archive/')}>全部条目</a>
+      <a href={url('/colophon/')}>制作说明</a>
+    </p>
+  </section>
+</MainGridLayout>

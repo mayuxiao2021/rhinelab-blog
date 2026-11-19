@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Readers shortcut">
+  <rect width="192" height="192" fill="#11181b"/>
+  <g fill="none" stroke="#c5a16b" stroke-width="7" stroke-linecap="square">
+    <path d="M52 66h88"/>
+    <path d="M52 96h88"/>
+    <path d="M52 126h56"/>
+    <path d="M128 120a20 20 0 0 1 20 20"/>
+    <path d="M128 96a44 44 0 0 1 44 44"/>
+  </g>
+</svg>

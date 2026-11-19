@@ -1,0 +1,130 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { url } from '@utils/url-utils'
+
+const feeds = [
+  {
+    id: 'rss',
+    label: 'RSS 2.0',
+    type: 'application/rss+xml',
+    href: url('/rss.xml'),
+    desc: '最通用的订阅格式。把地址粘进阅读器（Feedly、Inoreader、NetNewsWire、FreshRSS 等）即可。',
+  },
+  {
+    id: 'json',
+    label: 'JSON Feed 1.1',
+    type: 'application/feed+json',
+    href: url('/feed.json'),
+    desc: '结构化 JSON 订阅，适合脚本、自动化与支持 JSON Feed 的现代阅读器。',
+  },
+  {
+    id: 'json-summary',
+    label: 'JSON Feed 摘要版',
+    badge: 'LIGHT',
+    type: 'application/feed+json',
+    href: url('/feed-summary.json'),
+    desc: '只含标题、摘要与截断纯文本（约 600 字/条），文件体积约为全文版 28%（约 10KB vs 36KB），适合脚本与速览。',
+  },
+  {
+    id: 'opensearch',
+    label: 'OpenSearch',
+    type: 'application/opensearchdescription+xml',
+    href: url('/opensearch.xml'),
+    desc: '安装后可在浏览器地址栏直接检索本站；搜索请求走站内 <code>?q=</code> 参数。',
+  },
+]
+---
+
+<MainGridLayout title="订阅" description="通过 RSS / JSON Feed 订阅莱茵档案的更新，或把站内搜索接入浏览器">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">SUBSCRIBE / 订阅与集成</p>
+    <h1 class="rl-stats-head__title">订阅与集成</h1>
+    <p class="rl-stats-head__desc">
+      档案更新提供两种订阅格式；两个地址都按部署路径（<code>base</code>）自动生成，复制即可用。
+    </p>
+  </section>
+
+  <p class="rl-subscribe__note">
+    第一次使用阅读器？见 <a href={url('/readers/')}>阅读器兼容说明</a>（三种订阅源、兼容处理与已知限制）。
+  </p>
+
+  <div class="rl-subscribe">
+    {
+      feeds.map(feed => (
+        <section class="rl-subscribe__card card-base" aria-labelledby={`feed-${feed.id}`}>
+          <p class="rl-kicker" id={`feed-${feed.id}`}>
+            {feed.label}
+            {feed.badge ? <span class="rl-subscribe__badge">{feed.badge}</span> : null}
+          </p>
+          <code class="rl-subscribe__url">{feed.href}</code>
+          <p class="rl-subscribe__desc" set:html={feed.desc} />
+          <div class="rl-subscribe__actions">
+            <button type="button" class="rl-chip" data-rl-copy-feed>
+              复制链接 / COPY
+            </button>
+            <a class="rl-chip" href={feed.href} target="_blank" rel="noopener">
+              打开 / OPEN
+            </a>
+            <span class="rl-subscribe__type">{feed.type}</span>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <div class="rl-subscribe__toolbar">
+    <button type="button" class="rl-chip" id="rl-subscribe-copy-md">
+      复制 Markdown 订阅列表 / COPY AS MARKDOWN
+    </button>
+    <span class="rl-subscribe__hint">适合放进 README 或友链页</span>
+  </div>
+
+  <p class="rl-subscribe__note">
+    提示：RSS / JSON Feed 只包含已发布条目；OpenSearch 安装入口通常在浏览器的「设置 → 搜索引擎」或地址栏右键菜单中。
+  </p>
+
+  <script>
+    const mdButton = document.getElementById('rl-subscribe-copy-md')
+    if (mdButton) {
+      mdButton.addEventListener('click', async () => {
+        const lines = [...document.querySelectorAll<HTMLElement>('.rl-subscribe__card')].map(card => {
+          const label = card.querySelector('.rl-kicker')?.textContent?.trim() || 'Feed'
+          const href = card.querySelector<HTMLElement>('.rl-subscribe__url')?.textContent?.trim() || ''
+          const absolute = new URL(href, location.origin).href
+          return `- [${label}](${absolute})`
+        })
+        const ok = await copyText(`${lines.join('\n')}\n`)
+        mdButton.textContent = ok ? '已复制 / COPIED' : '复制失败 / FAILED'
+        window.setTimeout(() => {
+          mdButton.textContent = '复制 Markdown 订阅列表 / COPY AS MARKDOWN'
+        }, 1600)
+      })
+    }
+
+    async function copyText(text: string) {
+      try {
+        await navigator.clipboard.writeText(text)
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    document.querySelectorAll<HTMLElement>('.rl-subscribe__card').forEach(card => {
+      const button = card.querySelector<HTMLButtonElement>('[data-rl-copy-feed]')
+      const code = card.querySelector<HTMLElement>('.rl-subscribe__url')
+      if (!button || !code) return
+      if (button.dataset.rlBound === '1') return
+      button.dataset.rlBound = '1'
+      const original = button.textContent?.trim() || '复制链接 / COPY'
+      button.addEventListener('click', async () => {
+        const absolute = new URL(code.textContent?.trim() || '', location.origin).href
+        const ok = await copyText(absolute)
+        button.textContent = ok ? '已复制 / COPIED' : '复制失败 / FAILED'
+        window.setTimeout(() => {
+          button.textContent = original
+        }, 1600)
+      })
+    })
+  </script>
+</MainGridLayout>

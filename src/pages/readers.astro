@@ -1,0 +1,271 @@
+---
+import MainGridLayout from '@layouts/MainGridLayout.astro'
+import { profileConfig, siteConfig } from '../config'
+import { url } from '@utils/url-utils'
+
+const origin = Astro.site?.origin ?? ''
+const checkCommands = [
+  { label: 'RSS', command: `curl -sI ${origin}${url('/rss.xml')} | head -5` },
+  { label: 'JSON FEED', command: `curl -s ${origin}${url('/feed.json')} | head -12` },
+  { label: 'SITEMAP', command: `curl -s ${origin}${url('/sitemap-index.xml')} | head -5` },
+]
+
+const feeds = [
+  {
+    name: 'RSS 2.0',
+    href: url('/rss.xml'),
+    content: '全文 HTML（含 MathML 公式、代码高亮降级、绝对链接）',
+    use: '最通用的阅读器',
+  },
+  {
+    name: 'JSON Feed 1.1',
+    href: url('/feed.json'),
+    content: '全文 HTML，字段遵循 JSON Feed 规范',
+    use: '现代阅读器 / 脚本',
+  },
+  {
+    name: 'JSON Feed 摘要版',
+    href: url('/feed-summary.json'),
+    content: '标题 + 摘要 + 600 字纯文本（约全文版 28%）',
+    use: '速览 / 流量敏感',
+  },
+]
+
+const handled = [
+  ['绝对地址', '站内 href / src 在 feed 中全部改写为带域名的绝对地址。'],
+  ['去标题锚点', '正文自动生成的 # 锚点会移除，阅读器里不会出现孤立 #。'],
+  ['MathML 兜底', 'KaTeX 公式同时保留 <math> 结构，不支持 KaTeX 的阅读器仍能显示。'],
+  ['脚本清理', '正文不含 script / iframe / object / embed / style 与内联事件处理器。'],
+  ['图片可访问', '每张图片带 alt，src 为绝对地址。'],
+  ['单次转义', '不会出现 &amp;lt; 这类双重转义。'],
+  ['分类与作者', 'RSS 带 <category> 与 <dc:creator>；JSON Feed 带 tags / authors。'],
+]
+
+const readers = [
+  ['Feedly / Inoreader', 'RSS 2.0', '全文渲染；公式在支持 MathML 的客户端可见'],
+  ['NetNewsWire / Reeder', 'RSS 或 JSON Feed', '均可自动发现'],
+  ['FreshRSS / Miniflux', 'RSS 2.0', '可开启全文抓取，无需额外配置'],
+  ['脚本 / 自动化', 'JSON Feed（含摘要版）', '摘要版字段更小，适合通知与 LLM 消费'],
+]
+
+const limits = [
+  ['Mermaid 图表', '需要 JavaScript 渲染，阅读器中显示为代码块文本（安全降级）。'],
+  ['代码高亮', '不加载 Shiki 样式时退化为等宽纯文本，仍可复制。'],
+  ['全文体积', 'RSS / JSON 全文约 36KB；文章增多后建议使用摘要版。'],
+  ['阅读样式', '阅读器会按自己的样式重排正文，本站纸张底色不会带入。'],
+  ['评论', '默认不嵌入第三方评论系统，feed 中也不会出现评论内容。'],
+]
+---
+
+<MainGridLayout title="阅读器兼容" description="三种订阅源、为阅读器做的处理、常见阅读器建议与已知限制，含订阅源体积、语言与最近更新时间">
+  <section class="rl-stats-head card-base">
+    <p class="rl-kicker">READERS / 阅读器兼容</p>
+    <h1 class="rl-stats-head__title">在任何阅读器里读</h1>
+    <p class="rl-stats-head__desc">
+      「{siteConfig.title}」提供 RSS 2.0、JSON Feed 全文与摘要版三种订阅源，全部构建期生成、无第三方服务；
+      正文会做链接绝对化、公式兜底与脚本清理，尽量在各类阅读器中保持可读。
+    </p>
+    <div class="rl-stats-head__meta">
+      <span>FEEDS / 订阅源</span>
+      <b>{String(feeds.length).padStart(2, '0')}</b>
+      <span>AUTHOR / 作者</span>
+      <b>{profileConfig.name}</b>
+      <span>VALIDATE / 校验</span>
+      <b>check-feed</b>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="readers-feeds">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="readers-feeds">FEEDS / 订阅源</span>
+      <span class="rl-panel__note"><a href={url('/subscribe/')}>订阅页 →</a></span>
+    </div>
+    <div class="rl-readers__table-wrap">
+      <table class="rl-readers__table">
+        <thead>
+          <tr><th scope="col">订阅源</th><th scope="col">内容</th><th scope="col">适合</th></tr>
+        </thead>
+        <tbody>
+          {
+            feeds.map(feed => (
+              <tr>
+                <td>
+                  <a href={feed.href}>{feed.name}</a>
+                  <button
+                    class="rl-readers__copy"
+                    type="button"
+                    data-rl-copy-url={feed.href}
+                    data-rl-copy-label="已复制订阅地址"
+                    aria-label={`复制 ${feed.name} 订阅地址`}
+                  >复制</button>
+                </td>
+                <td>{feed.content}</td>
+                <td>{feed.use}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="rl-readers__hint">
+      页面 <code>&lt;head&gt;</code> 同时声明了三条 <code>rel=alternate</code>，输入站点地址通常可自动发现。
+    </p>
+    {
+      checkCommands.map(item => (
+        <div class="rl-readers__checks">
+          <span class="rl-kicker">{item.label}</span>
+          <code class="rl-readers__cmd">{item.command}</code>
+          <button
+            class="rl-readers__copy"
+            type="button"
+            data-rl-copy-url={item.command}
+            data-rl-copy-label="已复制验证命令"
+            aria-label={`复制 ${item.label} 验证命令`}
+          >复制命令</button>
+        </div>
+      ))
+    }
+    <div class="rl-readers__actions">
+      <button class="rl-sitemap__retry" id="rl-readers-copy-all" type="button">复制全部命令</button>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="readers-handled">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="readers-handled">FIXES / 为阅读器做的处理</span>
+    </div>
+    <ul class="rl-readers__list">
+      {handled.map(([title, desc]) => (<li><b>{title}</b><span>{desc}</span></li>))}
+    </ul>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="readers-advice">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="readers-advice">READERS / 常见阅读器建议</span>
+    </div>
+    <div class="rl-readers__table-wrap">
+      <table class="rl-readers__table">
+        <thead>
+          <tr><th scope="col">阅读器</th><th scope="col">推荐订阅源</th><th scope="col">说明</th></tr>
+        </thead>
+        <tbody>
+          {
+            readers.map(([name, feed, desc]) => (
+              <tr>
+                <td>{name}</td>
+                <td>{feed}</td>
+                <td>{desc}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rl-panel card-base" aria-labelledby="readers-limits">
+    <div class="rl-panel__head">
+      <span class="rl-kicker" id="readers-limits">LIMITS / 已知限制</span>
+    </div>
+    <ul class="rl-readers__list">
+      {limits.map(([title, desc]) => (<li><b>{title}</b><span>{desc}</span></li>))}
+    </ul>
+    <div class="rl-readers__sizes" id="rl-feed-sizes">
+      <span class="rl-kicker">SIZES / 当前体积</span>
+      <span class="rl-readers__size" data-feed-size="rss.xml">RSS …</span>
+      <span class="rl-readers__size" data-feed-size="feed.json">JSON FEED …</span>
+      <span class="rl-readers__size" data-feed-size="feed-summary.json">SUMMARY …</span>
+      <button class="rl-sitemap__retry" id="rl-feed-refresh" type="button">刷新</button>
+    </div>
+
+    <p class="rl-readers__hint">
+      维护者文档见仓库 <code>docs/READERS.md</code>；手动检查可用
+      <code>curl -sI {url('/rss.xml')}</code> 或 <code>node scripts/check-feed.mjs</code>。
+    </p>
+  </section>
+  <script>
+    const label = (name: string) => name.replace(/\.(json|xml)$/, '').toUpperCase()
+    const relativeDays = (value: number) => {
+      const days = Math.floor((Date.now() - value) / 86400000)
+      if (days <= 0) return '今天更新'
+      return `${days} 天前更新`
+    }
+    const summarize = (name: string, text: string) => {
+      const base = `${label(name)} ${(new Blob([text]).size / 1024).toFixed(1)}KB`
+      try {
+        if (name.endsWith('.xml')) {
+          const doc = new DOMParser().parseFromString(text, 'application/xml')
+          const language = doc.querySelector('channel > language')?.textContent?.trim() || 'zh-CN'
+          const items = [...doc.querySelectorAll('item')] as Element[]
+          const latest = items
+            .map((item: Element) => Date.parse(item.querySelector('pubDate')?.textContent || ''))
+            .filter((value: number) => !Number.isNaN(value))
+            .sort((a: number, b: number) => b - a)[0]
+          return `${base} · ${items.length} ITEMS · ${language} · ${latest ? relativeDays(latest) : '—'}`
+        }
+        const feed = JSON.parse(text)
+        const language = feed.language || 'zh-CN'
+        const items: Array<{ date_published?: string; date_modified?: string }> = Array.isArray(feed.items) ? feed.items : []
+        const latest = items
+          .map((item: { date_published?: string; date_modified?: string }) => Date.parse(item.date_published || item.date_modified || ''))
+          .filter((value: number) => !Number.isNaN(value))
+          .sort((a: number, b: number) => b - a)[0]
+        return `${base} · ${items.length} ITEMS · ${language} · ${latest ? relativeDays(latest) : '—'}`
+      } catch {
+        return base
+      }
+    }
+    const refresh = document.getElementById('rl-feed-refresh') as HTMLButtonElement | null
+    const loadSizes = () => {
+      if (refresh) {
+        refresh.disabled = true
+        refresh.textContent = '刷新中…'
+      }
+      const sizes = document.querySelectorAll('[data-feed-size]')
+      const requests: Promise<void>[] = []
+      for (const node of sizes) {
+        const name = node.getAttribute('data-feed-size')
+        if (!name) continue
+        node.textContent = `${label(name)} …`
+        const controller = new AbortController()
+        const timer = window.setTimeout(() => controller.abort(), 8000)
+        const request: Promise<void> = fetch(new URL('../' + name, window.location.href), { signal: controller.signal })
+          .then(response => (response.ok ? response.text() : Promise.reject(new Error(String(response.status)))))
+          .then(text => {
+            node.textContent = summarize(name, text)
+          })
+          .catch(() => {
+            node.textContent = `${label(name)} 不可用`
+          })
+          .finally(() => window.clearTimeout(timer))
+        requests.push(request)
+      }
+      Promise.allSettled(requests).finally(() => {
+        if (refresh) {
+          refresh.disabled = false
+          refresh.textContent = '刷新'
+        }
+      })
+    }
+    document.getElementById('rl-feed-refresh')?.addEventListener('click', loadSizes)
+
+    const copyAll = document.getElementById('rl-readers-copy-all') as HTMLButtonElement | null
+    copyAll?.addEventListener('click', async () => {
+      const commands = [...document.querySelectorAll('.rl-readers__cmd')].map(node => (node.textContent || '').trim())
+      if (commands.length === 0) return
+      let ok = false
+      try {
+        await navigator.clipboard.writeText(['# Rhine Archive · feed check commands', ...commands].join('\n'))
+        ok = true
+      } catch {
+        ok = false
+      }
+      const original = '复制全部命令'
+      copyAll.textContent = ok ? '已复制全部命令' : '复制失败'
+      window.setTimeout(() => {
+        copyAll.textContent = original
+      }, 1600)
+    })
+    loadSizes()
+  </script>
+</MainGridLayout>

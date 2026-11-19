@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Random shortcut">
+  <rect width="192" height="192" fill="#11181b"/>
+  <g fill="none" stroke="#c5a16b" stroke-width="7" stroke-linejoin="round">
+    <rect x="62" y="62" width="68" height="68" transform="rotate(12 96 96)"/>
+    <circle cx="96" cy="96" r="9" fill="#c5a16b" stroke="none"/>
+    <path d="M96 48v14M96 130v14M48 96h14M130 96h14"/>
+  </g>
+</svg>
