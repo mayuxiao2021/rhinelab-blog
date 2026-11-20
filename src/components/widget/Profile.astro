@@ -10,7 +10,9 @@ const config = profileConfig
 <div class="rl-profile card-base p-4 relative overflow-hidden">
   <div class="rl-profile__id">
     <span>SPECIMEN / 标本卡</span>
-    <b>OBSERVER-07</b>
+    <span class="rl-profile__id-no">01 / 04</span>
+    <b>RL-ID // OBSERVER-07</b>
+    <i class="rl-marker" aria-hidden="true"></i>
   </div>
   <a
     aria-label="前往关于页"
@@ -36,6 +38,17 @@ const config = profileConfig
     <div class="rl-profile__name text-xl text-center mb-1">{config.name}</div>
     <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2"></div>
     <div class="rl-profile__bio text-center mb-2.5">{config.bio}</div>
+    <div class="rl-swatch justify-center" aria-hidden="true">
+      <i style="background: var(--rl-bg)"></i>
+      <i style="background: var(--rl-amber)"></i>
+      <i style="background: var(--rl-signal)"></i>
+      <i style="background: var(--rl-verd)"></i>
+    </div>
+    <div class="rl-profile__telemetry">
+      <span><b>DEPT</b><i>ARCHIVE</i></span>
+      <span><b>CLEARANCE</b><i>LV.5</i></span>
+      <span><b>SYNC</b><i>98.7%</i></span>
+    </div>
     <div class="rl-profile__links flex gap-2 justify-center mb-1">
       {
         config.links.length > 1 &&
@@ -66,5 +79,14 @@ const config = profileConfig
         )
       }
     </div>
+  </div>
+
+  <div
+    class="rl-profile__stamp"
+    aria-hidden="true"
+    style={`--rl-faction-mark: url('${url('/rhine/art/rhine-mark.png')}')`}
+  >
+    <span>RHINE LAB</span>
+    <span>OBSERVER-07 // VERIFIED</span>
   </div>
 </div>

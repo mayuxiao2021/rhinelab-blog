@@ -5,6 +5,8 @@ description: "How to use this blog template."
 image: "/gallery/guide-cover.jpeg"
 tags: ["Fuwari", "Blogging", "Customization"]
 category: Guides
+series: Fuwari 模板与排版指南
+seriesOrder: 1
 draft: false
 ---
 

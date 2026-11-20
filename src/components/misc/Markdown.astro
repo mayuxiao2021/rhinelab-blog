@@ -168,37 +168,60 @@ const className = Astro.props.class;
 </script>
 
 <!-- Styles for copy-code-button -->
-<style lang="css" is:global>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer components {
-        .btn-regular-dark {
-            @apply flex items-center justify-center
-            bg-[oklch(0.45_0.01_var(--hue))] hover:bg-[oklch(0.50_0.01_var(--hue))] active:bg-[oklch(0.55_0.01_var(--hue))]
-            dark:bg-[oklch(0.30_0.02_var(--hue))] dark:hover:bg-[oklch(0.35_0.03_var(--hue))] dark:active:bg-[oklch(0.40_0.03_var(--hue))]
-        }
-        .btn-regular-dark.success {
-            @apply bg-[oklch(0.75_0.14_var(--hue))] dark:bg-[oklch(0.75_0.14_var(--hue))]
-        }
-
-        .copy-btn-icon {
-            @apply absolute top-1/2 left-1/2 transition -translate-x-1/2 -translate-y-1/2
-        }
-        .copy-btn .copy-icon {
-            @apply opacity-100 fill-white dark:fill-white/75
-        }
-        .copy-btn.success .copy-icon {
-            @apply opacity-0 fill-[var(--deep-text)]
-        }
-        .copy-btn .success-icon {
-            @apply opacity-0
-        }
-        .copy-btn.success .success-icon {
-            @apply opacity-100
-        }
-    }
+<style is:global>
+.btn-regular-dark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: oklch(0.45 0.01 var(--hue));
+}
+.btn-regular-dark:hover {
+    background-color: oklch(0.50 0.01 var(--hue));
+}
+.btn-regular-dark:active {
+    background-color: oklch(0.55 0.01 var(--hue));
+}
+.dark .btn-regular-dark {
+    background-color: oklch(0.30 0.02 var(--hue));
+}
+.dark .btn-regular-dark:hover {
+    background-color: oklch(0.35 0.03 var(--hue));
+}
+.dark .btn-regular-dark:active {
+    background-color: oklch(0.40 0.03 var(--hue));
+}
+.btn-regular-dark.success,
+.dark .btn-regular-dark.success {
+    background-color: oklch(0.75 0.14 var(--hue));
+}
+.copy-btn-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.copy-btn .copy-icon {
+    opacity: 1;
+    fill: #ffffff;
+}
+.dark .copy-btn .copy-icon {
+    fill: rgba(255, 255, 255, 0.75);
+}
+.copy-btn.success .copy-icon {
+    opacity: 0;
+    fill: var(--deep-text);
+}
+.copy-btn .success-icon {
+    opacity: 0;
+}
+.copy-btn.success .success-icon {
+    opacity: 1;
+}
+.custom-md h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
 </style>
 
 <style is:global>
@@ -641,17 +664,4 @@ github-logo {
     opacity: 0.15;
   }
 }
-</style>
-
-<style lang="css" is:global>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer components {
-        .custom-md h1 {
-            @apply text-3xl
-        }
-    }
-
 </style>

@@ -67,16 +67,29 @@ const className = Astro.props.class;
 </div>
 
 <style>
-@tailwind components;
-
-@layer components {
-    .meta-icon {
-        @apply w-8 h-8 transition rounded-md flex items-center justify-center bg-[var(--btn-regular-bg)]
-        text-[var(--btn-content)] mr-2
-    }
-    .with-divider {
-        @apply before:content-['/'] before:ml-1.5 before:mr-1.5 before:text-[var(--meta-divider)] before:text-sm
-        before:font-medium before:first-of-type:hidden before:transition
-    }
+.meta-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-regular-bg);
+    color: var(--btn-content);
+    margin-right: 0.5rem;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.with-divider::before {
+    content: "/";
+    margin-left: 0.375rem;
+    margin-right: 0.375rem;
+    color: var(--meta-divider);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.with-divider:first-of-type::before {
+    display: none;
 }
 </style>

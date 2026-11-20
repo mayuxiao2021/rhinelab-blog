@@ -31,7 +31,14 @@ const className = props.class;
 >
     <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
         before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
-        before:absolute before:left-[-16px] before:top-[5.5px]">{name}</div>
+        before:absolute before:left-[-16px] before:top-[5.5px]">
+        <div class="rl-widget-head">
+            <span class="rl-widget-eyebrow">MODULE // {id.toUpperCase()}</span>
+            <span class="rl-widget-rule" aria-hidden="true"></span>
+            <i class="rl-marker" aria-hidden="true"></i>
+        </div>
+        <span class="rl-widget-title">{name}</span>
+    </div>
     <div id={id} class:list={["collapse-wrapper px-4 overflow-hidden", {"collapsed": isCollapsed}]}>
         <slot></slot>
     </div>

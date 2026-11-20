@@ -7,13 +7,12 @@ import { PAGE_SIZE } from '../constants/constants'
 import { rhineOperators } from '../data/operators'
 import MainGridLayout from '../layouts/MainGridLayout.astro'
 import { getSortedPosts } from '../utils/content-utils'
-import { url } from '../utils/url-utils'
+import { getPostUrlBySlug, url } from '../utils/url-utils'
 
 export const getStaticPaths = (async ({ paginate }) => {
   const allBlogPosts = await getSortedPosts()
   return paginate(allBlogPosts, { pageSize: PAGE_SIZE })
 }) satisfies GetStaticPaths
-// https://github.com/withastro/astro/issues/6507#issuecomment-1489916992
 
 const { page } = Astro.props
 
@@ -21,38 +20,98 @@ const len = page.data.length
 const teaser = rhineOperators.filter(operator =>
   ['muelsyse', 'saria', 'ifrit', 'dorothy'].includes(operator.slug),
 )
+
+const priorityDossiers = [
+  {
+    code: 'RL-SEC-01 // AUDIT',
+    clearance: 'CLEARANCE LV.3',
+    division: 'DEFENSE & SECURITY',
+    title: '某校园跑步 App 安卓客户端安全审计：从静态还原到实机验证',
+    summary:
+      '国密 SM2/SM4 混合加密协议逆向、传感器反作弊架构剖析、生产包日志明文泄露，以及静态分析与实机验证的差异复盘。',
+    href: getPostUrlBySlug('campus-running-app-audit'),
+    lead: 'RL-01 塞雷娅 · RL-07 多萝西',
+    highlights: ['SM2/SM4 国密校验', '反作弊架构剖析', '静态 vs 实机复盘'],
+    metrics: 'SERIES 02/02 · 深度安全审计',
+  },
+  {
+    code: 'RL-SEC-02 // PIPELINE',
+    clearance: 'CLEARANCE LV.3',
+    division: 'CLINICAL & DATA',
+    title: '从零搭一条 Android logcat 脱敏抓取管线',
+    summary:
+      '当生产包直接向 logcat 打印明文响应时，如何绕过 256KiB 环形缓冲区限制，演进出一套从 PC 管道到手机端实时 PII 脱敏的抓取工具链。',
+    href: getPostUrlBySlug('logcat-sanitize-pipeline'),
+    lead: 'RL-02 赫默 · RL-04 白面鸮',
+    highlights: ['流式 PII 正则脱敏', '256KiB 缓冲突破', '手机端独立守护'],
+    metrics: 'SERIES 01/02 · 工具链演进',
+  },
+]
 ---
 
 <MainGridLayout>
     {page.currentPage === 1 && <RhineHero />}
     {page.currentPage === 1 && (
       <>
-        <section class="rl-org" aria-labelledby="rl-org-title">
-          <div class="rl-org__head">
-            <p class="rl-kicker">ORGANISATION / 组织概览</p>
-            <h2 id="rl-org-title">莱茵生命 · 哥伦比亚</h2>
-            <p class="rl-org__lede">
-              一家在公开资料里被反复提及、又始终语焉不详的研究机构。下面三块，是我们为这座档案室整理的工作面。
-            </p>
+        <section class="rl-org" id="rl-division-board" aria-labelledby="rl-org-title">
+          <div class="rl-org__top">
+            <div class="rl-org__head">
+              <p class="rl-kicker">ORGANISATION &amp; SWITCHBOARD / 莱茵科室控制台</p>
+              <h2 id="rl-org-title">莱茵生命 · 哥伦比亚工作面</h2>
+              <p class="rl-org__lede">
+                一家在公开资料里被反复提及、又始终语焉不详的研究机构。点击下方科室频段，可联动调谐本页的实验场与优先人事档案。
+              </p>
+            </div>
+            <div class="rl-org__switch" role="group" aria-label="切换观测科室频段">
+              <button type="button" class="rl-org__tab is-active" data-home-filter="all" aria-pressed="true">
+                ALL / 全频段
+              </button>
+              <button type="button" class="rl-org__tab" data-home-filter="structure" aria-pressed="false">
+                01 · 结构与源石
+              </button>
+              <button type="button" class="rl-org__tab" data-home-filter="defense" aria-pressed="false">
+                02 · 防卫与临床
+              </button>
+              <button type="button" class="rl-org__tab" data-home-filter="ecology" aria-pressed="false">
+                03 · 生态与科考
+              </button>
+            </div>
           </div>
+
+          <div class="rl-org__status" role="status" aria-live="polite" id="rl-home-channel-status">
+            ACTIVE CHANNEL: <b>ALL DIVISIONS // 三处工作面与四份优先人事卷宗全部在线</b>
+          </div>
+
           <div class="rl-org__grid">
-            <article class="rl-org__card">
-              <span class="rl-org__no">01</span>
-              <h3>结构研究</h3>
-              <p>从源石技艺到材料相变，把「不可控」拆成可测量的变量，再逐项归档。</p>
-              <span class="rl-org__tag">STRUCTURE / 材料 · 源石</span>
+            <article class="rl-org__card" data-home-div="structure">
+              <div class="rl-org__card-top">
+                <span class="rl-org__no">01 // STRUCTURE</span>
+                <span class="rl-org__lead">LEAD: RL-05 / RL-07</span>
+              </div>
+              <h3>结构与源石应用</h3>
+              <p>从源石技艺共振阵列到自动化工坊，把「不可控」拆成可测量的变量，再逐项归档。</p>
+              <div class="rl-org__bar" aria-hidden="true"><i style="width: 94%" /></div>
+              <span class="rl-org__tag">STRUCTURE / 材料 · 源石 · 自动化</span>
             </article>
-            <article class="rl-org__card">
-              <span class="rl-org__no">02</span>
-              <h3>防卫与临床</h3>
-              <p>保护样本，也保护记录记录的人。医疗与防卫在同一个实验台上交接。</p>
-              <span class="rl-org__tag">DEFENSE / 医疗 · 防卫</span>
+            <article class="rl-org__card" data-home-div="defense">
+              <div class="rl-org__card-top">
+                <span class="rl-org__no">02 // DEFENSE &amp; CLINICAL</span>
+                <span class="rl-org__lead">LEAD: RL-01 / RL-02</span>
+              </div>
+              <h3>防卫、临床与安全审计</h3>
+              <p>保护样本，也保护记录的人。医疗脱敏、协议逆向与防卫边界在同一个实验台上交接。</p>
+              <div class="rl-org__bar" aria-hidden="true"><i style="width: 98%" /></div>
+              <span class="rl-org__tag">DEFENSE / 医疗 · 防卫 · 安全审计</span>
             </article>
-            <article class="rl-org__card">
-              <span class="rl-org__no">03</span>
-              <h3>生态与野外</h3>
-              <p>把实验室搬到极地与湿地，观测那些不会配合实验的对象。</p>
-              <span class="rl-org__tag">ECOLOGY / 生态 · 科考</span>
+            <article class="rl-org__card" data-home-div="ecology">
+              <div class="rl-org__card-top">
+                <span class="rl-org__no">03 // ECOLOGY &amp; FIELD</span>
+                <span class="rl-org__lead">LEAD: RL-06 / RL-08</span>
+              </div>
+              <h3>生态与极地野外</h3>
+              <p>把实验室搬到极地冰原与生态温室，用流体镜像与无人机航迹观测那些不配合实验的对象。</p>
+              <div class="rl-org__bar" aria-hidden="true"><i style="width: 96%" /></div>
+              <span class="rl-org__tag">ECOLOGY / 生态 · 极地 · 远测信标</span>
             </article>
           </div>
         </section>
@@ -61,30 +120,30 @@ const teaser = rhineOperators.filter(operator =>
           <div class="rl-section-head">
             <p class="rl-kicker">FIELD RECORDS / 设施与野外</p>
             <h2 id="rl-field-title">三处正在运行的实验场</h2>
-            <p>从温室到极地，再到结构实验室。照片没有拍到的部分，用档案补上。</p>
+            <p>从温室到极地，再到结构与防卫实验室。照片没有拍到的部分，用档案补上。</p>
           </div>
           <div class="rl-field__grid">
-            <article class="rl-field__card">
+            <article class="rl-field__card" data-home-div="ecology">
               <img src={url('/rhine/art/art-muelsyse.webp')} alt="" width="1400" height="1323" loading="lazy" aria-hidden="true" />
               <div class="rl-field__body">
-                <span class="rl-field__no">SITE / 01</span>
+                <span class="rl-field__no">SITE / 01 · ECOLOGY</span>
                 <h3>生态温室</h3>
                 <p>水、光照与生长节律。这里的变量比人多。</p>
               </div>
             </article>
-            <article class="rl-field__card">
+            <article class="rl-field__card" data-home-div="ecology">
               <img src={url('/rhine/art/art-magallan.webp')} alt="" width="1400" height="1400" loading="lazy" aria-hidden="true" />
               <div class="rl-field__body">
-                <span class="rl-field__no">SITE / 02</span>
+                <span class="rl-field__no">SITE / 02 · EXPEDITION</span>
                 <h3>极地科考站</h3>
                 <p>风速、冰层与无人机的航迹，构成一套会移动的地图。</p>
               </div>
             </article>
-            <article class="rl-field__card">
+            <article class="rl-field__card" data-home-div="defense structure">
               <img src={url('/rhine/art/art-saria.webp')} alt="" width="1400" height="1400" loading="lazy" aria-hidden="true" />
               <div class="rl-field__body">
-                <span class="rl-field__no">SITE / 03</span>
-                <h3>结构实验室</h3>
+                <span class="rl-field__no">SITE / 03 · DEFENSE &amp; STRUCTURE</span>
+                <h3>结构与防卫实验室</h3>
                 <p>把防护测试做成可复现的实验，再让记录承担后果。</p>
               </div>
             </article>
@@ -93,26 +152,72 @@ const teaser = rhineOperators.filter(operator =>
 
         <section class="rl-teaser" aria-labelledby="rl-teaser-title">
           <div class="rl-section-head">
-            <p class="rl-kicker">PERSONNEL / 研究员</p>
+            <p class="rl-kicker">PERSONNEL / 研究员卷宗直达</p>
             <h2 id="rl-teaser-title">近期调阅的档案</h2>
-            <p>四份优先调阅的人事记录。完整名录见 <a href={url('/operators/')}>研究员名录</a>。</p>
+            <p>四份优先调阅的人事记录。点击任意卡片可直接进入 <a href={url('/operators/')}>研究员名录</a> 并唤起该干员的卷宗检视终端。</p>
           </div>
           <div class="rl-teaser__grid">
-            {teaser.map((operator, index) => (
-              <a class:list={['rl-teaser__card', `rl-teaser__card--${operator.slug}`]} href={url('/operators/')}>
-                <img
-                  src={url(operator.card)}
-                  alt={`${operator.cn}档案立绘`}
-                  width="700"
-                  height="700"
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                />
-                <span class="rl-teaser__meta">
-                  <span class="rl-teaser__code">{operator.code}</span>
-                  <span class="rl-teaser__name">{operator.cn}</span>
-                  <span class="rl-teaser__role">{operator.role}</span>
-                </span>
-              </a>
+            {teaser.map((operator, index) => {
+              const homeDiv =
+                operator.slug === 'muelsyse'
+                  ? 'ecology'
+                  : operator.slug === 'dorothy'
+                    ? 'structure'
+                    : 'defense'
+              return (
+                <a
+                  class:list={['rl-teaser__card', `rl-teaser__card--${operator.slug}`]}
+                  data-home-div={homeDiv}
+                  href={url(`/operators/?op=${operator.slug}`)}
+                >
+                  <img
+                    src={url(operator.card)}
+                    alt={`${operator.cn}档案立绘`}
+                    width="700"
+                    height="700"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                  />
+                  <span class="rl-teaser__badge">{operator.clearance.split('·')[0].trim()}</span>
+                  <span class="rl-teaser__meta">
+                    <span class="rl-teaser__code">{operator.code} · {operator.en}</span>
+                    <span class="rl-teaser__name">{operator.cn}</span>
+                    <span class="rl-teaser__role">{operator.role}</span>
+                  </span>
+                </a>
+              )
+            })}
+          </div>
+        </section>
+
+        <section class="rl-priority" aria-labelledby="rl-priority-title">
+          <div class="rl-section-head">
+            <p class="rl-kicker">PRIORITY DOSSIERS / 核心研究卷宗</p>
+            <h2 id="rl-priority-title">置顶安全研究报告</h2>
+            <p>两份完整的安卓客户端安全审计与日志脱敏管线实录，已编入 <a href={url('/series/')}>安卓客户端安全研究</a> 系列。</p>
+          </div>
+          <div class="rl-priority__grid">
+            {priorityDossiers.map(item => (
+              <article class="rl-priority__card card-base">
+                <div class="rl-priority__top">
+                  <span class="rl-priority__code">{item.code}</span>
+                  <span class="rl-priority__clearance">{item.clearance}</span>
+                </div>
+                <h3 class="rl-priority__title">
+                  <a href={item.href}>{item.title}</a>
+                </h3>
+                <p class="rl-priority__desc">{item.summary}</p>
+                <div class="rl-priority__chips">
+                  {item.highlights.map(chip => (
+                    <span class="rl-priority__chip">{chip}</span>
+                  ))}
+                </div>
+                <div class="rl-priority__foot">
+                  <span>REVIEWED BY: <b>{item.lead}</b></span>
+                  <a class="rl-priority__cta" href={item.href}>
+                    OPEN DOSSIER / 调阅报告 <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
             ))}
           </div>
         </section>
@@ -126,11 +231,57 @@ const teaser = rhineOperators.filter(operator =>
             <p class="rl-kicker">RHINE LAB / FIELD NOTE</p>
             <p class="rl-banner__quote">“记录不是为了证明我们做过什么，而是为了让下一次实验不必从零开始。”</p>
             <p class="rl-banner__by">— 观测者 07 · 档案室手记</p>
-            <a class="rl-btn rl-btn--solid" href={url('/operators/')}>进入名录 <span aria-hidden="true">→</span></a>
+            <div class="rl-banner__actions">
+              <a class="rl-btn rl-btn--solid" href={url('/operators/')}>进入研究员名录 <span aria-hidden="true">→</span></a>
+              <a class="rl-btn" href={url('/gallery/')}>检视实验项目</a>
+            </div>
           </div>
         </section>
       </>
     )}
     <PostPage page={page}></PostPage>
-    <Pagination class="mx-auto onload-animation" page={page} style=`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`></Pagination>
+    <Pagination class="mx-auto onload-animation" page={page} style={`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`}></Pagination>
 </MainGridLayout>
+
+<script is:inline>
+  ;(() => {
+    const CHANNEL_TEXT = {
+      all: 'ALL DIVISIONS // 三处工作面与四份优先人事卷宗全部在线',
+      structure: '01 · STRUCTURE // 结构与源石应用科高亮 — 关联 RL-07 多萝西与结构实验室',
+      defense: '02 · DEFENSE & CLINICAL // 防卫与临床安全频段高亮 — 关联 RL-01 塞雷娅与 RL-03 伊芙利特',
+      ecology: '03 · ECOLOGY & FIELD // 生态温室与极地科考站高亮 — 关联 RL-08 缪尔赛思',
+    }
+    const bindHomeBoard = () => {
+      const board = document.getElementById('rl-division-board')
+      if (!board || board.dataset.rlBound === '1') return
+      board.dataset.rlBound = '1'
+
+      const tabs = [...board.querySelectorAll('[data-home-filter]')]
+      const targets = [...document.querySelectorAll('[data-home-div]')]
+      const status = document.getElementById('rl-home-channel-status')
+
+      for (const tab of tabs) {
+        tab.addEventListener('click', () => {
+          const filter = tab.getAttribute('data-home-filter') || 'all'
+          for (const t of tabs) {
+            const active = t === tab
+            t.classList.toggle('is-active', active)
+            t.setAttribute('aria-pressed', active ? 'true' : 'false')
+          }
+          for (const el of targets) {
+            const divs = (el.getAttribute('data-home-div') || '').split(/\s+/)
+            const match = filter === 'all' || divs.includes(filter)
+            el.classList.toggle('is-dimmed', !match)
+            el.classList.toggle('is-highlighted', filter !== 'all' && match)
+          }
+          if (status) {
+            status.innerHTML = `ACTIVE CHANNEL: <b>${CHANNEL_TEXT[filter] || CHANNEL_TEXT.all}</b>`
+          }
+        })
+      }
+    }
+    bindHomeBoard()
+    document.addEventListener('astro:page-load', bindHomeBoard)
+    document.addEventListener('astro:after-swap', bindHomeBoard)
+  })()
+</script>

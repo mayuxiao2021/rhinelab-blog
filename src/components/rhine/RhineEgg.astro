@@ -1,41 +1,73 @@
 ---
-// 全站隐藏小彩蛋：输入 rhine 唤起一次「诊断完成」浮层。
-// 纯装饰、aria-hidden、可点击/Esc 关闭；减少动态效果时不显示。
+import { url } from '../../utils/url-utils'
+// 全站交互式诊断终端彩蛋与左下角仪器 HUD（逻辑由 /rhine/ui.js 统一驱动，避免每页重复内联）
 ---
 
-<div class="rl-egg" id="rl-site-egg" aria-hidden="true">
+<div
+  class="rl-egg"
+  id="rl-site-egg"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="rl-site-egg-title"
+  hidden
+>
   <div class="rl-egg__box">
-    <p class="rl-egg__kicker">RHINE LAB // DIAGNOSTIC</p>
-    <p class="rl-egg__title">ACCESS GRANTED</p>
+    <p class="rl-egg__kicker">RHINE LAB // INTERACTIVE DIAGNOSTIC CONSOLE</p>
+    <p class="rl-egg__title" id="rl-site-egg-title">ACCESS GRANTED</p>
     <p class="rl-egg__line"><span>OBSERVER</span><b>07 / 黯</b></p>
-    <p class="rl-egg__line"><span>ARCHIVE SYNC</span><b>COMPLETE</b></p>
-    <p class="rl-egg__line"><span>STRUCTURE / DEFENSE / ECOLOGY</span><b>OK</b></p>
+    <p class="rl-egg__line"><span>SECTOR-03 CLOCK</span><b id="rl-egg-clock">--:--:--</b></p>
+    <p class="rl-egg__line"><span>OPTICAL MODE</span><b id="rl-egg-theme">STANDBY</b></p>
+    <p class="rl-egg__line"><span>STRUCTURE / DEFENSE / ECOLOGY</span><b>98.7% NOMINAL</b></p>
     <p class="rl-egg__bar"><i /></p>
-    <button class="rl-egg__close" id="rl-site-egg-close" type="button">返回档案 / CLOSE</button>
+
+    <div class="rl-egg__cmds" role="group" aria-label="终端快捷指令">
+      <a class="rl-egg__cmd" href={url('/random/')}>[01] RANDOM / 随机抽调档案</a>
+      <button class="rl-egg__cmd" type="button" id="rl-egg-cmd-theme">[02] OPTICS / 切换亮暗观测</button>
+      <a class="rl-egg__cmd" href={url('/operators/')}>[03] PERSONNEL / 研究员名录</a>
+      <button class="rl-egg__cmd" type="button" id="rl-egg-cmd-log" aria-pressed="false">[04] LOG / 解密观测者手记</button>
+      <button class="rl-egg__cmd rl-egg__cmd--danger" type="button" data-rl-breach>[05] CONTAINMENT / 收容失效演习</button>
+    </div>
+
+    <p class="rl-egg__secret" id="rl-egg-secret" hidden>
+      “OBSERVER-07 手记：特里蒙的档案柜总比实验台安静。若你在检索框输入 RL-01 至 RL-08，可直接调出八位研究员的内部参数。另：B-07 单元的温控读数最近不太稳定，如果你听见有人键入 IFRIT，请立刻寻找塞雷娅。”
+    </p>
+
+    <div class="rl-egg__foot">
+      <button class="rl-egg__close" id="rl-site-egg-close" type="button">关闭终端 / ESC</button>
+    </div>
   </div>
 </div>
 
-<script is:inline>
-  ;(() => {
-    const egg = document.getElementById('rl-site-egg')
-    const closeButton = document.getElementById('rl-site-egg-close')
-    if (!egg) return
-    let buffer = ''
-    const close = () => egg.classList.remove('is-on')
-    window.addEventListener('keydown', event => {
-      if (event.metaKey || event.ctrlKey || event.altKey) return
-      if (event.key === 'Escape') return close()
-      if (event.key.length !== 1) return
-      buffer = (buffer + event.key.toLowerCase()).slice(-5)
-      if (buffer !== 'rhine') return
-      buffer = ''
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      egg.classList.add('is-on')
-      window.setTimeout(close, 12000)
-    })
-    closeButton?.addEventListener('click', close)
-    egg.addEventListener('click', event => {
-      if (event.target === egg) close()
-    })
-  })()
-</script>
+<aside class="rl-hud" aria-label="莱茵生命快捷仪器铭牌" data-pagefind-ignore>
+  <span
+    class="rl-hud__emblem"
+    style={`--rl-faction-mark: url('${url('/rhine/art/rhine-mark.png')}')`}
+    aria-hidden="true"
+  ></span>
+  <span class="rl-hud__no" aria-hidden="true">07<small>ARCHIVE</small></span>
+  <div class="rl-hud__ticks" role="group" aria-label="快速光学与终端控制">
+    <button
+      type="button"
+      class="rl-hud__tick"
+      data-rl-hud-theme="light"
+      aria-label="切换至昼间暖纸模式"
+      aria-pressed="false"
+      title="DAY / 暖纸模式"
+    ></button>
+    <button
+      type="button"
+      class="rl-hud__tick"
+      data-rl-hud-theme="dark"
+      aria-label="切换至夜间墨绿模式"
+      aria-pressed="false"
+      title="NIGHT / 墨绿模式"
+    ></button>
+    <button
+      type="button"
+      class="rl-hud__tick rl-hud__tick--term"
+      data-rl-open-egg
+      aria-label="打开莱茵诊断终端"
+      title="TERMINAL / 诊断终端"
+    ></button>
+  </div>
+</aside>

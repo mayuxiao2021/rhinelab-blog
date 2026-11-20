@@ -4,6 +4,8 @@ published: 2026-10-31
 description: 当目标 App 自己在生产包里打印明文报文时，抓包就成了多余的一步。记录一次从 adb 脚本到手机端 App 的抓取工具演进，以及途中踩过的权限坑。
 tags: [Android, 逆向, 工具链, logcat]
 category: 安全研究
+series: 安卓客户端安全研究
+seriesOrder: 1
 draft: false
 ---
 ## 免责声明

@@ -37,3 +37,4 @@ public/og/*.png
 # 发布包与本地缓存
 release/
 .tools/
+promo/

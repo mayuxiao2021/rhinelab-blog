@@ -1,4 +1,4 @@
-# 验收记录 · 黯的博客 · Rhine Archive v0.8.1
+# 验收记录 · 黯的博客 · Rhine Archive v0.10.0
 
 > 本文件记录最终交付版本的验收命令、实测结果与已知限制，便于接手者复现与核对。
 > 版本号以 `package.json` 与 `release/` 下最新 MANIFEST 为准。
@@ -7,9 +7,9 @@
 
 | 交付物 | 路径 | 说明 |
 | --- | --- | --- |
-| 模板站（可独立构建） | 仓库根目录 | Astro 6 + Fuwari 基座，38 个 HTML 页 |
+| 模板站（可独立构建） | 仓库根目录 | Astro 6 + Fuwari 基座，49 个 HTML 页 |
 | 主题覆盖层 | `theme/install.mjs` | 安装 / 幂等 / 验证 / 回滚 + selftest |
-| 发布包 | `release/rhinelab-blog-v0.5.0.zip` | 326 文件（8643 KB）；MANIFEST 含 sha256 与体积 |
+| 发布包 | `release/rhinelab-blog-v0.10.0.zip` | 342 文件（约 9.0 MB）；MANIFEST 含 sha256 与体积 |
 | 文档 | `README.md` + `docs/` | THEMING / DESIGN / ASSETS / DEPLOY / READERS / MILESTONE-100 / 本文件等 |
 
 ## 2. 验收命令（按顺序执行）
@@ -22,24 +22,21 @@ node scripts/package.mjs       # 生成 zip + MANIFEST
 node scripts/verify-release.mjs --full --build   # 清单一致性 + 解压包自测 + 文档门禁 + 解压后 astro build + check-links
 ```
 
-## 3. 实测结果（v0.8.1 · 交接文档 + 莱茵生命细节）
+## 3. 实测结果（v0.10.0 · CONTAINMENT PROTOCOL + 莱茵 0.5.0 仪器质感 + 创造性设计重构）
 
-- `pnpm verify`：**18/18 通过**；`astro check` 89 files 0/0/0。
-- 页面与索引：**49 个 HTML 页**（47 个参与 SEO；第三方静态小游戏页除外）/ 47 唯一标题 / 15 段 JSON-LD / 45 canonical / 47 张 OG / 45 条 sitemap URL / **7 篇文章** / 4 分类 / 16 标签。
-- 链接与无障碍：**3034 站内链接 / 309 锚点 / 312 资源** 0 断链；无障碍 **49 页**通过 17 条规则，fixture 自测命中 9 类提示。
-- Feed：RSS 2.0 6 items + JSON Feed 1.1 6 items；GUID/id 唯一、绝对地址、自引用与 URL 契约校验通过。
-- 体积预算：总产物 **11786 KB / 12800 KB（92%）**、JS 87%、CSS 95%、字体 73%、单页最大 **150.5 KB / 160 KB（94%）**、OG 60%、**79 张 `<img>` 全部带 width/height**。
+- `pnpm verify`：**18/18 通过**；`pnpm check`（95 files）0 errors / 0 warnings / 0 hints。
+- 页面与索引：**49 个 HTML 页**（47 个参与 SEO；第三方静态小游戏页除外）/ 47 唯一标题 / 15 段 JSON-LD / 45 canonical / 47 张 OG / 45 条 sitemap URL / **7 篇文章**（2 大系列 6 篇）/ 4 分类 / 16 标签。
+- 链接与无障碍：**3183 站内链接 / 315 锚点 / 363 资源** 0 断链；无障碍 **49 页**通过 17 条规则，fixture 自测通过。
+- 对比度：亮/暗双主题 **32 组**配色全部通过 WCAG AA。
+- Feed：RSS 2.0 7 items + JSON Feed 1.1 7 items；GUID/id 唯一、绝对地址、自引用与 URL 契约校验通过。
+- 体积预算：总产物 **12012.0 KB / 12800.0 KB（94%）**、JS **3776.3 KB / 4300.8 KB（88%）**、CSS **306.8 KB / 420.0 KB（73%）**、字体 73%、单页最大 **156.8 KB / 160.0 KB（98%）**、OG 60%、**83 张 `<img>` 全部带 width/height**。
 - 子路径部署：`BASE_PATH=/rhine-test/` 构建 + 断链/SEO/Feed 检查全过，并恢复默认构建。
 - 解压包自身可构建：`--build` 下解压 zip → 复用 `node_modules` → `astro build` 通过 → 构建后 `check-links --strict` 通过。
-- GitHub Actions：`verify.yml`（18 步 + 子路径 + 打包 + 解压构建）与 `pages.yml`（构建 + Actions 部署）均全绿。
-- **博客内容**：7 篇文章（2 篇安全研究长文）、关于页、头像、友链与静态小游戏页面已完整迁移（v0.5.0）。
-- **引导与动效**：`/start/` 三风格入口、莱茵启动序列、英雄区入场动画（v0.6.0；尊重 reduced-motion，可跳过）。
-- **莱茵生命细节（v0.8.0）**：Portal 与 `/start/` 加入遥测读数、标本标签、跑马灯、SECTOR-03 时钟；全站隐藏 `rhine` 诊断彩蛋。
-- **交接文档（v0.8.1）**：`docs/AI-HANDOFF.md` 记录三处部署、代码地图、Runbook、已知坑与下一轮路线；`portal/` 为根入口源码镜像。
-- **部署拓扑（v0.7.0）**：根域名 `/` = 选择界面 Portal（`mayuxiao2021.github.io` 的 `portal` 分支）；`/rhinelab-blog/` = 博客；`/legacy-blog/` = 旧版 Fuwari 归档（`mayuxiao2021/legacy-blog`）。三处均已线上核验 200。
+- GitHub Actions：`verify.yml`（18 步 + 子路径 + 打包 + 解压构建）与 `pages.yml`（构建 + Actions 部署）推送后自动触发。
+- **创造性重构与仪器质感（v0.9.0）**：移除重复 `@tailwind` 导入使 CSS 大幅瘦身；首页升级为交互式科室频段控制台、双联核心卷宗展柜与 CRC/阅读负荷卡片；`/operators/` 扩充 `[REDACTED]` 显影与 `#rl-dossier-modal`；搜索支持 `RL-01..08` 直达；外置 `public/rhine/ui.js`；引入阵营徽记遮罩 `rhine-mark.png` 与 14px 边缘标尺、Hero 铭牌、Specimen ID 卡与左下角 `.rl-hud`。
+- **CONTAINMENT PROTOCOL 特效与修复（v0.10.0）**：外置 `public/rhine/fx.js` 提供活体双螺旋 Canvas、显微透镜与隐藏批注、标题解密收敛、卡片扫描线、`ifrit` 收容失效演习与文末「已审阅」印章；修复暗色代码块不消费 Shiki `--shiki-dark` 变量的对比度缺陷。
 - **在线演示（GitHub Pages）**：<https://mayuxiao2021.github.io/rhinelab-blog/>（`BASE_PATH=/rhinelab-blog/`；备用域 <https://github.glmyx.eu.org/rhinelab-blog/>）。
-- 运行时采样（本机 Chromium，静态服务）：FCP **164ms**、load **320ms**、44 资源 / 255KB、DOM 632 节点。
-- 版本沿革：**140 条迭代记录**（Iteration 0–139），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
+- 版本沿革：**142 条迭代记录**（Iteration 0–141），每轮至少 1 个修复或创新点，见 `ITERATIONS.md`。
 
 ## 4. 已知限制
 

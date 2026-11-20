@@ -4,6 +4,7 @@ import { url } from '@utils/url-utils.ts'
 import { i18n } from '@i18n/translation'
 import I18nKey from '@i18n/i18nKey'
 import Icon from '@iconify/svelte'
+import { rhineOperators } from '../data/operators'
 
 let keywordDesktop = $state('')
 let keywordMobile = $state('')
@@ -15,6 +16,17 @@ let searching = $state(false)
 let panelOpen = $state(false)
 let activeIndex = $state(-1)
 let recentSearches = $state<string[]>([])
+
+const activeQuery = $derived((keywordDesktop || keywordMobile).trim().toLowerCase())
+const matchedOperators = $derived(
+    activeQuery.length >= 1
+        ? rhineOperators.filter(op =>
+              `${op.code} ${op.cn} ${op.en} ${op.role} ${op.division} ${op.tags.join(' ')}`
+                  .toLowerCase()
+                  .includes(activeQuery),
+          )
+        : [],
+)
 
 const HISTORY_KEY = 'rl-search-history'
 
@@ -363,13 +375,33 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
         </div>
     {/if}
 
+    {#if matchedOperators.length > 0}
+        <div class="rl-search-ops" role="region" aria-label="研究员档案直达">
+            <span class="rl-search-filters__label">PERSONNEL REGISTRY / 研究员卷宗直达 ({matchedOperators.length})</span>
+            <div class="rl-search-ops__list">
+                {#each matchedOperators as op}
+                    <a
+                        class="rl-search-ops__card"
+                        href={url(`/operators/?op=${op.slug}`)}
+                        onclick={() => { rememberSearch(keywordDesktop || keywordMobile); closePanel() }}
+                    >
+                        <span class="rl-search-ops__code">{op.code}</span>
+                        <span class="rl-search-ops__name">{op.cn} <i>{op.en}</i></span>
+                        <span class="rl-search-ops__role">{op.division} · {op.role}</span>
+                        <span class="rl-search-ops__go" aria-hidden="true">调阅 →</span>
+                    </a>
+                {/each}
+            </div>
+        </div>
+    {/if}
+
     {#if result.length > 0}
         <div class="rl-search-count" role="status" aria-live="polite">
             RESULTS / {result.length} 条档案{#if selectedCategory || selectedTag}（已筛选）{/if}
         </div>
     {:else if searching}
         <div class="rl-search-empty" role="status" aria-live="polite">SEARCHING / 检索中…</div>
-    {:else if keywordDesktop || keywordMobile || selectedCategory || selectedTag}
+    {:else if (keywordDesktop || keywordMobile || selectedCategory || selectedTag) && matchedOperators.length === 0}
         {#if recentSearches.length > 0}
             <div class="rl-search-history">
                 <span class="rl-search-history__label">RECENT / 最近检索</span>

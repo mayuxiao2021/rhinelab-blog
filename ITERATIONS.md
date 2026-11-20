@@ -3571,3 +3571,55 @@
 
 - `node scripts/check-docs.mjs` 文档一致；`pnpm verify` 18 步全绿（无代码变更）。
 - 发布包重新生成并校验；随后 push 触发 CI 与 Pages 复核。
+
+
+## Iteration 140 — 全站检查完善与创造性设计重构（v0.9.0）
+
+### 检查发现
+
+1. **CSS 预算逼近上限（398.5/420 KB，95%）**：`Markdown.astro`（2 处）、`ArchivePanel.astro`、`PostMeta.astro`、`Layout.astro` 在组件样式块中重复声明 `@tailwind base/components/utilities`，导致 Tailwind 工具类与 Typography 在 `dist/_astro/` 被重复打包 4 次。
+2. **系列页面 (`/series/`) 断层为空**：作者文章迁移后未标注 `series` 与 `seriesOrder`，导致 `/series/` 显示 `EMPTY / 暂无系列`，文章底部系列进度条未激活。
+3. **Portal 与博客主题存储键割裂**：Portal 用 `rhine-theme`、博客用 `theme`，跨入口切换亮暗模式不同步。
+4. **研究员名录、项目索引与彩蛋交互单一**：`/operators/` 仅跳外部 Wiki、无站内深度检视与科室过滤；`/gallery/` 仅 1 个项目；`RhineEgg` 为静态装饰层。
+
+### 创造性重构落地
+
+- **CSS 架构瘦身**：移除 4 个组件的冗余 `@tailwind` 导入并转为原生 CSS，清理 `rhinelab.css` 重复媒体查询；在新增完整第 24 节重构样式后，构建产物 CSS 仍从 **398.5 KB 降至 280.4 KB（−29.6%，占用 67%）**。
+- **首页「莱茵科室控制台 + 核心研究卷宗双联展柜」**：
+  - `.rl-org` 升级为带 4 个频段按钮（`ALL` / `01 结构与源石` / `02 防卫与临床` / `03 生态与科考`）的交互控制台，点击联动高亮实验场与研究员预览卡。
+  - 新增 `.rl-priority` 核心安全研究双联展柜，突出展示两篇安卓安全研究长文；`PostCard` 增加 CRC 校验指纹、安全等级、阅读负荷刻度条与系列徽标。
+- **研究员名录 (`/operators/`) 交互式人事档案调阅终端**：
+  - 为 8 位干员扩充科室、权限等级、三项实验参数进度条、可点击显影的 `[REDACTED]` 内部涂改批注（含一键全部显影）及关联站内文章。
+  - 新增按科室与关键词实时筛选控制台，以及站内 `#rl-dossier-modal` 深度卷宗检视弹窗（支持前后切换、键盘左右键与 Esc、`?op=<slug>` URL 直达）。
+- **搜索框干员直达 (`Search.svelte`)**：输入 `RL-01`～`RL-08` 或干员名/科室时，在检索面板顶部即时渲染「研究员卷宗直达」卡片。
+- **交互式诊断终端 (`RhineEgg.astro`) & 外置脚本 (`public/rhine/ui.js`)**：升级为合规 `role="dialog"` 交互终端，支持输入 `rhine` 或点击左下角 HUD / 页脚 `TERMINAL` 唤起（内置 4 项指令），同步将全站交互脚本外置至 `ui.js`（减少约 110 KB 跨页内联），并补齐左下角 `.rl-hud` 快捷控制铭牌。
+- **莱茵生命 0.5.0 仪器质感全面对齐（`dsh` 协作重构，CSS 第 25 节）**：引入 `public/rhine/art/rhine-mark.png` 阵营徽记遮罩（记录于 `docs/ASSETS.md` 3.1），全站升级 `--rl-radius: 0px` 直角仪器边缘、双侧 `14px` 垂直刻度标尺、Hero `01 / 08 ARCHIVE` 铭牌与双螺旋水印、侧栏 `SPECIMEN` 标本卡与 `MODULE //` 仪器模块头。
+- **内容与跨入口主题闭环**：激活「安卓客户端安全研究」与「Fuwari 模板与排版指南」2 个系列（6 篇文章）；`/gallery/` 扩充为 4 个实验项目并支持领域过滤；打通 Portal、`/start/` 与博客的 `theme`/`rhine-theme` 同步。
+
+### 验证
+
+- `pnpm check`：95 files **0 errors / 0 warnings / 0 hints**。
+- `pnpm verify`：**18 步全绿**（CSS 292.3/420 KB = 70%，JS 88%，总预算全通过）。
+
+
+## Iteration 141 — CONTAINMENT PROTOCOL 视觉特效与代码块暗色修复（v0.10.0）
+
+### 创新与改造
+
+1. **新增全站渐进增强视觉特效层（`public/rhine/fx.js` + `rhinelab.css` 第 26 节）**：
+   - **Hero 活体双螺旋样本柱**：`<canvas data-rl-helix>` 在右侧立绘过渡区实时绘制三维旋转双螺旋与 `A·T / G·C / O·R / R·L` 碱基对刻度，指针靠近时局部膨胀高亮，滚出视口与后台标签页自动暂停。
+   - **Hero 显微透镜**：精细指针悬停 Hero 时显现跟随瞄准环、蓝图细网格、`X · Y · MAG ×` 倍率读数与 7 条隐藏观测批注（含 `ifrit` 彩蛋线索）。
+   - **收容失效演习 (`ifrit`)**：任意页面键入 `ifrit` 或点击诊断终端 `[05]` 指令触发全屏红色紧急警报，Canvas 驱动火星粒子、核心温度飙升至 `412°C` 并逐条输出 6 行演习日志；约 4.6 秒后转绿显示 `CONTAINMENT RESTORED`，支持 `Esc` 或点击背景关闭并累计演习次数。
+   - **文末审阅印章 & 首页「已调阅」标记**：阅读文章到文末自动盖下带同源 `CRC` 校验码的「已审阅」印章并写入 `localStorage['rl-read']`；列表卡片自动显示 `已调阅 · READ`。
+   - **仪器解密读出 & 卡片扫描线**：`.rl-kicker` / `.rl-post__title` 等纯文本标题首次入屏时由同语种随机字符逐帧解密收敛（被控制台动态改写时自动让位），文章卡片悬停/聚焦触发一次性扫描光束。
+   - 全部特效均尊重 `prefers-reduced-motion: reduce` 并在 `@media print` 隐藏。
+2. **排查与修复 4 项浏览器实测视觉问题**：
+   - **暗色模式代码块低对比度（既有遗留问题）**：实测发现代码块未消费 Shiki `--shiki-dark` 变量，导致暗色模式标识符沿用 `github-light` 的 `#24292e` 几乎无法辨认；在 `html.dark .astro-code` 作用域切换 `--shiki-dark` 配色，同时保留亮色暖纸底的高对比语法高亮。
+   - **双螺旋水平偏移调整**：移至 `left: calc(58% - 84px)` 贴合立绘淡入区，不再遮挡首页左侧导语文字。
+   - **警报面板遮挡与行距**：收容警报面板改实底隔离，日志网格设置 `align-content: start` 紧凑排布。
+   - **印章签名与单字孤行**：印章底部过长 slug 改为与卡片同源的 `OBSERVER-07 · CRC XXXX` 校验码，提示文本设置 `text-wrap: balance` 消除单字换行。
+3. **打包与文档规范**：`.gitignore` 与 `scripts/package.mjs` 排除本地 `promo/` 目录，补齐 `docs/ASSETS.md` 中 `rhine-mark.png`（17 项演示素材）与 `ui.js` / `fx.js` 清单。
+
+### 验证
+
+- `pnpm check`：0 errors / 0 warnings / 0 hints；`pnpm verify` 18 步、`pnpm test:subpath`、`package.mjs` 与 `verify-release --full --build` 全部通过（实测数据见 `STATE.md` / `docs/ACCEPTANCE.md`）。

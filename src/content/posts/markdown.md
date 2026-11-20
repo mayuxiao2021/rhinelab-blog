@@ -4,6 +4,8 @@ published: 2023-10-01
 description: A simple example of a Markdown blog post.
 tags: [Markdown, Blogging, Demo]
 category: Examples
+series: Fuwari 模板与排版指南
+seriesOrder: 2
 draft: false
 ---
 

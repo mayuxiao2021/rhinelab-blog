@@ -71,6 +71,7 @@ const styles = [
         <b id="rl-start-clock">--:--:--</b>
       </span>
       <a class="rl-start__back" href={url('/')} data-no-swup>直接进入博客 →</a>
+      <button class="rl-start__theme" id="rl-start-theme" type="button" aria-label="切换亮色 / 暗色主题">◐</button>
     </header>
 
     <main id="swup-container" tabindex="-1" class="rl-start__main">
@@ -193,14 +194,26 @@ const styles = [
 
     <footer class="rl-start__foot">
       <span>{siteConfig.title} / TRIMONT · COLUMBIA</span>
-      <span>MIT CODE · CC BY-NC-SA CONTENT · <b class="rl-start__hint">HINT / 输入 rhine 试试</b></span>
+      <span>
+        MIT CODE · CC BY-NC-SA CONTENT ·{' '}
+        <button type="button" class="rl-start__hint rl-footer__terminal-btn" id="rl-start-egg-open">
+          TERMINAL / 输入 rhine 试试
+        </button>
+      </span>
     </footer>
   </div>
 
-  <div class="rl-egg" id="rl-egg" aria-hidden="true">
+  <div
+    class="rl-egg"
+    id="rl-egg"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="rl-start-egg-title"
+    hidden
+  >
     <div class="rl-egg__box">
       <p class="rl-egg__kicker">RHINE LAB // DIAGNOSTIC</p>
-      <p class="rl-egg__title">ACCESS GRANTED</p>
+      <p class="rl-egg__title" id="rl-start-egg-title">ACCESS GRANTED</p>
       <p class="rl-egg__line"><span>OBSERVER</span><b>07 / {siteConfig.title}</b></p>
       <p class="rl-egg__line"><span>ARCHIVE SYNC</span><b>COMPLETE</b></p>
       <p class="rl-egg__line"><span>STRUCTURE / DEFENSE / ECOLOGY</span><b>OK</b></p>
@@ -221,9 +234,34 @@ const styles = [
     tick()
     setInterval(tick, 1000)
 
+    const themeBtn = document.getElementById('rl-start-theme')
+    themeBtn?.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark')
+      const next = isDark ? 'dark' : 'light'
+      try {
+        localStorage.setItem('theme', next)
+        localStorage.setItem('rhine-theme', next)
+      } catch {
+        /* 隐私模式忽略 */
+      }
+    })
+
     const egg = document.getElementById('rl-egg')
     const eggClose = document.getElementById('rl-egg-close')
-    const closeEgg = () => egg?.classList.remove('is-on')
+    const eggOpen = document.getElementById('rl-start-egg-open')
+    const closeEgg = () => {
+      if (!egg) return
+      egg.classList.remove('is-on')
+      egg.hidden = true
+    }
+    const openEgg = () => {
+      if (!egg) return
+      egg.hidden = false
+      void egg.offsetHeight
+      egg.classList.add('is-on')
+      eggClose?.focus()
+      window.setTimeout(closeEgg, 12000)
+    }
     let buffer = ''
     window.addEventListener('keydown', event => {
       if (event.metaKey || event.ctrlKey || event.altKey) return
@@ -232,11 +270,10 @@ const styles = [
       buffer = (buffer + event.key.toLowerCase()).slice(-5)
       if (buffer === 'rhine') {
         buffer = ''
-        if (!egg || matchMedia('(prefers-reduced-motion: reduce)').matches) return
-        egg.classList.add('is-on')
-        window.setTimeout(closeEgg, 12000)
+        openEgg()
       }
     })
+    eggOpen?.addEventListener('click', openEgg)
     eggClose?.addEventListener('click', closeEgg)
     egg?.addEventListener('click', event => {
       if (event.target === egg) closeEgg()

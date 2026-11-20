@@ -1,39 +1,115 @@
 ---
 import MainGridLayout from '@layouts/MainGridLayout.astro'
-import { url } from '@utils/url-utils'
+import { getPostUrlBySlug, url } from '@utils/url-utils'
 
 const projects = [
   {
-    title: '黯的博客',
-    en: 'MAYUXIAO / BLOG',
-    description: '基于 Astro + Fuwari 的个人博客，莱茵档案主题：亮暗双模式、Pagefind 全文检索、RSS / JSON Feed 与 Mermaid 图表。',
+    code: 'EXP-01 // ARCHIVE',
+    status: 'ACTIVE · v0.9',
+    category: 'system',
+    title: '黯的博客 · 莱茵档案系统',
+    en: 'RHINE ARCHIVE / BLOG & THEME PACKAGE',
+    description:
+      '基于 Astro 6 + Fuwari 的莱茵生命风格研究档案系统：暖纸/墨绿双模式、18 步自动化门禁、Pagefind 静态全文检索、交互式研究员名录与可剥离主题安装器。',
     image: '/rhine/project-blog.svg',
-    link: 'https://github.glmyx.eu.org',
-    tags: ['Astro', 'Fuwari', 'Tailwind'],
+    link: 'https://github.com/mayuxiao2021/rhinelab-blog',
+    external: true,
+    cta: 'GITHUB REPO ↗',
+    secondaryHref: url('/colophon/'),
+    secondaryLabel: 'COLOPHON / 制作说明 →',
+    metrics: '18 GATES · AA CONTRAST · MIT',
+    tags: ['Astro 6', 'Fuwari', 'Svelte 5', 'Pagefind'],
+  },
+  {
+    code: 'EXP-02 // PIPELINE',
+    status: 'VERIFIED · TOOLING',
+    category: 'security',
+    title: 'Android Logcat 实时脱敏抓取管线',
+    en: 'FIELD CAPTURE / LOGCAT SANITIZE PIPELINE',
+    description:
+      '针对生产包明文日志泄露场景的三代抓取工具链演进：从 PC 端 adb + Python 正则流式脱敏管道，到突破 256KiB 缓冲区限制的手机端独立守护方案。',
+    image: '/rhine/project-search.svg',
+    link: getPostUrlBySlug('logcat-sanitize-pipeline'),
+    external: false,
+    cta: 'READ DOSSIER / 调阅报告 →',
+    secondaryHref: url('/series/'),
+    secondaryLabel: 'SERIES / 安全研究系列 →',
+    metrics: '3 ITERATIONS · ZERO PII LEAK',
+    tags: ['Android', 'Logcat', 'Python', 'PII 脱敏'],
+  },
+  {
+    code: 'EXP-03 // AUDIT',
+    status: 'VERIFIED · RESEARCH',
+    category: 'security',
+    title: '校园运动客户端国密协议与反作弊审计',
+    en: 'SECURITY AUDIT / SM2 & SM4 PROTOCOL ANALYSIS',
+    description:
+      '一次完整的安卓客户端安全审计复盘：涵盖国密 SM2/SM4 混合加密报文还原、客户端传感器反作弊架构剖析，以及静态逆向与实机动态验证的方法论对照。',
+    image: '/rhine/project-blog.svg',
+    link: getPostUrlBySlug('campus-running-app-audit'),
+    external: false,
+    cta: 'READ DOSSIER / 调阅报告 →',
+    secondaryHref: url('/operators/?op=saria'),
+    secondaryLabel: 'REVIEWER / RL-01 塞雷娅 →',
+    metrics: 'SM2/SM4 · STATIC vs DYNAMIC',
+    tags: ['安全审计', '国密 SM2/SM4', '逆向分析', 'Android'],
+  },
+  {
+    code: 'EXP-04 // PLAYGROUND',
+    status: 'ARCHIVED · MINI-GAME',
+    category: 'playground',
+    title: 'SECTOR-03 观测室休闲实验集',
+    en: 'RECREATION / STATIC WEB MINI-GAMES',
+    description:
+      '托管于本站静态子路径的轻量级 Web 互动小游戏实验归档（「吃掉明卓」音游块与「明卓跑酷」横版跳跃），已完成无障碍属性与离线静态化适配。',
+    image: '/rhine/project-search.svg',
+    link: url('/EatKun-main/index.html'),
+    external: false,
+    cta: 'LAUNCH EXP-04A / 吃掉明卓 →',
+    secondaryHref: url('/jump play/index.html'),
+    secondaryLabel: 'EXP-04B / 明卓跑酷 →',
+    metrics: '2 STATIC GAMES · ZERO BACKEND',
+    tags: ['HTML5 Canvas', 'Web Audio', 'Static Archive'],
   },
 ]
 ---
 
-<MainGridLayout title="项目索引" description="正在进行的实验与项目：按状态分组的项目索引，含进度、技术栈与相关文章入口">
+<MainGridLayout title="项目索引" description="正在进行的实验与项目：按状态与领域编目的莱茵实验装置、安全审计研究与静态工具索引。">
   <section class="rl-index-head card-base">
-    <p class="rl-kicker">INDEX / 项目索引</p>
+    <p class="rl-kicker">INDEX / 实验与项目图录</p>
     <h1 class="rl-index-head__title">在做的实验</h1>
     <p class="rl-index-head__desc">
-      这里陈列仍在维护的项目与工具。每一项都标注了它的用途与依赖边界——
+      这里陈列仍在维护的工程、安全研究卷宗与静态实验装置。每一项都标注了它的实验编号、校验指标与依赖边界——
       能被别人复现的，才放进索引。
     </p>
+    <div class="rl-gfilter" role="group" aria-label="按实验领域过滤项目">
+      <button type="button" class="rl-chip is-active" data-gfilter="all" aria-pressed="true">
+        ALL / 全部实验<span>04</span>
+      </button>
+      <button type="button" class="rl-chip" data-gfilter="system" aria-pressed="false">
+        ARCHIVE / 档案系统<span>01</span>
+      </button>
+      <button type="button" class="rl-chip" data-gfilter="security" aria-pressed="false">
+        SECURITY / 安全与工具链<span>02</span>
+      </button>
+      <button type="button" class="rl-chip" data-gfilter="playground" aria-pressed="false">
+        PLAYGROUND / 互动小游戏<span>01</span>
+      </button>
+    </div>
   </section>
 
-  <div class="rl-gallery">
+  <div class="rl-gallery" id="rl-gallery-grid">
     {
       projects.map((project, i) => (
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
+        <article
           class="rl-gcard card-base"
+          data-gcat={project.category}
           style={`animation-delay: calc(var(--content-delay) + ${i * 75}ms)`}
         >
+          <div class="rl-gcard__top">
+            <span class="rl-gcard__code">{project.code}</span>
+            <span class="rl-gcard__status">{project.status}</span>
+          </div>
           <div class="rl-gcard__cover">
             <img
               src={url(project.image)}
@@ -43,19 +119,68 @@ const projects = [
               width="640"
               height="400"
             />
+            <span class="rl-gcard__metrics">{project.metrics}</span>
           </div>
           <div class="rl-gcard__body">
             <span class="rl-kicker">{project.en}</span>
-            <h2 class="rl-gcard__title">{project.title}</h2>
+            <h2 class="rl-gcard__title">
+              <a
+                href={project.link}
+                {...(project.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {project.title}
+              </a>
+            </h2>
             <p class="rl-gcard__desc">{project.description}</p>
             <div class="rl-gcard__tags">
               {project.tags.map(tag => (
                 <span>{tag}</span>
               ))}
             </div>
+            <div class="rl-gcard__actions">
+              <a
+                class="rl-gcard__btn rl-gcard__btn--primary"
+                href={project.link}
+                {...(project.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {project.cta}
+              </a>
+              <a class="rl-gcard__btn" href={project.secondaryHref}>
+                {project.secondaryLabel}
+              </a>
+            </div>
           </div>
-        </a>
+        </article>
       ))
     }
   </div>
 </MainGridLayout>
+
+<script is:inline>
+  ;(() => {
+    const bindGallery = () => {
+      const grid = document.getElementById('rl-gallery-grid')
+      if (!grid || grid.dataset.rlBound === '1') return
+      grid.dataset.rlBound = '1'
+      const buttons = [...document.querySelectorAll('[data-gfilter]')]
+      const cards = [...grid.querySelectorAll('[data-gcat]')]
+      for (const btn of buttons) {
+        btn.addEventListener('click', () => {
+          const cat = btn.getAttribute('data-gfilter') || 'all'
+          for (const b of buttons) {
+            const active = b === btn
+            b.classList.toggle('is-active', active)
+            b.setAttribute('aria-pressed', active ? 'true' : 'false')
+          }
+          for (const card of cards) {
+            const match = cat === 'all' || card.getAttribute('data-gcat') === cat
+            card.hidden = !match
+          }
+        })
+      }
+    }
+    bindGallery()
+    document.addEventListener('astro:page-load', bindGallery)
+    document.addEventListener('astro:after-swap', bindGallery)
+  })()
+</script>

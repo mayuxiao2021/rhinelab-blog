@@ -330,4 +330,125 @@
     window.setTimeout(enhanceToc, 200)
     window.setTimeout(enhanceAnchors, 200)
   })
+
+  // 全站诊断终端彩蛋（#rl-site-egg）与左下角仪器 HUD（.rl-hud）
+  const egg = document.getElementById('rl-site-egg')
+  if (egg) {
+    const closeButton = document.getElementById('rl-site-egg-close')
+    const themeCmd = document.getElementById('rl-egg-cmd-theme')
+    const logCmd = document.getElementById('rl-egg-cmd-log')
+    const secret = document.getElementById('rl-egg-secret')
+    const clockEl = document.getElementById('rl-egg-clock')
+    const themeEl = document.getElementById('rl-egg-theme')
+    const hudTicks = [...document.querySelectorAll('[data-rl-hud-theme]')]
+    let buffer = ''
+    let autoTimer = 0
+
+    const syncStatus = () => {
+      const now = new Date()
+      const pad = n => String(n).padStart(2, '0')
+      if (clockEl) {
+        clockEl.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+      }
+      if (themeEl) {
+        const isDark = document.documentElement.classList.contains('dark')
+        themeEl.textContent = isDark ? 'DARK // 墨绿暗场' : 'LIGHT // 暖骨档案纸'
+      }
+    }
+
+    const syncHud = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      for (const tick of hudTicks) {
+        const target = tick.getAttribute('data-rl-hud-theme')
+        const pressed = target === 'dark' ? isDark : !isDark
+        tick.setAttribute('aria-pressed', pressed ? 'true' : 'false')
+      }
+    }
+
+    const applyTheme = next => {
+      const isDark = next === 'dark'
+      document.documentElement.classList.toggle('dark', isDark)
+      try {
+        localStorage.setItem('theme', next)
+        localStorage.setItem('rhine-theme', next)
+      } catch {
+        /* 忽略 */
+      }
+      syncHud()
+      syncStatus()
+    }
+
+    const closeEgg = () => {
+      window.clearTimeout(autoTimer)
+      egg.classList.remove('is-on')
+      egg.hidden = true
+    }
+
+    const openEgg = () => {
+      syncStatus()
+      egg.hidden = false
+      void egg.offsetHeight
+      egg.classList.add('is-on')
+      closeButton?.focus()
+      window.clearTimeout(autoTimer)
+      autoTimer = window.setTimeout(closeEgg, 20000)
+    }
+
+    window.addEventListener('keydown', event => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return
+      if (event.key === 'Escape' && !egg.hidden) {
+        event.preventDefault()
+        closeEgg()
+        return
+      }
+      if (isTyping(event.target)) return
+      if (event.key.length !== 1) return
+      buffer = (buffer + event.key.toLowerCase()).slice(-5)
+      if (buffer !== 'rhine') return
+      buffer = ''
+      openEgg()
+    })
+
+    document.addEventListener('click', event => {
+      const trigger = event.target instanceof Element ? event.target.closest('[data-rl-open-egg]') : null
+      if (trigger) {
+        event.preventDefault()
+        openEgg()
+      }
+    })
+
+    themeCmd?.addEventListener('click', () => {
+      applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark')
+    })
+
+    for (const tick of hudTicks) {
+      tick.addEventListener('click', () => {
+        applyTheme(tick.getAttribute('data-rl-hud-theme') === 'dark' ? 'dark' : 'light')
+      })
+    }
+
+    syncHud()
+    if (typeof MutationObserver === 'function') {
+      new MutationObserver(syncHud).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
+    }
+
+    logCmd?.addEventListener('click', () => {
+      if (!secret) return
+      const willShow = secret.hidden
+      secret.hidden = !willShow
+      logCmd.setAttribute('aria-pressed', willShow ? 'true' : 'false')
+    })
+
+    for (const link of egg.querySelectorAll('a.rl-egg__cmd')) {
+      link.addEventListener('click', closeEgg)
+    }
+
+    closeButton?.addEventListener('click', closeEgg)
+    egg.addEventListener('click', event => {
+      if (event.target === egg) closeEgg()
+    })
+  }
 })()

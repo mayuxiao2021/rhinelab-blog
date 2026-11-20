@@ -16,7 +16,8 @@
   <script>
     ;(() => {
       try {
-        const saved = localStorage.getItem('rhine-theme')
+        const raw = localStorage.getItem('theme') || localStorage.getItem('rhine-theme')
+        const saved = raw === 'dark' || raw === 'light' ? raw : null
         const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
         document.documentElement.dataset.theme = dark ? 'dark' : 'light'
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
@@ -503,6 +504,7 @@
         root.style.colorScheme = next
         try {
           localStorage.setItem('rhine-theme', next)
+          localStorage.setItem('theme', next)
         } catch {
           /* ignore */
         }

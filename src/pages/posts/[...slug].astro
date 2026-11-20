@@ -33,6 +33,10 @@ export async function getStaticPaths() {
 
 const { entry, posts } = Astro.props
 const postSlug = entry.id.replace(/\/index$/, '')
+// 审阅印章校验码：与 PostCard 的 CRC 同算法、同种子（entry.id），两处读数一致
+let reviewHash = 0x7a3
+for (const c of String(entry.id)) reviewHash = ((reviewHash << 5) - reviewHash + c.charCodeAt(0)) & 0xffff
+const reviewCrc = reviewHash.toString(16).toUpperCase().padStart(4, '0')
 const siteOrigin = (Astro.site ?? new URL('https://example.com')).origin
 const ogImage = new URL(
   url(`/og/${entry.id.replace(/\/index$/, '').replaceAll('/', '-')}.png`),
@@ -189,6 +193,17 @@ const jsonLd = {
             <Markdown class="mb-6 markdown-content onload-animation rl-prose">
                 <Content />
             </Markdown>
+
+            <!-- 审阅印章 / REVIEW STAMP（/rhine/fx.js：读到此处盖章并写入本地调阅记录） -->
+            <div class="rl-review" data-rl-review data-pagefind-ignore aria-hidden="true">
+                <p class="rl-review__note" data-rl-review-note>READ TO THE END TO FILE THIS DOSSIER / 读至此处即归档</p>
+                <div class="rl-review__stamp">
+                    <span class="rl-review__org">RHINE LAB · 莱茵生命</span>
+                    <b class="rl-review__word">已审阅</b>
+                    <span class="rl-review__date" data-rl-review-date>REVIEWED · ----.--.--</span>
+                    <span class="rl-review__sig">OBSERVER-07 · CRC {reviewCrc}</span>
+                </div>
+            </div>
 
             {licenseConfig.enable && <License title={entry.data.title} pubDate={entry.data.published} class="rl-license mb-6 rounded-xl license-container onload-animation" data-pagefind-ignore></License>}
 

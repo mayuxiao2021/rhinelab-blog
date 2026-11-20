@@ -10,6 +10,7 @@
 | `public/rhine/favicon.svg` | 32–64px 图标 | 同上 |
 | `public/rhine/avatar.svg` | 抽象观测者头像（无面部特征、不指向任何角色） | 手写 SVG，原创 |
 | `src/styles/rhinelab.css` 内联 SVG | 背景准星阵列、封面扫描环水印、代码块装饰 | 手写 SVG data URI |
+| `public/rhine/ui.js`、`public/rhine/fx.js` | 快捷键、复制增强、诊断终端、双螺旋/显微透镜/收容失效演习/审阅印章交互脚本 | 原创 vanilla JS |
 | `src/components/rhine/*.astro` | 徽标组件、首页封面 | 原创代码 |
 
 > 这些图形只借鉴"档案/仪器"的通用视觉语言（圆环、刻度、细线、方点），**不复制**任何官方徽标、角色或宣传图。
@@ -73,19 +74,20 @@
 
 ## 3.1 演示站立绘素材（非商业同人演示）
 
-v0.4.0 的演示站（首页 + `/operators/`）额外包含以下 16 个 WebP 文件（8 位干员 × 立绘/档案图），
-全部来自公开素材归档 [Aceship/Arknight-Images](https://github.com/Aceship/Arknight-Images)：
+v0.4.0–v0.9.0 的演示站（首页 + `/operators/` + 全局仪表面板）额外包含以下 17 个非商业素材文件（8 位干员 × 立绘/档案图 + 阵营徽记遮罩），
+全部来自公开素材归档 [Aceship/Arknight-Images](https://github.com/Aceship/Arknight-Images) 与 PRTS Wiki：
 
 | 文件 | 干员 | 来源 | 权利方 | 使用范围 |
 | --- | --- | --- | --- | --- |
 | `art-*.webp`（8 张，1400px 内） | 塞雷娅 / 赫默 / 伊芙利特 / 白面鸮 / 梅尔 / 麦哲伦 / 多萝西 / 缪尔赛思 | `characters/<id>_2.png` | 鹰角网络（Hypergryph） | 仅非商业同人演示 |
 | `card-*.webp`（8 张，700px） | 同上 | `characters/<id>_1.png` | 鹰角网络（Hypergryph） | 仅非商业同人演示 |
+| `rhine-mark.png`（453×257 RGBA） | 莱茵生命阵营徽记（白底透明遮罩） | PRTS Wiki `Logo_莱茵生命.png` | 鹰角网络（Hypergryph） | 仅非商业同人演示 |
 
 说明：
 
 - 这些文件**不属于**本项目的 MIT 代码许可；版权与角色相关权利归鹰角网络所有，本站为**非官方、非营利**同人演示，不构成授权或合作。
 - 若你要商用、公开发布模板或二次分发，请**删除 / 回退**：
-  1. `public/rhine/art/`（16 张演示立绘）；
+  1. `public/rhine/art/`（17 个演示素材）；
   2. `src/data/operators.ts`、`src/pages/operators.astro`；
   3. `src/config.ts` 中导航「研究员」入口；
   4. `src/pages/[...page].astro` 中 `rl-org` / `rl-field` / `rl-teaser` / `rl-banner` 四段演示区块；

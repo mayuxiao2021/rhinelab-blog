@@ -19,7 +19,38 @@ const dateLabel = fmt.format(latest).replaceAll('/', '.')
 const pad = (n: number) => String(n).padStart(2, '0')
 ---
 
-<section class="rhine-hero rhine-hero--demo" aria-labelledby="rhine-hero-title">
+<section class="rhine-hero rhine-hero--demo" aria-labelledby="rhine-hero-title" data-rl-lens>
+  <!-- 活体双螺旋样本柱（/rhine/fx.js 驱动；无 JS 时保持透明不占位） -->
+  <canvas class="rhine-hero__dna" data-rl-helix aria-hidden="true"></canvas>
+
+  <!-- 显微透镜：指针所在处揭示蓝图网格与隐藏批注 -->
+  <div class="rhine-hero__lens" aria-hidden="true">
+    <span class="rhine-hero__xray" style="top: 14%; left: 6%">◆ SUBJECT // ARCHIVE-07 · 观测者手记已加密</span>
+    <span class="rhine-hero__xray" style="top: 9%; left: 42%">CLASSIFIED // RL-Ω-03</span>
+    <span class="rhine-hero__xray" style="top: 30%; left: 63%">SPECIMEN · SARIA / 钙质化指数 0.71</span>
+    <span class="rhine-hero__xray" style="top: 47%; left: 34%">INCIDENT LOG 1097-B ███████ [REDACTED]</span>
+    <span class="rhine-hero__xray" style="top: 63%; left: 72%">SPECIMEN · MUELSYSE / 水体同步率 93%</span>
+    <span class="rhine-hero__xray" style="top: 76%; left: 8%">ORIGINIUM RESONANCE ▲ 0.82 Hz · STABLE</span>
+    <span class="rhine-hero__xray" style="top: 84%; left: 48%">HINT // 在任意页面键入 IFRIT ……请先确认灭火器位置</span>
+  </div>
+  <span class="rhine-hero__lens-ring" aria-hidden="true"></span>
+  <span class="rhine-hero__lens-read" data-rl-lens-read aria-hidden="true">X 0000 · Y 0000 · MAG ×40</span>
+
+  <svg
+    class="rhine-hero__helix"
+    viewBox="0 0 120 96"
+    aria-hidden="true"
+    fill="none"
+  >
+    <path d="M8 20 C34 20, 46 76, 72 76 C94 76, 104 34, 114 24" />
+    <path d="M8 76 C34 76, 46 20, 72 20 C94 20, 104 62, 114 72" />
+    <line x1="22" y1="29" x2="22" y2="67" />
+    <line x1="40" y1="48" x2="40" y2="48" />
+    <line x1="58" y1="29" x2="58" y2="67" />
+    <line x1="86" y1="30" x2="86" y2="66" />
+    <line x1="102" y1="35" x2="102" y2="61" />
+  </svg>
+
   <div class="rhine-hero__scan" aria-hidden="true"></div>
   <div class="rhine-hero__ticks" aria-hidden="true">
     <i></i><i></i><i></i><i></i>
@@ -58,6 +89,19 @@ const pad = (n: number) => String(n).padStart(2, '0')
   </div>
 
   <div class="rhine-hero__content">
+    <div class="rhine-hero__plate" aria-hidden="true">
+      <span
+        class="rhine-hero__emblem"
+        style={`--rl-faction-mark: url('${url('/rhine/art/rhine-mark.png')}')`}
+      ></span>
+      <div class="rhine-hero__brand-copy">
+        <strong>RHINE LAB</strong>
+        <span>SYNTHESIZE INFORMATION</span>
+        <span>ANALYSIS OSCILLATION</span>
+      </div>
+      <span class="rhine-hero__index">01 / 08<small>ARCHIVE</small></span>
+    </div>
+
     <p class="rhine-hero__kicker">
       <RhineMark class="rhine-hero__mark" size={18} />
       莱茵生命 · 同人档案风格 <b>UNOFFICIAL</b>
@@ -107,6 +151,16 @@ const pad = (n: number) => String(n).padStart(2, '0')
         <span>STATUS / 状态</span>
         <b class="rl-live">OPERATIONAL</b>
       </div>
+    </div>
+
+    <div class="rhine-hero__calibration" aria-hidden="true">
+      <span class="rl-swatch">
+        <i style="background: var(--rl-bg)"></i>
+        <i style="background: var(--rl-amber)"></i>
+        <i style="background: var(--rl-signal)"></i>
+        <i style="background: var(--rl-verd)"></i>
+      </span>
+      <span class="rhine-hero__motto">POWERED BY RHINE LAB // SESSION AUTHORIZED</span>
     </div>
   </div>
 

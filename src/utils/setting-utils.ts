@@ -46,9 +46,16 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {
 
 export function setTheme(theme: LIGHT_DARK_MODE): void {
   localStorage.setItem('theme', theme)
+  if (theme === LIGHT_MODE || theme === DARK_MODE) {
+    localStorage.setItem('rhine-theme', theme)
+  }
   applyThemeToDocument(theme)
 }
 
 export function getStoredTheme(): LIGHT_DARK_MODE {
-  return (localStorage.getItem('theme') as LIGHT_DARK_MODE) || DEFAULT_THEME
+  return (
+    (localStorage.getItem('theme') as LIGHT_DARK_MODE) ||
+    (localStorage.getItem('rhine-theme') as LIGHT_DARK_MODE) ||
+    DEFAULT_THEME
+  )
 }

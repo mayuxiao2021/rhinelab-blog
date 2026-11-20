@@ -29,6 +29,7 @@ const EXCLUDE_DIRS = new Set([
   '.tmp-pkgtest',
   '.vscode',
   '.idea',
+  'promo',
 ])
 
 const EXCLUDE_FILES = [/\.log$/, /\.zip$/, /^\.env(\..*)?$/, /^Thumbs\.db$/, /^\.DS_Store$/]

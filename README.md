@@ -161,7 +161,7 @@
 | --- | --- | --- |
 | ![404](docs/screenshots/404.webp) | ![隐私与数据](docs/screenshots/privacy.webp) | ![版本徽章](docs/screenshots/version-badge.webp) |
 
-> 截图来自 v0.8.1 真实构建产物，无后期合成。
+> 截图来自 v0.10.0 真实构建产物，无后期合成。
 
 ## 它是什么
 
@@ -296,6 +296,9 @@ theme/                # 可移植主题包 + 安装器（见 theme/README.md）
 - [x] 统计页编目热力图（最近 365 天，5 级色阶 + 月份标签）
 - [x] `prefers-contrast: more` 与 `forced-colors: active` 适配
 - [x] `prefers-reduced-motion` 全量降级、键盘焦点可见、skip link、h1 语义、辅助色 AA
+- [x] 交互式科室控制台 + 核心卷宗展柜 + 卡片 `CRC` 校验/阅读负荷条/审阅登记（v0.9.0–v0.10.0）
+- [x] 研究员交互式卷宗弹窗（`#rl-dossier-modal`、`[REDACTED]` 点击显影、搜索框 `RL-01..08` 直达）
+- [x] 莱茵仪器 HUD 与渐进特效：活体双螺旋 Canvas、显微透镜批注、文字解密、`ifrit` 收容失效演习（v0.10.0）
 
 ## 部署拓扑（GitHub Pages）
 
@@ -359,9 +362,9 @@ node theme/selftest.mjs                                   # 安装器自测
 
 本项目以「每轮迭代至少修一个严重 bug 或加一个创新点」的方式持续开发：
 
-- 当前版本 **v0.8.1**（`package.json`）
-- 已完成：设计系统、首页档案封面、`X-001` 编号、Mermaid 档案配色、主题安装器、文章目录 + 刻度进度轨、亮/暗/移动端验收
-- 下一轮：Astro 6 markdown 管线迁移、a11y 审计、体积优化
+- 当前版本 **v0.10.0**（`package.json`）
+- 已完成：莱茵设计系统、仪器级视觉外框、交互式科室控制台与研究员卷宗、诊断终端与 `ifrit` 收容失效演习、显微透镜与活体双螺旋、`CHECK`/18 步门禁与发布校验全绿
+- 下一轮候选：CI/真机回归补充新交互截图、外部阅读器实测、Portal 自动同步
 - 每一轮的问题、根因、修复与验证证据在 [ITERATIONS.md](ITERATIONS.md)；续跑状态在 [STATE.md](STATE.md)。
 
-> `pnpm check` 已 **0 errors**（63 files），`pnpm build` 通过，`release/` 内为可独立构建的版本化 zip。
+> `pnpm check` 已 **0 errors**，`pnpm verify` 18 步全绿，`release/` 内为可独立构建的版本化 zip。

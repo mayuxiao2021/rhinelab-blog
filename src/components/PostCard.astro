@@ -29,15 +29,30 @@ const coverWidth = '28%'
 const fileNo = `X-${String(index ?? 1).padStart(3, '0')}`
 
 const { remarkPluginFrontmatter } = await render(entry)
+const words = Number(remarkPluginFrontmatter.words ?? 0)
+const minutes = Number(remarkPluginFrontmatter.minutes ?? 1)
+const meterPct = Math.min(100, Math.max(14, minutes * 8))
+
+// 生成确定性 4 位十六进制档案校验码
+const slugSeed = String(entry?.id ?? title)
+let hashNum = 0x7a3
+for (let i = 0; i < slugSeed.length; i++) {
+  hashNum = ((hashNum << 5) - hashNum + slugSeed.charCodeAt(i)) & 0xffff
+}
+const digestHex = hashNum.toString(16).toUpperCase().padStart(4, '0')
+const isSecurity = category === '安全研究'
+const clearance = isSecurity ? 'LV.3 // AUDIT' : 'LV.2 // OPEN'
 ---
 
 <div
   class:list={[
     'rl-card card-base flex flex-col-reverse md:flex-col w-full overflow-hidden relative',
+    { 'rl-card--security': isSecurity },
     className,
   ]}
   style={style}
 >
+  <span class="rl-card__scan" aria-hidden="true"></span>
   <div
     class:list={[
       'rl-card__body relative',
@@ -49,7 +64,12 @@ const { remarkPluginFrontmatter } = await render(entry)
   >
     <div class="rl-card__head">
       <span class="rl-card__idx">FILE / 档案 · {fileNo}</span>
-      <span class="rl-card__class">{category || 'UNCLASSIFIED'}</span>
+      <span class="rl-card__stamp">
+        <span class="rl-card__read" hidden>已调阅 · READ</span>
+        <span class="rl-card__clearance">{clearance}</span>
+        <span class="rl-card__hash">CRC·{digestHex}</span>
+        <span class="rl-card__class">{category || 'UNCLASSIFIED'}</span>
+      </span>
     </div>
 
     <a href={url} class="rl-card__title group">
@@ -72,10 +92,16 @@ const { remarkPluginFrontmatter } = await render(entry)
     <div class="rl-card__desc">{description}</div>
 
     <div class="rl-card__foot">
-      <span>{remarkPluginFrontmatter.words} WORDS / 字</span>
+      <span>{words.toLocaleString('en-US')} WORDS / 字</span>
       <i>/</i>
-      <span>{remarkPluginFrontmatter.minutes} MIN / 分钟</span>
-      <span class="ml-auto">ACCESS →</span>
+      <span>{minutes} MIN / 分钟</span>
+      <span class="rl-card__meter" aria-hidden="true" title={`阅读负荷 ${minutes} 分钟`}>
+        <b style={`width: ${meterPct}%`} />
+      </span>
+      {entry.data?.series && (
+        <span class="rl-card__series-tag">SERIES · {entry.data.series}</span>
+      )}
+      <span class="ml-auto rl-card__access">ACCESS →</span>
     </div>
   </div>
 

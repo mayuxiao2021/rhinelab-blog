@@ -244,16 +244,15 @@ function formatTag(tag: string[]) {
 </script>
 
 <style>
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer components {
-        .dash-line {
-        }
-        .dash-line::before {
-            content: "";
-            @apply w-[10%] h-full absolute -top-1/2 left-[calc(50%_-_1px)] -top-[50%] border-l-[2px]
-            border-dashed pointer-events-none border-[var(--line-color)] transition
-        }
+    .dash-line::before {
+        content: "";
+        width: 10%;
+        height: 100%;
+        position: absolute;
+        top: -50%;
+        left: calc(50% - 1px);
+        border-left: 2px dashed var(--line-color);
+        pointer-events: none;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
 </style>

@@ -5,6 +5,8 @@ description: 'Read more about Markdown features in Fuwari'
 image: ''
 tags: [Demo, Example, Markdown, Fuwari]
 category: 'Examples'
+series: Fuwari 模板与排版指南
+seriesOrder: 3
 draft: false 
 ---
 

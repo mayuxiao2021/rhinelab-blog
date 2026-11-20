@@ -76,9 +76,11 @@ function switchTheme() {
     if (localStorage.theme === 'dark') {
         document.documentElement.classList.remove('dark');
         localStorage.theme = 'light';
+        localStorage.setItem('rhine-theme', 'light');
     } else {
         document.documentElement.classList.add('dark');
         localStorage.theme = 'dark';
+        localStorage.setItem('rhine-theme', 'dark');
     }
 }
 

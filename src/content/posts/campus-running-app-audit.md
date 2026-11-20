@@ -4,6 +4,8 @@ published: 2026-10-31
 description: 一次完整的移动端安全审计实践——国密 SM2/SM4 协议逆向、客户端反作弊架构剖析、生产包日志泄露，以及静态分析与动态验证的差异复盘。
 tags: [Android, 逆向, 安全审计, 国密, 隐私]
 category: 安全研究
+series: 安卓客户端安全研究
+seriesOrder: 2
 draft: false
 ---
 

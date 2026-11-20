@@ -4,6 +4,8 @@ published: 2023-08-01
 description: This post demonstrates how to include embedded video in a blog post.
 tags: [Example, Video]
 category: Examples
+series: Fuwari 模板与排版指南
+seriesOrder: 4
 draft: false
 ---
 
